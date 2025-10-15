@@ -2,10 +2,13 @@
 body {
     font-family: 'Be Vietnam Pro', sans-serif;
 }
+
 /* Hiệu ứng mượt mà cho các phần tử */
 .smooth-transition {
     transition: all 0.3s ease-in-out;
 }
+
+/* Thanh tìm kiếm*/
 .search {
     flex: 1;
     display: flex;
@@ -35,6 +38,20 @@ body {
     color: #111;
     cursor: pointer;
 }
+
+/* Thẻ sản phẩm */
+.product-card {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+.product-card:hover img {
+  transform: scale(1.08);
+}
+
+/* Giỏ hàng */
 .cart {
     position: relative;
     font-size: 22px;
