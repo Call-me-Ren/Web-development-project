@@ -32,22 +32,23 @@
                 <a href="#contact" class="text-gray-600 hover:text-indigo-600 smooth-transition">Liên Hệ</a>
                 <!-- Thanh tìm kiếm-->
                 <div class="search">
-                 <input 
-                    type="search" 
-                    placeholder="Tìm kiếm..." 
-                    aria-label="Tìm kiếm"
-                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600 hover:text-indigo-600 smooth-transition"/>
+                    <input
+                    type="search"
+                    id="search"
+                    placeholder="Tìm kiếm..."
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600"
+                />
+
                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" style = "right: calc(20px); cursor: pointer; ">
                     <i data-lucide="search"></i>
                 </span></div>
-                <!-- Nút Đăng nhập -->
+                <!-- Nút Chuyển đổi VI|EN -->
                 <div class="actions flex items-center gap-6" >
                     <button class="text-gray-600 hover:text-indigo-600 smooth-transition btn">VI | EN</button>
-                <button class="text-gray-600 hover:text-indigo-600 smooth-transition btn">Đăng nhập/Đăng ký</button>
                 </div>
             </div>
             <!-- Icon thêm vào giỏ hàng-->
-            <div class="flex items-center space-x-4">
+            <div class="actions flex items-center gap-6">
             <button class="relative text-gray-600 hover:text-indigo-600 focus:outline-none">
                 <i class="fa-solid fa-cart-plus text-2xl"></i>
                 <span id="cart-count"
@@ -58,6 +59,25 @@
                  <button class="md:hidden text-gray-600 hover:text-indigo-600 focus:outline-none">
                     <i data-lucide="menu"></i>
                 </button>
+            </div>
+
+            <!-- Nút Đăng nhập -->
+            <div class="actions flex items-center gap-6" >
+            <button id="login-btn" class="text-gray-600 hover:text-indigo-600 smooth-transition btn">Đăng nhập</button>
+            </div>
+            <!-- Nút avatar-->
+            <div id="user-avatar" class="hidden relative items-center gap-3 cursor-pointer">
+            <button>
+                <img src="https://i.pravatar.cc/40"
+                alt="Avatar"
+                class="w-10 h-10 rounded-full border-2 border-indigo-500"
+                />
+            </button>
+            <!--Menu đăng nhập-->
+            <div id="user-menu" class="hidden absolute right-0 top-12 bg-white shadow-lg rounded-lg py-2 w-40">
+                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Thông tin cá nhân</a>
+                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Đăng xuất</a>
+            </div>
             </div>
         </nav>
     </header>
@@ -81,10 +101,32 @@
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-2">Sản Phẩm Nổi Bật</h2>
                 <p class="text-center text-gray-600 mb-12">Những mẫu đồng hồ được yêu thích nhất tại WatchTime</p>
-                
+
+
+        <!-- Bộ lọc -->
+        <!-- Bộ lọc nâng cao -->
+<div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-10">
+    <!-- Lọc theo loại -->
+    <select id="filter-category" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
+        <option value="all">Tất cả</option>
+        <option value="nam">Đồng hồ Nam</option>
+        <option value="nu">Đồng hồ Nữ</option>
+        <option value="doi">Đồng hồ Đôi</option>
+    </select>
+    <!-- Lọc theo giá -->
+    <select id="filter-price" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
+        <option value="all">Tất cả giá</option>
+        <option value="5">Dưới 5 triệu</option>
+        <option value="10">Dưới 10 triệu</option>
+        <option value="15">Dưới 15 triệu</option>
+        <option value="20">Dưới 20 triệu</option>
+        <option value="over20">Trên 20 triệu</option>
+    </select>
+</div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     <!-- Product Card 1 -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                    <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="nam">
                         <div class="relative overflow-hidden">
                            <img src="https://images.unsplash.com/photo-1620625515032-6ed0a1790474?q=80&w=1887&auto=format&fit=crop" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
                            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
@@ -92,14 +134,14 @@
                            </div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-semibold mb-2">Rolex Submariner</h3>
+                            <h3 class="text-xl font-semibold mb-2" data-name = "Rolex Submariner">Rolex Submariner</h3>
                             <p class="text-gray-600 mb-4">Biểu tượng của sự sang trọng và đẳng cấp.</p>
                             <p class="text-2xl font-bold text-indigo-600">450.000.000 VNĐ</p>
                         </div>
                     </div>
 
                     <!-- Product Card 2 -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                    <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="nu">
                          <div class="relative overflow-hidden">
                             <img src="https://images.unsplash.com/photo-1614703418052-d5b8b191636b?q=80&w=1887&auto=format&fit=crop" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
                             <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
@@ -107,14 +149,14 @@
                            </div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-semibold mb-2">Omega Seamaster</h3>
+                            <h3 class="text-xl font-semibold mb-2" data-name = "Omega Seamaster">Omega Seamaster</h3>
                             <p class="text-gray-600 mb-4">Sự lựa chọn của điệp viên James Bond.</p>
                             <p class="text-2xl font-bold text-indigo-600">180.000.000 VNĐ</p>
                         </div>
                     </div>
 
                     <!-- Product Card 3 -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                    <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="nam">
                         <div class="relative overflow-hidden">
                             <img src="https://images.unsplash.com/photo-1587836374828-e6539f563cca?q=80&w=1887&auto=format&fit=crop" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
                             <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
@@ -122,14 +164,14 @@
                            </div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-semibold mb-2">Seiko 5 Sport</h3>
+                            <h3 class="text-xl font-semibold mb-2" data-name = "Seiko 5 Sport">Seiko 5 Sport</h3>
                             <p class="text-gray-600 mb-4">Chất lượng Nhật Bản, bền bỉ với thời gian.</p>
                             <p class="text-2xl font-bold text-indigo-600">8.500.000 VNĐ</p>
                         </div>
                     </div>
 
                     <!-- Product Card 4 -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                    <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="doi">
                          <div class="relative overflow-hidden">
                             <img src="https://images.unsplash.com/photo-1609581125239-d3527b686134?q=80&w=1887&auto=format&fit=crop" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
                              <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
@@ -137,7 +179,7 @@
                            </div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-semibold mb-2">Casio G-Shock</h3>
+                            <h3 class="text-xl font-semibold mb-2" data-name = "Casio G-Shock">Casio G-Shock</h3>
                             <p class="text-gray-600 mb-4">Thiết kế hầm hố, chống va đập tuyệt đối.</p>
                             <p class="text-2xl font-bold text-indigo-600">4.200.000 VNĐ</p>
                         </div>
