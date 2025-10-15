@@ -11,14 +11,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- File CSS tùy chỉnh (ĐÃ SỬA ĐƯỜNG DẪN) -->
+    <!-- File CSS tùy chỉnh -->
     <link rel="stylesheet" href="css/Giaodien.css" />
     <!-- Tích hợp icon Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <!-- Phần Header và Navigation (Đã sửa lại cấu trúc) -->
+    <!-- Phần Header và Navigation -->
     <header class="bg-white shadow-md sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-4 flex items-center justify-between gap-4">
             <!-- 1. Logo -->
@@ -26,7 +26,7 @@
                 Watch<span class="text-indigo-600">Time</span>
             </a>
 
-            <!-- 2. Menu chính (Tự động ẩn trên mobile) -->
+            <!-- 2. Menu chính -->
             <div class="hidden md:flex items-center gap-8">
                 <a href="#home" class="text-gray-600 hover:text-indigo-600 smooth-transition">Trang Chủ</a>
                 <a href="#products" class="text-gray-600 hover:text-indigo-600 smooth-transition">Sản Phẩm</a>
@@ -34,7 +34,7 @@
                 <a href="#contact" class="text-gray-600 hover:text-indigo-600 smooth-transition">Liên Hệ</a>
             </div>
 
-            <!-- 3. Cụm Hành Động (Tìm kiếm, Giỏ hàng, Đăng nhập, Đăng ký) -->
+            <!-- 3. Cụm Hành Động -->
             <div class="flex items-center justify-end gap-4 md:gap-5">
                 <!-- Thanh tìm kiếm -->
                 <div class="relative hidden sm:block">
@@ -61,7 +61,7 @@
                 <!-- Nút Đăng nhập -->
                 <button id="login-btn" class="text-gray-600 hover:text-indigo-600 smooth-transition btn hidden sm:block">Đăng nhập</button>
                 
-                <!-- Nút Đăng ký (MỚI) -->
+                <!-- Nút Đăng ký -->
                 <button id="signup-btn" class="bg-indigo-600 text-white hover:bg-indigo-700 smooth-transition btn hidden sm:block border-indigo-600">Đăng ký</button>
 
                 <!-- Nút avatar -->
@@ -98,7 +98,7 @@
             </div>
         </section>
 
-        <!-- Products Section -->
+        <!-- Products Section (ĐÃ CẬP NHẬT ẢNH) -->
         <section id="products" class="py-16">
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-2">Sản Phẩm Nổi Bật</h2>
@@ -122,63 +122,77 @@
                     </select>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
                     <!-- Product Card 1 -->
                     <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="nam">
                         <div class="relative overflow-hidden">
-                           <img src="https://images.unsplash.com/photo-1620625515032-6ed0a1790474?q=80&w=1887&auto=format&fit=crop" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
+                           <img src="images/Ben10.webp" alt="Đồng hồ Ben 10" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
                            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
                                <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
                            </div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-semibold mb-2" data-name = "Rolex Submariner">Rolex Submariner</h3>
-                            <p class="text-gray-600 mb-4">Biểu tượng của sự sang trọng và đẳng cấp.</p>
-                            <p class="text-2xl font-bold text-indigo-600">450.000.000 VNĐ</p>
+                            <h3 class="text-xl font-semibold mb-2" data-name = "Đồng hồ Ben 10">Đồng hồ Ben 10</h3>
+                            <p class="text-gray-600 mb-4">Biểu tượng của tuổi thơ.</p>
+                            <p class="text-2xl font-bold text-indigo-600">500.000 VNĐ</p>
                         </div>
                     </div>
                     <!-- Product Card 2 -->
                     <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="nu">
                          <div class="relative overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1614703418052-d5b8b191636b?q=80&w=1887&auto=format&fit=crop" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
+                            <img src="images/conan.jpg" alt="Đồng hồ Conan" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
                             <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
                                <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
                            </div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-semibold mb-2" data-name = "Omega Seamaster">Omega Seamaster</h3>
-                            <p class="text-gray-600 mb-4">Sự lựa chọn của điệp viên James Bond.</p>
-                            <p class="text-2xl font-bold text-indigo-600">180.000.000 VNĐ</p>
+                            <h3 class="text-xl font-semibold mb-2" data-name = "Đồng hồ Conan">Đồng hồ Conan</h3>
+                            <p class="text-gray-600 mb-4">Gây mê và bắn kim.</p>
+                            <p class="text-2xl font-bold text-indigo-600">1.800.000 VNĐ</p>
                         </div>
                     </div>
                     <!-- Product Card 3 -->
                     <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="nam">
                         <div class="relative overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1587836374828-e6539f563cca?q=80&w=1887&auto=format&fit=crop" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
+                            <img src="images/doraemon.jpg" alt="Đồng hồ Doraemon" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
                             <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
                                <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
                            </div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-semibold mb-2" data-name = "Seiko 5 Sport">Seiko 5 Sport</h3>
-                            <p class="text-gray-600 mb-4">Chất lượng Nhật Bản, bền bỉ với thời gian.</p>
-                            <p class="text-2xl font-bold text-indigo-600">8.500.000 VNĐ</p>
+                            <h3 class="text-xl font-semibold mb-2" data-name = "Đồng hồ Doraemon">Đồng hồ Doraemon</h3>
+                            <p class="text-gray-600 mb-4">Thiết kế dễ thương, bền bỉ.</p>
+                            <p class="text-2xl font-bold text-indigo-600">850.000 VNĐ</p>
                         </div>
                     </div>
                     <!-- Product Card 4 -->
                     <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="doi">
                          <div class="relative overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1609581125239-d3527b686134?q=80&w=1887&auto=format&fit=crop" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
+                            <img src="images/OIP.webp" alt="Đồng hồ OIP" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
                              <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
                                <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
                            </div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-semibold mb-2" data-name = "Casio G-Shock">Casio G-Shock</h3>
-                            <p class="text-gray-600 mb-4">Thiết kế hầm hố, chống va đập tuyệt đối.</p>
+                            <h3 class="text-xl font-semibold mb-2" data-name = "Đồng hồ OIP">Đồng hồ OIP</h3>
+                            <p class="text-gray-600 mb-4">Phong cách hiện đại.</p>
                             <p class="text-2xl font-bold text-indigo-600">4.200.000 VNĐ</p>
                         </div>
                     </div>
+                    <!-- Product Card 5 (Mới thêm) -->
+                    <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="doi">
+                        <div class="relative overflow-hidden">
+                           <img src="images/Time city.webp" alt="Đồng hồ Time City" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
+                            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
+                              <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
+                          </div>
+                       </div>
+                       <div class="p-6">
+                           <h3 class="text-xl font-semibold mb-2" data-name = "Đồng hồ Time City">Đồng hồ Time City</h3>
+                           <p class="text-gray-600 mb-4">Đẳng cấp và sang trọng.</p>
+                           <p class="text-2xl font-bold text-indigo-600">12.500.000 VNĐ</p>
+                       </div>
+                   </div>
                 </div>
             </div>
         </section>
@@ -243,7 +257,7 @@
             </div>
         </div>
     </footer>
-    <!-- Script JS (ĐÃ SỬA ĐƯỜNG DẪN) -->
+    <!-- Script JS -->
     <script src="js/Giaodien.js"></script>
 </body>
 </html>
