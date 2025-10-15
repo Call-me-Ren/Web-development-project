@@ -59,115 +59,145 @@ const products = document.querySelectorAll('.product-card');
 
 // Lắng nghe khi người dùng gõ
 searchInput.addEventListener('input', () => {
-  const searchTerm = searchInput.value.toLowerCase().trim();
+    const searchTerm = searchInput.value.toLowerCase().trim();
 
-  products.forEach(product => {
+    products.forEach(product => {
     const name = product.querySelector('[data-name]').dataset.name.toLowerCase();
 
     // Kiểm tra có chứa từ khóa hay không
     if (name.includes(searchTerm)) {
-      product.style.display = 'block';
+        product.style.display = 'block';
     } else {
-      product.style.display = 'none';
+        product.style.display = 'none';
     }
-  });
+    });
 });
 
-// Đăng nhập
+// 🎯 Quản lý đăng nhập / avatar / đăng xuất
 document.addEventListener("DOMContentLoaded", function () {
-  const loginBtn = document.getElementById("login-btn");
-  const userAvatar = document.getElementById("user-avatar");
-
-  // Giả lập đăng nhập
-  loginBtn.addEventListener("click", function () {
-    // Ẩn nút đăng nhập
-    loginBtn.classList.add("hidden");
-
-    // Hiện avatar người dùng
-    userAvatar.classList.remove("hidden");
-    userAvatar.classList.add("flex");
-
-    // Sau này, nếu có thông tin người dùng thực
-    // bạn có thể thay ảnh động:
-    // userAvatar.querySelector("img").src = userInfo.avatarUrl;
-  });
-});
-
-// Hiển thị menu người dùng khi click vào avatar
-document.addEventListener("DOMContentLoaded", function () {
-  const loginBtn = document.getElementById("login-btn");
+  const loginLink = document.querySelector('a[href="dangnhap.html"]');
   const userAvatar = document.getElementById("user-avatar");
   const userMenu = document.getElementById("user-menu");
+  const logoutBtn = userMenu.querySelector("a:last-child");
+  const infoBtn = userMenu.querySelector("a:first-child");
 
-  // Khi bấm Đăng nhập → ẩn nút, hiện avatar
-  loginBtn.addEventListener("click", function () {
-    loginBtn.classList.add("hidden");
-    userAvatar.classList.remove("hidden");
-    userAvatar.classList.add("flex");
-  });
+  // Kiểm tra trạng thái đăng nhập
+  let isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
-  // Khi bấm vào avatar → bật/tắt menu
-  userAvatar.addEventListener("click", function () {
+  function updateLoginUI() {
+    if (isLoggedIn) {
+      loginLink.classList.add("hidden");
+      userAvatar.classList.remove("hidden");
+      userAvatar.classList.add("flex");
+    } else {
+      loginLink.classList.remove("hidden");
+      userAvatar.classList.add("hidden");
+      localStorage.removeItem("isLoggedIn");
+    }
+  }
+
+  updateLoginUI();
+
+  // Khi đăng nhập từ trang khác quay lại
+  if (window.location.href.includes("dangnhap.html")) {
+    localStorage.setItem("isLoggedIn", "true");
+    isLoggedIn = true;
+    updateLoginUI();
+  }
+
+  // Khi bấm avatar -> mở menu
+  userAvatar.addEventListener("click", function (e) {
+    e.stopPropagation();
     userMenu.classList.toggle("hidden");
   });
 
-  // Khi bấm ra ngoài → ẩn menu
+  // Khi click ra ngoài -> đóng menu
   document.addEventListener("click", function (e) {
-    if (!userAvatar.contains(e.target)) {
+    if (!userAvatar.contains(e.target) && !userMenu.contains(e.target)) {
       userMenu.classList.add("hidden");
     }
   });
+
+  // Khi click "Đăng xuất"
+  logoutBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    localStorage.removeItem("isLoggedIn");
+    isLoggedIn = false;
+    updateLoginUI();
+    userMenu.classList.add("hidden");
+    cartCount = 0;
+    const cartCountEl = document.getElementById("cart-count");
+  if (cartCountEl) {
+    cartCountEl.textContent = cartCount;
+  }
+  });
+
+  // Khi click "Thông tin cá nhân"
+  infoBtn.addEventListener("click", function () {
+    window.location.href = "xuathongtin.html";
+  });
 });
 
-let isLoggedIn = false;
+
+// --------------------------------------------------------------------
+// Giỏ hàng
 let cartCount = 0;
-
-// --- Đăng nhập ---
-const loginBtn = document.getElementById("login-btn");
-const userAvatar = document.getElementById("user-avatar");
-
-if (loginBtn) {
-    loginBtn.addEventListener("click", () => {
-    isLoggedIn = true;
-    loginBtn.classList.add("hidden");
-    userAvatar.classList.remove("hidden");
-    });
-}
-
-// --- Đăng xuất ---
-const logoutBtn = document.querySelector("#user-menu a:last-child");
-if (logoutBtn) {
-    logoutBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    isLoggedIn = false;
-    loginBtn.classList.remove("hidden");
-    userAvatar.classList.add("hidden");
-    cartCount = 0;
-    document.getElementById("cart-count").textContent = cartCount;
-    });
-}
-
-// --- Thêm vào giỏ hàng ---
 document.querySelectorAll(".add-to-cart").forEach((btn) => {
-    btn.addEventListener("click", function (e) {
+  btn.addEventListener("click", (e) => {
     e.preventDefault();
 
-    if (!isLoggedIn) {
-        alert("Bạn cần đăng nhập để mua hàng!");
-        return;
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+      alert("Bạn cần đăng nhập để mua hàng!");
+      return;
     }
 
-    // Nếu đã đăng nhập thì cho thêm sản phẩm
     cartCount++;
     const cartCountEl = document.getElementById("cart-count");
     cartCountEl.textContent = cartCount;
 
-   // Hiệu ứng phóng to nhỏ nhanh khi thêm
+    // Hiệu ứng nhỏ
     cartCountEl.style.transform = "scale(1.3)";
-    cartCountEl.style.transition = "transform 0.2s ease";
+    setTimeout(() => (cartCountEl.style.transform = "scale(1)"), 150);
+  });
+});
 
-    setTimeout(() => {
-    cartCountEl.style.transform = "scale(1)";
-    }, 150);
-    });
+
+// --------------------------------------------------------------------
+// Đa ngôn ngữ
+let currentLang = "vi";
+const langToggleBtn = document.querySelector(".btn");
+
+const translations = {
+  vi: {
+    Home: "Trang Chủ",
+    Products: "Sản Phẩm",
+    About: "Về Chúng Tôi",
+    Contact: "Liên Hệ",
+    "hero-title": "Bộ Sưu Tập Đồng Hồ Đẳng Cấp",
+    "hero-sub": "Khẳng định phong cách và vị thế của bạn với những chiếc đồng hồ tinh xảo nhất.",
+    explore: "Khám Phá Ngay",
+  },
+  en: {
+    Home: "Home",
+    Products: "Products",
+    About: "About Us",
+    Contact: "Contact",
+    "hero-title": "Luxury Watch Collection",
+    "hero-sub": "Define your style and status with the finest timepieces.",
+    explore: "Explore Now",
+  },
+};
+
+function updateLanguage() {
+  const lang = translations[currentLang];
+  document.querySelectorAll("[data-key]").forEach((el) => {
+    const key = el.getAttribute("data-key");
+    if (lang[key]) el.textContent = lang[key];
+  });
+}
+
+langToggleBtn.addEventListener("click", () => {
+  currentLang = currentLang === "vi" ? "en" : "vi";
+  langToggleBtn.textContent = currentLang === "vi" ? "VI" : "EN";
+  updateLanguage();
 });
