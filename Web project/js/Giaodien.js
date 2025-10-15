@@ -2,20 +2,6 @@
 // Tự động gọi hàm render icon của Lucide
     lucide.createIcons();
 
-// Thêm giỏ hàng
-    let count = 0;
-    const cartCount = document.getElementById("cart-count");
-    const addButtons = document.querySelectorAll(".add-to-cart");
-    addButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-        count++;
-        cartCount.textContent = count;
-        // hiệu ứng nhỏ khi thêm
-        cartCount.style.transform = "scale(1.3)";
-        setTimeout(() => cartCount.style.transform = "scale(1)", 150);
-     });
-});
-
 // Lọc sản phẩm
 function filterProducts() {
     const category = document.getElementById("filter-category").value;
@@ -133,3 +119,55 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+let isLoggedIn = false;
+let cartCount = 0;
+
+// --- Đăng nhập ---
+const loginBtn = document.getElementById("login-btn");
+const userAvatar = document.getElementById("user-avatar");
+
+if (loginBtn) {
+    loginBtn.addEventListener("click", () => {
+    isLoggedIn = true;
+    loginBtn.classList.add("hidden");
+    userAvatar.classList.remove("hidden");
+    });
+}
+
+// --- Đăng xuất ---
+const logoutBtn = document.querySelector("#user-menu a:last-child");
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    isLoggedIn = false;
+    loginBtn.classList.remove("hidden");
+    userAvatar.classList.add("hidden");
+    cartCount = 0;
+    document.getElementById("cart-count").textContent = cartCount;
+    });
+}
+
+// --- Thêm vào giỏ hàng ---
+document.querySelectorAll(".add-to-cart").forEach((btn) => {
+    btn.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    if (!isLoggedIn) {
+        alert("Bạn cần đăng nhập để mua hàng!");
+        return;
+    }
+
+    // Nếu đã đăng nhập thì cho thêm sản phẩm
+    cartCount++;
+    const cartCountEl = document.getElementById("cart-count");
+    cartCountEl.textContent = cartCount;
+
+   // Hiệu ứng phóng to nhỏ nhanh khi thêm
+    cartCountEl.style.transform = "scale(1.3)";
+    cartCountEl.style.transition = "transform 0.2s ease";
+
+    setTimeout(() => {
+    cartCountEl.style.transform = "scale(1)";
+    }, 150);
+    });
+});
