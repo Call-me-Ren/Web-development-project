@@ -79,7 +79,7 @@ document.getElementById("btnRegister").addEventListener("click", (e) => {
   // Kiểm tra email đã tồn tại
   if (localStorage.getItem(email)) {
     alert("Tài khoản này đã tồn tại, vui lòng đăng nhập!");
-    window.location.href = "dangnhap.html";
+    window.location.href = "dangnhap.html"; // Chuyển hướng đến dangnhap.html (cùng folder index/)
     return;
   }
 
@@ -97,5 +97,5 @@ document.getElementById("btnRegister").addEventListener("click", (e) => {
   localStorage.setItem(email, JSON.stringify(user));
 
   alert("Đăng ký thành công! Hãy đăng nhập nhé!");
-  window.location.href = "dangnhap.html";
+  window.location.href = "dangnhap.html"; // Chuyển hướng đến dangnhap.html (cùng folder index/)
 });

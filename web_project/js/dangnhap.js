@@ -38,7 +38,7 @@ $(document).ready(function () {
       localStorage.setItem("currentUser", JSON.stringify(user));
       localStorage.setItem("isLoggedIn", "true");
       alert("Đăng nhập thành công!");
-      window.location.href = "index/index.html"; // Chuyển hướng đến index/index.html
+      window.location.href = "index.html"; // Chuyển hướng đến index.html (cùng folder index/)
     } else {
       $("#form-login").prepend(
         '<p class="error-message">Sai mật khẩu! Vui lòng thử lại.</p>'
@@ -83,6 +83,6 @@ $(document).ready(function () {
     localStorage.setItem(username, JSON.stringify(user));
 
     alert("Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.");
-    window.location.href = "dangnhap.html";
+    window.location.href = "dangnhap.html"; // Trở lại trang đăng nhập (cùng folder index/)
   });
 });

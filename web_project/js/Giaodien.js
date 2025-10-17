@@ -75,7 +75,7 @@ searchInput.addEventListener('input', () => {
 // Quản lý đăng nhập / avatar / đăng xuất
 document.addEventListener("DOMContentLoaded", function () {
   // Cập nhật đường dẫn Đăng nhập trong index.html
-  const loginLink = document.querySelector('a[href="../dangnhap.html"]');
+  const loginLink = document.querySelector('a[href="dangnhap.html"]');
   const userAvatar = document.getElementById("user-avatar");
   const userMenu = document.getElementById("user-menu");
   const logoutBtn = userMenu.querySelector("a:last-child");
@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Khi click "Thông tin cá nhân"
   infoBtn.addEventListener("click", function () {
-    window.location.href = "../xuathongtin.html"; // Cập nhật đường dẫn
+    window.location.href = "xuathongtin.html"; // Cập nhật đường dẫn
   });
 });
 
