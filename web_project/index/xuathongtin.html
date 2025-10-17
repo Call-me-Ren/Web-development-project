@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thông tin cá nhân</title>
+    <link rel="stylesheet" href="css/Giaodien.css" />
+    <style>
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        font-family: sans-serif;
+      }
+      .hidden { display: none; }
+      select, input {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .c-birthday {
+        display: flex;
+        gap: 10px;
+      }
+      .c-birthday select {
+        flex: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Thông tin cá nhân</h1>
+
+      <div id="user-info" class="user-info"></div>
+
+      <div id="edit-form" class="hidden">
+        <label>Họ:</label>
+        <input type="text" id="edit-firstname" />
+
+        <label>Tên:</label>
+        <input type="text" id="edit-lastname" />
+
+        <label>Email:</label>
+        <input type="email" id="edit-email" disabled />
+
+        <label>Số điện thoại:</label>
+        <input type="text" id="edit-number" />
+
+        <label>Địa chỉ:</label>
+        <input type="text" id="edit-address" />
+
+        <label>Ngày sinh:</label>
+        <div class="c-birthday">
+          <div class="day">
+            <select id="day"><option value="">Ngày</option></select>
+          </div>
+          <div class="month">
+            <select id="month"><option value="">Tháng</option></select>
+          </div>
+          <div class="year">
+            <select id="year"><option value="">Năm</option></select>
+          </div>
+        </div>
+
+        <label>Giới tính:</label>
+        <select id="edit-gender">
+          <option value="Nam">Nam</option>
+          <option value="Nữ">Nữ</option>
+          <option value="Khác">Khác</option>
+        </select>
+
+        <button id="save-btn">Lưu thay đổi</button>
+        <button id="cancel-btn">Hủy</button>
+      </div>
+
+      <button id="edit-btn">Sửa thông tin</button>
+      <button id="back-btn">Quay lại</button>
+    </div>
+
+    <script>
+      // ==== DỮ LIỆU NGƯỜI DÙNG ====
+      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+      if (!currentUser) {
+        alert("Vui lòng đăng nhập để xem thông tin!");
+        window.location.href = "dangnhap.html";
+      }
+
+      let userData = JSON.parse(localStorage.getItem(currentUser.email));
+
+      const userInfoDiv = document.getElementById("user-info");
+      const editForm = document.getElementById("edit-form");
+      const editBtn = document.getElementById("edit-btn");
+      const saveBtn = document.getElementById("save-btn");
+      const cancelBtn = document.getElementById("cancel-btn");
+      const backBtn = document.getElementById("back-btn");
+
+      // ==== HIỂN THỊ THÔNG TIN ====
+      function renderUserInfo() {
+        userInfoDiv.innerHTML = `
+          <p><strong>Họ tên:</strong> ${userData.firstname} ${userData.lastname}</p>
+          <p><strong>Email:</strong> ${userData.email}</p>
+          <p><strong>Số điện thoại:</strong> ${userData.number}</p>
+          <p><strong>Địa chỉ:</strong> ${userData.address}</p>
+          <p><strong>Ngày sinh:</strong> ${userData.birthday}</p>
+          <p><strong>Giới tính:</strong> ${userData.gender}</p>
+        `;
+      }
+      renderUserInfo();
+
+      // ==== KHỞI TẠO DANH SÁCH NGÀY / THÁNG / NĂM ====
+      function initDateSelects() {
+        const daySelect = document.getElementById("day");
+        const monthSelect = document.getElementById("month");
+        const yearSelect = document.getElementById("year");
+
+        // Thêm ngày (1–31)
+        for (let d = 1; d <= 31; d++) {
+          const opt = document.createElement("option");
+          opt.value = d.toString().padStart(2, "0");
+          opt.textContent = d;
+          daySelect.appendChild(opt);
+        }
+
+        // Thêm tháng (1–12)
+        for (let m = 1; m <= 12; m++) {
+          const opt = document.createElement("option");
+          opt.value = m.toString().padStart(2, "0");
+          opt.textContent = m;
+          monthSelect.appendChild(opt);
+        }
+
+        // Thêm năm (1950–2025)
+        for (let y = 2025; y >= 1950; y--) {
+          const opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = y;
+          yearSelect.appendChild(opt);
+        }
+      }
+      initDateSelects();
+
+      // ==== KHI NHẤN "SỬA" ====
+      editBtn.addEventListener("click", () => {
+        userInfoDiv.classList.add("hidden");
+        editForm.classList.remove("hidden");
+        editBtn.classList.add("hidden");
+
+        document.getElementById("edit-firstname").value = userData.firstname || "";
+        document.getElementById("edit-lastname").value = userData.lastname || "";
+        document.getElementById("edit-email").value = userData.email || "";
+        document.getElementById("edit-number").value = userData.number || "";
+        document.getElementById("edit-address").value = userData.address || "";
+        document.getElementById("edit-gender").value = userData.gender || "Khác";
+
+        // Gán ngày sinh cũ (tách từ chuỗi "YYYY-MM-DD")
+        if (userData.birthday) {
+          // Lưu ý: Chuỗi ngày sinh trong dangky.js là "D/M/Y", không phải "Y-M-D". Cần sửa logic nếu muốn lưu "Y-M-D".
+          // Giả định ở đây ta đọc lại chuỗi D/M/Y và tách
+          const parts = userData.birthday.split('/');
+          if (parts.length === 3) {
+            document.getElementById("day").value = parts[0].padStart(2, '0') || "";
+            document.getElementById("month").value = parts[1].padStart(2, '0') || "";
+            document.getElementById("year").value = parts[2] || "";
+          }
+        }
+      });
+
+      // ==== KHI NHẤN "LƯU" ====
+      saveBtn.addEventListener("click", () => {
+        const day = document.getElementById("day").value;
+        const month = document.getElementById("month").value;
+        const year = document.getElementById("year").value;
+
+        // Định dạng ngày sinh giống như đăng ký (D/M/Y)
+        const birthday = (year && month && day) ? `${parseInt(day)}/${parseInt(month)}/${year}` : "";
+
+        // Kiểm tra thông tin trống cơ bản trước khi lưu (Không có logic kiểm tra ngày tháng hợp lệ)
+        if (!document.getElementById("edit-firstname").value || !document.getElementById("edit-lastname").value || !document.getElementById("edit-number").value || !document.getElementById("edit-address").value) {
+             alert("Vui lòng nhập đầy đủ Họ, Tên, Số điện thoại và Địa chỉ!");
+             return;
+        }
+
+        userData = {
+          // Giữ lại mật khẩu (password) cũ vì form này không có trường mật khẩu
+          password: userData.password, 
+          firstname: document.getElementById("edit-firstname").value,
+          lastname: document.getElementById("edit-lastname").value,
+          email: document.getElementById("edit-email").value,
+          number: document.getElementById("edit-number").value,
+          address: document.getElementById("edit-address").value,
+          birthday: birthday,
+          gender: document.getElementById("edit-gender").value
+        };
+
+        localStorage.setItem(userData.email, JSON.stringify(userData));
+        renderUserInfo();
+
+        editForm.classList.add("hidden");
+        userInfoDiv.classList.remove("hidden");
+        editBtn.classList.remove("hidden");
+
+        alert("Cập nhật thông tin thành công!");
+      });
+
+      // ==== HỦY ====
+      cancelBtn.addEventListener("click", () => {
+        editForm.classList.add("hidden");
+        userInfoDiv.classList.remove("hidden");
+        editBtn.classList.remove("hidden");
+      });
+
+      // ==== QUAY LẠI ====
+      backBtn.addEventListener("click", () => {
+        window.location.href = "index/index.html"; // Trở về index/index.html
+      });
+    </script>
+  </body>
+</html>

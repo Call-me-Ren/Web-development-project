@@ -4,25 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WatchTime - Cửa Hàng Đồng Hồ Uy Tín</title>
-    <!-- Tích hợp Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tích hợp Google Fonts -->
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="Giaodien.css" />
-    <!-- Tích hợp icon -->
+    <link rel="stylesheet" href="../css/Giaodien.css" />
     <script src="https://unpkg.com/lucide@latest"></script>
 
 
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <!-- Phần Header và Navigation -->
     <header class="bg-white shadow-md sticky top-0 z-50">
         <nav class="container mx-auto px-8 py-4 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold text-gray-800 flex-shrink-0">
+            <a href="index.html" class="text-2xl font-bold text-gray-800 flex-shrink-0">
                 Watch<span class="text-indigo-600">Time</span>
             </a>
             <div class="hidden md:flex space-x-10 items-center ml-6">
@@ -31,7 +27,6 @@
                 <a href="#about" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="About">Về Chúng Tôi</a>
                 <a href="#contact" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="Contact">Liên Hệ</a>
                 <div class="flex items-center gap-6">
-                <!-- Thanh tìm kiếm-->
                 <div class="search">
                     <input
                     type="search"
@@ -43,12 +38,10 @@
                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" style = "right: calc(20px); cursor: pointer; ">
                     <i data-lucide="search"></i>
                 </span></div>
-                <!-- Nút Chuyển đổi VI|EN -->
                 <div class="actions flex items-center gap-6" >
                     <button class="text-gray-600 hover:text-indigo-600 smooth-transition btn">VI</button>
                 </div>
             </div>
-            <!-- Icon thêm vào giỏ hàng-->
             <div class="actions flex items-center gap-6">
             <button class="relative text-gray-600 hover:text-indigo-600 focus:outline-none">
                 <i class="fa-solid fa-cart-plus text-2xl"></i>
@@ -62,24 +55,21 @@
                 </button>
             </div>
 
-            <!-- Nút Đăng nhập -->
             <div class="actions flex items-center gap-6" >
-            <a href="dangnhap.html"
-            class="text-gray-600 hover:text-indigo-600 smooth-transition btn">
+            <a href="../dangnhap.html"
+            class="text-gray-600 hover:text-indigo-600 smooth-transition btn" data-key = "Login">
             Đăng nhập
             </a>
 
-            <!-- Nút avatar-->
             <div id="user-avatar" class="hidden relative items-center gap-3 cursor-pointer">
             <button>
-                <img src="Images/Avatar.jpg"
+                <img src="../images/Avatar.jpg"
                 alt="Avatar"
                 class="w-10 h-10 rounded-full border-2 border-indigo-500"
                 />
             </button>
-            <!--Menu đăng nhập-->
             <div id="user-menu" class="hidden absolute right-0 top-12 bg-white shadow-lg rounded-lg py-2 w-40">
-                <a href="xuathongtin.html" class="block px-4 py-2 hover:bg-gray-100">Thông tin cá nhân</a>
+                <a href="../xuathongtin.html" class="block px-4 py-2 hover:bg-gray-100">Thông tin cá nhân</a>
                 <a href="#" class="block px-4 py-2 hover:bg-gray-100">Đăng xuất</a>
             </div>
             </div>
@@ -87,9 +77,7 @@
         </nav>
     </header>
 
-    <!-- Phần Main Content -->
     <main>
-        <!-- Hero Section -->
         <section id="home" class="relative bg-cover bg-center h-[60vh] md:h-[80vh]" style="background-image: url('https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop');">
             <div class="absolute inset-0 bg-black bg-opacity-50"></div>
             <div class="relative container mx-auto px-6 h-full flex flex-col justify-center items-start text-white">
@@ -101,24 +89,20 @@
             </div>
         </section>
 
-        <!-- Products Section -->
         <section id="products" class="py-16">
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-2">Sản Phẩm Nổi Bật</h2>
                 <p class="text-center text-gray-600 mb-12">Những mẫu đồng hồ được yêu thích nhất tại WatchTime</p>
 
 
-        <!-- Bộ lọc -->
-        <!-- Bộ lọc nâng cao -->
-<div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-10">
-    <!-- Lọc theo loại -->
+        <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-10">
+    <p class="text-center text-gray-600" >Thể loại:</p>
     <select id="filter-category" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
         <option value="all">Tất cả</option>
         <option value="nam">Đồng hồ Nam</option>
         <option value="nu">Đồng hồ Nữ</option>
         <option value="doi">Đồng hồ Đôi</option>
     </select>
-    <!-- Lọc theo giá -->
     <select id="filter-price" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
         <option value="all">Tất cả giá</option>
         <option value="5">Dưới 5 triệu</option>
@@ -130,13 +114,12 @@
 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Product Card 1 -->
                     <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="nam">
                         <div class="relative overflow-hidden">
-                           <img src="images/ben10.webp" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
-                           <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
-                               <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
-                           </div>
+                            <img src="../images/ben10.webp" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
+                            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
+                                <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart" data-key = "AToCard">Thêm vào giỏ</button>
+                            </div>
                         </div>
                         <div class="p-6">
                             <h3 class="text-xl font-semibold mb-2" data-name = "Rolex Submariner">Rolex Submariner</h3>
@@ -145,13 +128,12 @@
                         </div>
                     </div>
 
-                    <!-- Product Card 2 -->
                     <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="nu">
-                         <div class="relative overflow-hidden">
-                            <img src="images/conan.jpg" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
+                            <div class="relative overflow-hidden">
+                            <img src="../images/conan.jpg" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
                             <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
-                               <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
-                           </div>
+                                <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
+                            </div>
                         </div>
                         <div class="p-6">
                             <h3 class="text-xl font-semibold mb-2" data-name = "Omega Seamaster">Omega Seamaster</h3>
@@ -160,13 +142,12 @@
                         </div>
                     </div>
 
-                    <!-- Product Card 3 -->
                     <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="nam">
                         <div class="relative overflow-hidden">
-                            <img src="images/doraemon.jpg" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
+                            <img src="../images/doraemon.jpg" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
                             <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
-                               <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
-                           </div>
+                                <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
+                            </div>
                         </div>
                         <div class="p-6">
                             <h3 class="text-xl font-semibold mb-2" data-name = "Seiko 5 Sport">Seiko 5 Sport</h3>
@@ -175,13 +156,12 @@
                         </div>
                     </div>
 
-                    <!-- Product Card 4 -->
                     <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="doi">
-                         <div class="relative overflow-hidden">
-                            <img src="images/oip.webp" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
-                             <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
-                               <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
-                           </div>
+                            <div class="relative overflow-hidden">
+                            <img src="../images/oip.webp" alt="Đồng hồ" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
+                                <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
+                                <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
+                            </div>
                         </div>
                         <div class="p-6">
                             <h3 class="text-xl font-semibold mb-2" data-name = "Casio G-Shock">Casio G-Shock</h3>
@@ -189,30 +169,29 @@
                             <p class="text-2xl font-bold text-indigo-600">4.200.000 VNĐ</p>
                         </div>
                     </div>
-                    
-                    <!-- Product car 5 -->
+
                     <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="doi">
                         <div class="relative overflow-hidden">
-                           <img src="images/time_city.webp" alt="Đồng hồ Time City" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
+                            <img src="../images/time_city.webp" alt="Đồng hồ Time City" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
                             <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
-                              <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
-                          </div>
-                       </div>
-                       <div class="p-6">
-                           <h3 class="text-xl font-semibold mb-2" data-name = "Đồng hồ Time City">Đồng hồ Time City</h3>
-                           <p class="text-gray-600 mb-4">Đẳng cấp và sang trọng.</p>
-                           <p class="text-2xl font-bold text-indigo-600">12.500.000 VNĐ</p>
-                       </div>
+                                <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart">Thêm vào giỏ</button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold mb-2" data-name = "Đồng hồ Time City">Đồng hồ Time City</h3>
+                            <p class="text-gray-600 mb-4">Đẳng cấp và sang trọng.</p>
+                            <p class="text-2xl font-bold text-indigo-600">12.500.000 VNĐ</p>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div id="pagination" class="flex justify-center mt-8 space-x-2"></div>
         </section>
 
-         <!-- About Us Section -->
         <section id="about" class="bg-white py-16">
             <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
                 <div class="md:w-1/2">
-                    <img src="https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=1932&auto=format&fit=crop" alt="Cửa hàng đồng hồ" class="rounded-lg shadow-xl w-full">
+                    <img src="../images/about_us.jpg" alt="Cửa hàng đồng hồ" class="rounded-lg shadow-xl w-full"> 
                 </div>
                 <div class="md:w-1/2">
                     <h2 class="text-3xl font-bold mb-4">Về WatchTime</h2>
@@ -228,17 +207,14 @@
 
     </main>
     
-    <!-- Phần Footer -->
     <footer id="contact" class="bg-gray-800 text-white pt-12">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-                <!-- Cột 1: Giới thiệu -->
                 <div>
                     <h3 class="text-xl font-bold mb-4">WatchTime</h3>
                     <p class="text-gray-400">Nơi thời gian và phong cách hội tụ. Cung cấp đồng hồ chính hãng, uy tín và chất lượng.</p>
                 </div>
 
-                <!-- Cột 2: Liên kết nhanh -->
                 <div>
                     <h3 class="text-xl font-bold mb-4">Liên kết</h3>
                     <ul class="space-y-2">
@@ -249,7 +225,6 @@
                     </ul>
                 </div>
 
-                <!-- Cột 3: Liên hệ -->
                 <div>
                     <h3 class="text-xl font-bold mb-4">Thông Tin Liên Hệ</h3>
                     <p class="text-gray-400 mb-2 flex items-center justify-center md:justify-start"><i data-lucide="map-pin" class="w-4 h-4 mr-2"></i> 123 Đường ABC, Quận 1, TP. Hồ Chí Minh</p>
@@ -263,12 +238,11 @@
                 </div>
             </div>
 
-            <!-- Dòng Copyright -->
             <div class="mt-8 py-4 border-t border-gray-700 text-center text-gray-500">
                 <p>&copy; 2024 WatchTime. Đã đăng ký bản quyền.</p>
             </div>
         </div>
     </footer>
-    <script src="Giaodien.js"></script>
+    <script src="../js/Giaodien.js"></script>
 </body>
 </html>

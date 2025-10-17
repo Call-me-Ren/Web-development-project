@@ -1,4 +1,4 @@
- /* CSS tùy chỉnh để sử dụng font Be Vietnam Pro */
+/* CSS tùy chỉnh để sử dụng font Be Vietnam Pro */
 body {
     font-family: 'Be Vietnam Pro', sans-serif;
 }
@@ -71,4 +71,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+#pagination button {
+  transition: 0.2s;
 }

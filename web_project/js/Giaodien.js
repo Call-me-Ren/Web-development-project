@@ -1,7 +1,6 @@
-
 // Tự động gọi hàm render icon của Lucide
     lucide.createIcons();
-
+//Tìm kiếm nâng cao----------------------------------------------------------------------
 // Lọc sản phẩm
 function filterProducts() {
     const category = document.getElementById("filter-category").value;
@@ -73,9 +72,10 @@ searchInput.addEventListener('input', () => {
     });
 });
 
-// 🎯 Quản lý đăng nhập / avatar / đăng xuất
+// Quản lý đăng nhập / avatar / đăng xuất
 document.addEventListener("DOMContentLoaded", function () {
-  const loginLink = document.querySelector('a[href="dangnhap.html"]');
+  // Cập nhật đường dẫn Đăng nhập trong index.html
+  const loginLink = document.querySelector('a[href="../dangnhap.html"]');
   const userAvatar = document.getElementById("user-avatar");
   const userMenu = document.getElementById("user-menu");
   const logoutBtn = userMenu.querySelector("a:last-child");
@@ -99,8 +99,9 @@ document.addEventListener("DOMContentLoaded", function () {
   updateLoginUI();
 
   // Khi đăng nhập từ trang khác quay lại
-  if (window.location.href.includes("dangnhap.html")) {
-    localStorage.setItem("isLoggedIn", "true");
+  // Giả định trang đăng nhập sẽ redirect về index/index.html
+  if (window.location.href.includes("dangnhap.html") && localStorage.getItem("isLoggedIn") === "true") {
+    // Chỉ cập nhật UI nếu đã đăng nhập thành công
     isLoggedIn = true;
     updateLoginUI();
   }
@@ -122,6 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
   logoutBtn.addEventListener("click", function (e) {
     e.preventDefault();
     localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("currentUser"); // Thêm xóa currentUser
     isLoggedIn = false;
     updateLoginUI();
     userMenu.classList.add("hidden");
@@ -134,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Khi click "Thông tin cá nhân"
   infoBtn.addEventListener("click", function () {
-    window.location.href = "xuathongtin.html";
+    window.location.href = "../xuathongtin.html"; // Cập nhật đường dẫn
   });
 });
 
@@ -176,6 +178,8 @@ const translations = {
     "hero-title": "Bộ Sưu Tập Đồng Hồ Đẳng Cấp",
     "hero-sub": "Khẳng định phong cách và vị thế của bạn với những chiếc đồng hồ tinh xảo nhất.",
     explore: "Khám Phá Ngay",
+    Login:"Đăng nhập",
+    AToCard: "Thêm vào giỏ",
   },
   en: {
     Home: "Home",
@@ -185,6 +189,8 @@ const translations = {
     "hero-title": "Luxury Watch Collection",
     "hero-sub": "Define your style and status with the finest timepieces.",
     explore: "Explore Now",
+    Login: "Login",
+    AToCard: "Add to Cart",
   },
 };
 
@@ -200,4 +206,77 @@ langToggleBtn.addEventListener("click", () => {
   currentLang = currentLang === "vi" ? "en" : "vi";
   langToggleBtn.textContent = currentLang === "vi" ? "VI" : "EN";
   updateLanguage();
+});
+
+
+// Phân trang---------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+    const productsPerPage = 8; // số sản phẩm mỗi trang
+    const productCards = Array.from(document.querySelectorAll(".product-card"));
+    const paginationContainer = document.getElementById("pagination");
+
+    let currentPage = 1;
+    const totalPages = Math.ceil(productCards.length / productsPerPage);
+
+    function showPage(page) {
+        // Ẩn tất cả
+        productCards.forEach((card, index) => {
+            card.style.display = "none";
+        });
+
+        // Hiển thị sản phẩm của trang hiện tại
+        const start = (page - 1) * productsPerPage;
+        const end = start + productsPerPage;
+        productCards.slice(start, end).forEach(card => {
+            card.style.display = "block";
+        });
+
+        // Cập nhật trạng thái nút phân trang
+        renderPagination();
+    }
+
+    function renderPagination() {
+        paginationContainer.innerHTML = "";
+
+        // Nút "Trước"
+        const prevBtn = document.createElement("button");
+        prevBtn.textContent = "←";
+        prevBtn.className = `px-3 py-1 rounded-md ${currentPage === 1 ? 'bg-gray-300 text-gray-500' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`;
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        };
+        paginationContainer.appendChild(prevBtn);
+
+        // Nút số trang
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = document.createElement("button");
+            btn.textContent = i;
+            btn.className = `px-3 py-1 rounded-md ${i === currentPage ? 'bg-indigo-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`;
+            btn.onclick = () => {
+                currentPage = i;
+                showPage(currentPage);
+            };
+            paginationContainer.appendChild(btn);
+        }
+
+        // Nút "Sau"
+        const nextBtn = document.createElement("button");
+        nextBtn.textContent = "→";
+        nextBtn.className = `px-3 py-1 rounded-md ${currentPage === totalPages ? 'bg-gray-300 text-gray-500' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`;
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        };
+        paginationContainer.appendChild(nextBtn);
+    }
+
+    // Hiển thị trang đầu tiên khi tải
+    showPage(currentPage);
 });
