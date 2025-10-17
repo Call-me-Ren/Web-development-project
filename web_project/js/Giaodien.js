@@ -61,7 +61,7 @@ searchInput.addEventListener('input', () => {
     const searchTerm = searchInput.value.toLowerCase().trim();
 
     products.forEach(product => {
-    const name = product.querySelector('[data-name]').dataset.name.toLowerCase();
+    const name = product.querySelector("h3").innerText.toLowerCase();
 
     // Kiểm tra có chứa từ khóa hay không
     if (name.includes(searchTerm)) {
