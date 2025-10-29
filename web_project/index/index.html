@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/Giaodien.css" />
+    <link rel="stylesheet" href="../css/bootstrap.css" />
     <script src="https://unpkg.com/lucide@latest"></script>
 
 
@@ -44,17 +45,19 @@
                 </div>
             </div>
             <div class="actions flex items-center gap-6">
-            <button class="relative text-gray-600 hover:text-indigo-600 focus:outline-none">
-                <i class="fa-solid fa-cart-plus text-2xl"></i>
-                <span id="cart-count"
-                class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
-                0
-                </span>
-            </button>
-                <button class="md:hidden text-gray-600 hover:text-indigo-600 focus:outline-none">
-                    <i data-lucide="menu"></i>
-                </button>
-            </div>
+    <!-- 👇 Khi nhấn vào giỏ hàng sẽ mở trang bạn muốn -->
+    <a href="ThanhToan.html" class="relative text-gray-600 hover:text-indigo-600 focus:outline-none">
+        <i class="fa-solid fa-cart-plus text-2xl"></i>
+        <span id="cart-count"
+              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+              0
+        </span>
+    </a>
+
+    <button class="md:hidden text-gray-600 hover:text-indigo-600 focus:outline-none">
+        <i data-lucide="menu"></i>
+    </button>
+</div
 
             <div class="actions flex items-center gap-6" >
             <a href="dangnhap.html"
@@ -123,7 +126,12 @@
                             </div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-semibold mb-2">BEN 10 OMNITRIX</h3>
+                            <h3 class="text-xl font-semibold mb-2 text-indigo-600 cursor-pointer"
+                            data-bs-toggle="modal" data-bs-target="#productModal"
+                                data-name="BEN 10 OMNITRIX"
+                                data-img="../images/ben10.webp"
+                                data-desc="Chỉ dành cho người được chọn hoặc người có đủ tiền mua."
+                                data-price="999.999.999 VNĐ">BEN 10 OMNITRIX</h3>
                             <p class="text-gray-600 mb-4">Chỉ dành cho người được chọn hoặc người có đủ tiền mua.</p>
                             <p class="text-2xl font-bold text-indigo-600">999.999.999 VNĐ</p>
                         </div>
@@ -245,5 +253,6 @@
         </div>
     </footer>
     <script src="../js/Giaodien.js"></script>
+    <script src="../js/bootstrap.js"></script>
 </body>
 </html>
