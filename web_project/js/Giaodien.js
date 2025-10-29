@@ -162,7 +162,46 @@ document.querySelectorAll(".add-to-cart").forEach((btn) => {
     setTimeout(() => (cartCountEl.style.transform = "scale(1)"), 150);
   });
 });
+// === Giaodien.js: lưu sản phẩm vào localStorage khi bấm "Thêm vào giỏ" ===
+(function(){
+  function parsePrice(text){
+    if(!text) return 0;
+    // loại bỏ chữ, dấu, chỉ giữ số
+    return Number(String(text).replace(/[^\d]/g,''));
+  }
 
+  // key lưu cart
+  const CART_KEY = 'watchtime_cart';
+
+  function getCart(){
+    try{ return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; }
+  }
+  function saveCart(cart){ localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+
+  // thêm nút add-to-cart hiện có => gắn sự kiện
+  document.querySelectorAll('.product-card').forEach(card=>{
+    const btn = card.querySelector('.add-to-cart');
+    if(!btn) return;
+    btn.addEventListener('click', ()=> {
+      // Lấy id (nếu có), tên, giá
+      const id = card.dataset.id || card.querySelector('[data-name]')?.getAttribute('data-name') || card.querySelector('h3')?.textContent?.trim();
+      const name = card.querySelector('[data-name]')?.getAttribute('data-name') || card.querySelector('h3')?.textContent?.trim() || 'Sản phẩm';
+      // tìm phần hiển thị giá (giả định có class text-indigo-600 chứa số)
+      const priceEl = card.querySelector('.text-indigo-600') || card.querySelector('.price') || card.querySelector('p:last-of-type');
+      const rawPrice = priceEl ? priceEl.textContent : '';
+      const price = parsePrice(rawPrice);
+
+      let cart = getCart();
+      const existing = cart.find(it => it.id === id);
+      if(existing){
+        existing.qty = (existing.qty || 1) + 1;
+      } else {
+        cart.push({ id, name, price, qty: 1 });
+      }
+      saveCart(cart);
+    });
+  });
+})();
 
 // --------------------------------------------------------------------
 // Đa ngôn ngữ
