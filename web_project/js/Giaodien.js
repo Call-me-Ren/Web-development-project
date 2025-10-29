@@ -202,6 +202,21 @@ document.querySelectorAll(".add-to-cart").forEach((btn) => {
     });
   });
 })();
+// Đồng bộ cart-count từ localStorage (dán vào Giaodien.js)
+(function syncHeaderCartCount(){
+  const CART_KEY = 'watchtime_cart';
+  function getCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; } }
+  function updateHeaderCount(){
+    const cart = getCart();
+    const count = cart.reduce((s,i)=> s + (i.qty || 0), 0);
+    const el = document.getElementById('cart-count');
+    if(el) el.textContent = count;
+  }
+  // update ngay khi load
+  document.addEventListener('DOMContentLoaded', updateHeaderCount);
+  // cung cấp hàm toàn cục để các trang khác gọi khi thay đổi cart
+  window.updateHeaderCartCount = updateHeaderCount;
+})();
 
 // --------------------------------------------------------------------
 // Đa ngôn ngữ
