@@ -59,215 +59,26 @@ const products = document.querySelectorAll('.product-card');
 // Lắng nghe khi người dùng gõ
 searchInput.addEventListener('input', () => {
     const searchTerm = searchInput.value.toLowerCase().trim();
+    let found = false; // Kiểm tra xem có sản phẩm nào trùng không
 
     products.forEach(product => {
-    const name = product.querySelector("h3").innerText.toLowerCase();
+        const name = product.querySelector("h3").innerText.toLowerCase();
 
-    // Kiểm tra có chứa từ khóa hay không
-    if (name.includes(searchTerm)) {
-        product.style.display = 'block';
-    } else {
-        product.style.display = 'none';
-    }
-    });
-});
-
-/* SEARCH-AS-YOU-TYPE + AUTOCOMPLETE + FILTER FOR .product-card
-   Dán đoạn này vào cuối Giaodien.js hoặc trước </body>.
-*/
-(function(){
-  // CONFIG
-  const SEARCH_INPUT_ID = 'search'; // id input tìm kiếm của bạn
-  const CARD_SELECTOR = '.product-card'; // selector product card
-  const NAME_SEL = '[data-name]'; // selector cho tên nếu bạn dùng data-name
-  const SUGGEST_LIMIT = 8;
-  const DEBOUNCE_MS = 180;
-
-  // helpers
-  function normalizeText(s){
-    if(!s) return '';
-    // bỏ dấu, chuyển thường
-    try{
-      // dùng Unicode normalize nếu trình duyệt hỗ trợ
-      return s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
-    }catch(e){
-      // fallback: thay các dấu phổ biến (đơn giản)
-      return s.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/gi,'a')
-              .replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/gi,'e')
-              .replace(/ì|í|ị|ỉ|ĩ/gi,'i')
-              .replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/gi,'o')
-              .replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/gi,'u')
-              .replace(/ỳ|ý|ỵ|ỷ|ỹ/gi,'y')
-              .replace(/đ/gi,'d').toLowerCase();
-    }
-  }
-  function debounce(fn, t){ let to; return (...a)=>{ clearTimeout(to); to=setTimeout(()=>fn(...a), t); }; }
-
-  // build product index from DOM
-  const cards = Array.from(document.querySelectorAll(CARD_SELECTOR));
-  const products = cards.map(card=>{
-    // read name: prefer data-name, fallback to H3 text or innerText
-    const nameEl = card.querySelector(NAME_SEL) || card.querySelector('h3') || card.querySelector('h2');
-    const name = nameEl ? (nameEl.getAttribute('data-name') || nameEl.textContent.trim()) : card.textContent.trim().slice(0,40);
-    const descEl = card.querySelector('p') || null;
-    const desc = descEl ? descEl.textContent.trim() : '';
-    const category = card.dataset.category || card.getAttribute('data-category') || '';
-    // price: try to parse numeric from an element with class 'text-indigo-600' or .price
-    let price = 0;
-    const priceEl = card.querySelector('.text-indigo-600') || card.querySelector('.price') || card.querySelector('.product-price');
-    if(priceEl) price = Number(String(priceEl.textContent).replace(/[^\d]/g,'')) || 0;
-    return {
-      id: card.dataset.id || (name + Math.random().toString(36).slice(2,8)),
-      name,
-      nameNorm: normalizeText(name),
-      desc,
-      descNorm: normalizeText(desc),
-      category,
-      categoryNorm: normalizeText(category),
-      price,
-      card
-    };
-  });
-
-  // create suggestions dropdown UI anchored to search input
-  const searchInput = document.getElementById(SEARCH_INPUT_ID);
-  if(!searchInput) return console.warn('Search input not found:', SEARCH_INPUT_ID);
-
-  // ensure parent is positioned
-  const wrapper = document.createElement('div');
-  wrapper.style.position = 'relative';
-  wrapper.className = 'search-wrapper';
-  // wrap input with wrapper
-  const parent = searchInput.parentNode;
-parent.replaceChild(wrapper, searchInput);
-  wrapper.appendChild(searchInput);
-
-  const sugBox = document.createElement('div');
-  sugBox.className = 'search-suggestions hidden';
-  sugBox.setAttribute('role','listbox');
-  wrapper.appendChild(sugBox);
-
-  let activeIndex = -1;
-  function clearSuggestions(){
-    sugBox.innerHTML = '';
-    sugBox.classList.add('hidden');
-    activeIndex = -1;
-  }
-
-  function showSuggestions(items, query){
-    sugBox.innerHTML = '';
-    if(!items || items.length === 0){
-      const no = document.createElement('div');
-      no.className = 'no-results';
-      no.textContent = query ? 'Không tìm thấy sản phẩm phù hợp.' : 'Gõ để tìm sản phẩm...';
-      sugBox.appendChild(no);
-      sugBox.classList.remove('hidden');
-      return;
-    }
-    items.slice(0, SUGGEST_LIMIT).forEach((p, i)=>{
-      const it = document.createElement('div');
-      it.className = 'item';
-      it.setAttribute('role','option');
-      it.dataset.index = i;
-      it.innerHTML = `<div style="flex:1"><div class="name">${escapeHtml(p.name)}</div>
-                      <div class="note" style="font-size:12px;color:#6b7280">${p.category ? escapeHtml(p.category) + ' • ' : ''}${p.price ? (p.price.toLocaleString('vi-VN') + '₫') : ''}</div></div>`;
-      it.addEventListener('click', ()=>{
-        focusProduct(p);
-        clearSuggestions();
-      });
-      sugBox.appendChild(it);
-    });
-    sugBox.classList.remove('hidden');
-  }
-
-  // filtering function: returns matching product objects (best ordering: name match startsWith, includes, desc match)
-  function searchProducts(query){
-    const q = normalizeText(query || '');
-    if(!q) return products.slice(); // return all
-    const starts = [], includes = [], descMatches = [];
-    for(const p of products){
-      if(p.nameNorm.startsWith(q)) starts.push(p);
-      else if(p.nameNorm.includes(q)) includes.push(p);
-      else if(p.descNorm.includes(q) || p.categoryNorm.includes(q)) descMatches.push(p);
-    }
-    return starts.concat(includes, descMatches);
-  }
-
-  // highlight & filter cards on page
-  function filterCards(matches){
-    const matchSet = new Set(matches.map(m=>m.card));
-    for(const p of products){
-      if(matchSet.has(p.card)) p.card.style.display = '';
-      else p.card.style.display = 'none';
-    }
-  }
-
-  function focusProduct(product){
-    // scroll to product and add temporary highlight
-    const el = product.card;
-    if(!el) return;
-    el.scrollIntoView({behavior:'smooth', block:'center'});
-    el.style.outline = '3px solid rgba(37,99,235,0.25)';
-    setTimeout(()=> el.style.outline = '', 1800);
-  }
-
-  // keyboard navigation for suggestions
-  function setActive(idx){
-    const items = Array.from(sugBox.querySelectorAll('.item'));
-    items.forEach(it => it.classList.remove('active'));
-    if(idx >= 0 && idx < items.length){
-      items[idx].classList.add('active');
-      items[idx].scrollIntoView({block:'nearest'});
-      activeIndex = idx;
-    } else activeIndex = -1;
-  }
-// main input handler
-  const onInput = debounce(function(ev){
-    const q = searchInput.value.trim();
-    const results = searchProducts(q);
-    // show suggestions
-    showSuggestions(results, q);
-    // filter cards
-    if(!q) {
-      // show all
-      products.forEach(p => p.card.style.display = '');
-    } else {
-      filterCards(results);
-    }
-  }, DEBOUNCE_MS);
-
-  // bind events
-  searchInput.addEventListener('input', onInput);
-
-  searchInput.addEventListener('keydown', function(e){
-    const items = sugBox.querySelectorAll('.item');
-    if(sugBox.classList.contains('hidden')) return;
-    if(e.key === 'ArrowDown'){ e.preventDefault(); setActive((activeIndex+1) % items.length); }
-    else if(e.key === 'ArrowUp'){ e.preventDefault(); setActive((activeIndex-1 + items.length) % items.length); }
-    else if(e.key === 'Enter'){ 
-      // if an item active, pick it; otherwise if text present and results exist pick first
-      e.preventDefault();
-      if(activeIndex >= 0 && items[activeIndex]) items[activeIndex].click();
-      else {
-        const q = searchInput.value.trim();
-        if(q){
-          const res = searchProducts(q);
-          if(res.length) focusProduct(res[0]);
-          clearSuggestions();
+        if (name.includes(searchTerm) && searchTerm !== "") {
+            product.style.display = 'block';
+            found = true;
+        } else {
+            product.style.display = 'none';
         }
-      }
-    } else if(e.key === 'Escape'){ clearSuggestions(); }
-  });
+    });
 
-  // click outside closes suggestions
-  document.addEventListener('click', function(e){
-    if(!wrapper.contains(e.target)) clearSuggestions();
-  });
-
-  // helper: escape html
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-})();
+    // Nếu không tìm thấy sản phẩm nào khớp hoặc ô trống -> hiện tất cả
+    if (!found || searchTerm === "") {
+        products.forEach(product => {
+            product.style.display = 'block';
+        });
+    }
+});
 
 // Quản lý đăng nhập / avatar / đăng xuất
 document.addEventListener("DOMContentLoaded", function () {
