@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trang quản trị</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <section class="admin row-grid">
+      <!-- SIDEBAR -->
+      <div class="admin-sidebar">
+        <div class="admin-sidebar-top">
+          <img src="images/logo.png" alt="Logo" />
+        </div>
+
+        <div class="admin-sidebar-content">
+          <ul>
+            <li class="active">
+              <a href="admin.html">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+                <i class="ri-add-box-line toggle-icon"></i>
+              </a>
+            </li>
+
+            <li>
+              <a href="#">
+                <i class="ri-file-list-line"></i>
+                <span>Đơn hàng</span>
+                <i class="ri-add-box-line toggle-icon"></i>
+              </a>
+              <ul class="sub-menu">
+                <li>
+                  <a href="#" class="menu-link" data-target="orders-list">
+                    <i class="ri-arrow-right-s-fill"></i>Danh sách đơn hàng
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="menu-link" data-target="orders-detail">
+                    <i class="ri-arrow-right-s-fill"></i>Chi tiết đơn hàng
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <a href="#">
+                <i class="ri-box-3-line"></i>
+                <span>Sản phẩm</span>
+                <i class="ri-add-box-line toggle-icon"></i>
+              </a>
+              <ul class="sub-menu">
+                <li>
+                  <a href="#" class="menu-link" data-target="product-list">
+                    <i class="ri-arrow-right-s-fill"></i>Danh sách
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="menu-link" data-target="product-add">
+                    <i class="ri-arrow-right-s-fill"></i>Thêm sản phẩm
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <a href="#">
+                <i class="ri-truck-line"></i>
+                <span>Nhập sản phẩm</span>
+                <i class="ri-add-box-line toggle-icon"></i>
+              </a>
+              <ul class="sub-menu">
+                <li>
+                  <a href="#" class="menu-link" data-target="order-list">
+                    <i class="ri-arrow-right-s-fill"></i>Phiếu nhập hàng
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="menu-link" data-target="order-add">
+                    <i class="ri-arrow-right-s-fill"></i>Thêm phiếu nhập hàng
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <a href="#">
+                <i class="ri-coin-line"></i>
+                <span>Giá bán</span>
+                <i class="ri-add-box-line toggle-icon"></i>
+              </a>
+              <ul class="sub-menu">
+                <li>
+                  <a href="#" class="menu-link" data-target="order-list">
+                    <i class="ri-arrow-right-s-fill"></i>Chi tiết giá bán
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="menu-link" data-target="order-add">
+                    <i class="ri-arrow-right-s-fill"></i>Thêm phiếu nhập hàng
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="admin-content">
+        <div class="admin-content-top">
+          <div class="admin-content-top-left flex-box">
+            <i class="ri-search-line"></i>
+            <i class="ri-drag-move-line"></i>
+          </div>
+
+          <div class="admin-content-top-right flex-box">
+            <i class="ri-notification-4-line" data-number="3"></i>
+            <i class="ri-message-2-line" data-number="5"></i>
+            <div class="user-box flex-box">
+              <img src="images/user.jpg" alt="User" />
+              <p>Mina <i class="ri-arrow-down-s-fill"></i></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-content-main">
+          <div class="admin-content-main-title">
+            <h1 id="page-title">Dashboard</h1>
+          </div>
+
+          <div class="admin-content-main-content" id="main-content">
+            <p>Chào mừng đến với trang quản trị!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      // === Xử lý submenu ===
+      const menuItems = document.querySelectorAll(
+        ".admin-sidebar-content > ul > li"
+      );
+      menuItems.forEach((item) => {
+        const submenu = item.querySelector(".sub-menu");
+        const toggleIcon = item.querySelector(".toggle-icon");
+        item.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (!submenu) {
+            menuItems.forEach((i) => i.classList.remove("active"));
+            item.classList.add("active");
+            return;
+          }
+          document.querySelectorAll(".sub-menu").forEach((sub) => {
+            if (sub !== submenu) sub.classList.remove("active");
+          });
+          document.querySelectorAll(".toggle-icon").forEach((icon) => {
+            if (icon !== toggleIcon) icon.classList.remove("rotate");
+          });
+          submenu.classList.toggle("active");
+          if (toggleIcon) toggleIcon.classList.toggle("rotate");
+          item.classList.toggle("active");
+        });
+      });
+
+      // === Xử lý nội dung chính ===
+      const mainContent = document.getElementById("main-content");
+      const pageTitle = document.getElementById("page-title");
+
+      document.querySelectorAll(".menu-link").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const target = link.dataset.target;
+          pageTitle.textContent = link.textContent.trim();
+
+          // DASHBOARD
+          if (target === "dashboard") {
+            mainContent.innerHTML = `<p>Chào mừng đến với trang quản trị!</p>`;
+          }
+
+          // DANH SÁCH ĐƠN HÀNG
+          if (target === "orders-list") {
+            mainContent.innerHTML = `
+              <div class="admin-content-main-content-order-list">
+                <table class="product-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Tên</th>
+                      <th>Số điện thoại</th>
+                      <th>Email</th>
+                      <th>Địa chỉ</th>
+                      <th>Ghi chú</th>
+                      <th>Chi tiết</th>
+                      <th>Ngày</th>
+                      <th>Trạng thái</th>
+                      <th>Tùy chỉnh</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td>Nguyễn Văn A</td>
+                      <td>0123456789</td>
+                      <td>1234@gmail.com</td>
+                      <td>HCM</td>
+                      <td>Giao nhanh</td>
+                      <td><a class="edit-class menu-link" data-target="orders-detail" href="#">Chi tiết</a></td>
+                      <td>23/12/2003</td>
+                      <td><a class="confirm-order" href="#">Đã xác nhận</a></td>
+                      <td><a class="delete-class" href="#">Xóa</a></td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td>Nguyễn Văn B</td>
+                      <td>0987654321</td>
+                      <td>abcd@gmail.com</td>
+                      <td>Hà Nội</td>
+                      <td>Thanh toán khi nhận</td>
+                      <td><a class="edit-class menu-link" data-target="orders-detail" href="#">Chi tiết</a></td>
+                      <td>25/12/2003</td>
+                      <td><a class="non-confirm-order" href="#">Chưa xác nhận</a></td>
+                      <td><a class="delete-class" href="#">Xóa</a></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            `;
+          }
+
+          // CHI TIẾT ĐƠN HÀNG
+          if (target === "orders-detail") {
+            mainContent.innerHTML = `
+              <div class="admin-content-main-content-order-detail">
+                <table class="product-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Ảnh</th>
+                      <th>Tên</th>
+                      <th>Giá</th>
+                      <th>Số lượng</th>
+                      <th>Thành tiền</th>
+                      <th>Tùy chỉnh</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td><img style="width:70px" src="image.avif" alt="Đồng hồ" /></td>
+                      <td>Đồng hồ Casio</td>
+                      <td>120,000</td>
+                      <td>3</td>
+                      <td>360,000</td>
+                      <td><a class="delete-class" href="#">Xóa</a></td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td><img style="width:70px" src="image.avif" alt="Đồng hồ" /></td>
+                      <td>Đồng hồ cổ</td>
+                      <td>150,000</td>
+                      <td>2</td>
+                      <td>300,000</td>
+                      <td><a class="delete-class" href="#">Xóa</a></td>
+                    </tr>
+                    <tr>
+                      <td colspan="5" style="font-weight:bold; text-align:right;">Tổng cộng</td>
+                      <td style="font-weight:bold;">660,000</td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            `;
+          }
+
+          // DANH SÁCH SẢN PHẨM
+          if (target === "product-list") {
+            mainContent.innerHTML = `
+              <div class="admin-content-main-content-product-list">
+                <table class="product-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Ảnh</th>
+                      <th>Tên Sản Phẩm</th>
+                      <th>Giá Bán</th>
+                      <th>Giá Giảm</th>
+                      <th>Ngày Đăng</th>
+                      <th>Tùy Chỉnh</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td><img style="width:70px" src="image.avif" alt="Đồng hồ" /></td>
+                      <td>Đồng hồ Casio</td>
+                      <td>120,000</td>
+                      <td>60,000</td>
+                      <td>2023-10-27</td>
+                      <td><a class="edit-class">Sửa</a> | <a class="delete-class">Xóa</a></td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td><img style="width:70px" src="image.avif" alt="Đồng hồ" /></td>
+                      <td>Đồng hồ cổ</td>
+                      <td>220,000</td>
+                      <td>150,000</td>
+                      <td>2023-10-27</td>
+                      <td><a class="edit-class">Sửa</a> | <a class="delete-class">Xóa</a></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            `;
+          }
+
+          // THÊM SẢN PHẨM
+          if (target === "product-add") {
+            mainContent.innerHTML = `
+              <div class="admin-content-main-content-product-add">
+                <div class="admin-content-main-content-left">
+                  <div class="admin-content-main-content-two-input">
+                    <input type="text" placeholder="Tên sản phẩm" />
+                    <input type="text" placeholder="Chất liệu" />
+                  </div>
+                  <div class="admin-content-main-content-two-input">
+                    <input type="text" placeholder="Giá bán" />
+                    <input type="text" placeholder="Giá giảm" />
+                  </div>
+                  <textarea placeholder="Đặc điểm"></textarea>
+                  <textarea placeholder="Mô tả sản phẩm"></textarea>
+                  <button class="main-btn">Thêm sản phẩm</button>
+                </div>
+
+                <div class="admin-content-main-content-right">
+                  <div class="admin-content-main-content-right-image">
+                    <label for="file">Ảnh đại diện</label>
+                    <input id="file" type="file" />
+                    <div class="image-show"></div>
+                  </div>
+
+                  <div class="admin-content-main-content-right-images">
+                    <label for="files">Ảnh sản phẩm</label>
+                    <input id="files" type="file" multiple />
+                    <div class="images-show"></div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+          // Chi tiết đơn nhập hàng
+          if (target === "order-list") {
+            mainContent.innerHTML = `
+              <div class="admin-content-main-content-order-list">
+                <table class="order-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Ảnh</th>
+                      <th>Tên Sản Phẩm</th>
+                      <th>Giá nhập</th>
+                      <th>Số lượng </th>
+                      <th>Ngày nhập</th>
+                      <th>Tùy Chỉnh</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td><img style="width:70px" src="image.avif" alt="Đồng hồ" /></td>
+                      <td>Đồng hồ Casio</td>
+                      <td>120,000</td>
+                      <td>3</td>
+                      <td>2023-10-27</td>
+                      <td><a class="edit-class">Sửa</a> | <a class="delete-class">Xóa</a></td>
+                    </tr>
+                  
+                  </tbody>
+                </table>
+              </div>
+            `;
+          }
+          // THÊM ĐƠN HÀNG
+          if (target === "order-add") {
+            mainContent.innerHTML = `
+              <div class="admin-content-main-content-product-add">
+                <div class="admin-content-main-content-left">
+                  <div class="admin-content-main-content-two-input">
+                    <input type="text" placeholder="Tên sản phẩm" />
+                    <input type="text" placeholder="Chất liệu" />
+                  </div>
+                  <div class="admin-content-main-content-two-input">
+                    <input type="text" placeholder="Giá bán" />
+                    <input type="text" placeholder="Giá giảm" />
+                  </div>
+                  <textarea placeholder="Đặc điểm"></textarea>
+                  <textarea placeholder="Mô tả sản phẩm"></textarea>
+                  <button class="main-btn">Thêm phiếu nhập </button>
+                </div>
+
+                <div class="admin-content-main-content-right">
+                  <div class="admin-content-main-content-right-image">
+                    <label for="file">Ảnh đại diện</label>
+                    <input id="file" type="file" />
+                    <div class="image-show"></div>
+                  </div>
+
+                  <div class="admin-content-main-content-right-images">
+                    <label for="files">Ảnh sản phẩm</label>
+                    <input id="files" type="file" multiple />
+                    <div class="images-show"></div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+          // DANH SÁCH ĐƠN HÀNG (7. Quản lý đơn đặt hàng của khách hàng)
+          if (target === "orders-list") {
+            mainContent.innerHTML = `
+    <div class="admin-content-main-content-order-list">
+      <h2>Quản lý đơn đặt hàng của khách hàng</h2>
+
+      <!-- Bộ lọc tìm kiếm -->
+      <div class="filter-section">
+        <form>
+          <label>Từ ngày:</label>
+          <input type="date" name="start-date" />
+          <label>Đến ngày:</label>
+          <input type="date" name="end-date" />
+          <label>Trạng thái:</label>
+          <select name="status">
+            <option value="">--Tất cả--</option>
+            <option value="new">Mới đặt</option>
+            <option value="processed">Đã xử lý</option>
+            <option value="delivered">Đã giao</option>
+            <option value="cancelled">Hủy</option>
+          </select>
+          <button type="submit">Tra cứu</button>
+        </form>
+      </div>
+
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tên khách hàng</th>
+            <th>Số điện thoại</th>
+            <th>Email</th>
+            <th>Địa chỉ</th>
+            <th>Ghi chú</th>
+            <th>Chi tiết</th>
+            <th>Ngày đặt</th>
+            <th>Trạng thái</th>
+            <th>Tùy chỉnh</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Nguyễn Văn A</td>
+            <td>0123456789</td>
+            <td>1234@gmail.com</td>
+            <td>HCM</td>
+            <td>Giao nhanh</td>
+            <td><a class="edit-class menu-link" data-target="orders-detail" href="#">Chi tiết</a></td>
+            <td>23/12/2003</td>
+            <td>
+              <select class="order-status">
+                <option value="new" selected>Mới đặt</option>
+                <option value="processed">Đã xử lý</option>
+                <option value="delivered">Đã giao</option>
+                <option value="cancelled">Hủy</option>
+              </select>
+            </td>
+            <td><a class="delete-class" href="#">Xóa</a></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Trần Thị B</td>
+            <td>0987654321</td>
+            <td>tranb@gmail.com</td>
+            <td>Hà Nội</td>
+            <td>Thanh toán khi nhận hàng</td>
+            <td><a class="edit-class menu-link" data-target="orders-detail" href="#">Chi tiết</a></td>
+            <td>25/12/2003</td>
+            <td>
+              <select class="order-status">
+                <option value="new">Mới đặt</option>
+                <option value="processed" selected>Đã xử lý</option>
+                <option value="delivered">Đã giao</option>
+                <option value="cancelled">Hủy</option>
+              </select>
+            </td>
+            <td><a class="delete-class" href="#">Xóa</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+          }
+
+          // 8. QUẢN LÝ TỒN KHO SẢN PHẨM
+          if (target === "product-stock") {
+            mainContent.innerHTML = `
+    <div class="admin-content-main-content-stock">
+      <h2>Quản lý số lượng tồn của sản phẩm</h2>
+
+      <div class="filter-section">
+        <form>
+          <label>Tên sản phẩm:</label>
+          <input type="text" name="product-name" placeholder="Nhập tên sản phẩm..." />
+
+          <label>Loại sản phẩm:</label>
+          <select name="product-type">
+            <option value="">--Tất cả--</option>
+            <option value="oto">Ô tô</option>
+            <option value="phutung">Phụ tùng</option>
+            <option value="dichvu">Dịch vụ</option>
+          </select>
+
+          <label>Thời điểm:</label>
+          <input type="date" name="check-date" />
+
+          <button type="submit">Tra cứu</button>
+        </form>
+      </div>
+
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tên sản phẩm</th>
+            <th>Loại</th>
+            <th>Số lượng nhập</th>
+            <th>Số lượng xuất</th>
+            <th>Tồn kho</th>
+            <th>Tình trạng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SP01</td>
+            <td>Dầu nhớt Castrol</td>
+            <td>Phụ tùng</td>
+            <td>100</td>
+            <td>85</td>
+            <td>15</td>
+            <td>Cảnh báo: Sắp hết hàng</td>
+          </tr>
+          <tr>
+            <td>SP02</td>
+            <td>Bánh xe Bridgestone</td>
+            <td>Phụ tùng</td>
+            <td>50</td>
+            <td>30</td>
+            <td>20</td>
+            <td>Bình thường</td>
+          </tr>
+          <tr>
+            <td>SP03</td>
+            <td>Kính chiếu hậu</td>
+            <td>Phụ tùng</td>
+            <td>40</td>
+            <td>40</td>
+            <td>0</td>
+            <td><strong>Hết hàng</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

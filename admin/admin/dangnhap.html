@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="reset.css" />
+    <link
+      rel="stylesheet"
+      href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+    />
+    <title>login.vn</title>
+  </head>
+  <body>
+    <div id="wrapper">
+      <form action="" id="form-login">
+        <h1 class="form-heading">Đăng nhập</h1>
+        <div class="form-group">
+          <i class="far fa-user"></i>
+          <input type="text" class="form-input" placeholder="Tên đăng nhập" />
+        </div>
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" class="form-input" placeholder="Mật khẩu" />
+          <div id="eye">
+            <i class="far fa-eye"></i>
+          </div>
+        </div>
+        <div class="link">
+          <a href="#">Quên mật khẩu?</a>
+          <a href="dangky.html">Đăng ký</a>
+        </div>
+        <input type="submit" value="Đăng nhập" class="form-submit" />
+      </form>
+    </div>
+    <script>
+      // ✅ Kiểm tra đăng nhập
+      if (!localStorage.getItem("isAdmin")) {
+        window.location.href = "dangnhap.html";
+      }
+
+      // ✅ Đăng xuất
+      const logoutBtn = document.getElementById("logout-btn");
+      logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("isAdmin");
+        window.location.href = "dangnhap.html";
+      });
+
+      // ✅ Hiển thị tên admin (nếu có)
+      const currentUser = JSON.parse(
+        localStorage.getItem("currentUser") || "{}"
+      );
+      if (currentUser.username) {
+        document.getElementById("adminName").innerHTML =
+          currentUser.username + ' <i class="ri-arrow-down-s-fill"></i>';
+      }
+
+      // ✅ Mở/đóng submenu
+      const menuItems = document.querySelectorAll(
+        ".admin-sidebar-content > ul > li"
+      );
+      menuItems.forEach((item) => {
+        const submenu = item.querySelector(".sub-menu");
+        const toggleIcon = item.querySelector(".toggle-icon");
+        item.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (!submenu) {
+            menuItems.forEach((i) => i.classList.remove("active"));
+            item.classList.add("active");
+            return;
+          }
+          document.querySelectorAll(".sub-menu").forEach((sub) => {
+            if (sub !== submenu) sub.classList.remove("active");
+          });
+          if (toggleIcon) toggleIcon.classList.toggle("rotate");
+          submenu.classList.toggle("active");
+        });
+      });
+
+      // ✅ Hàm load nội dung trang chính
+      const mainContent = document.getElementById("main-content");
+      const pageTitle = document.getElementById("page-title");
+
+      // 👉 Tạo hàm loadContent riêng để tái sử dụng
+      function loadContent(target, title) {
+        pageTitle.textContent = title;
+
+        // === DANH SÁCH ĐƠN HÀNG ===
+        if (target === "orders-list") {
+          mainContent.innerHTML = `
+        <div class="admin-content-main-content-order-list">
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tên khách hàng</th>
+                <th>Số điện thoại</th>
+                <th>Email</th>
+                <th>Địa chỉ</th>
+                <th>Ghi chú</th>
+                <th>Chi tiết</th>
+                <th>Ngày đặt</th>
+                <th>Trạng thái</th>
+                <th>Tùy chỉnh</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Nguyễn Văn A</td>
+                <td>0123456789</td>
+                <td>a@gmail.com</td>
+                <td>HCM</td>
+                <td>Giao nhanh</td>
+                <td><a href="#" class="view-detail" data-target="orders-detail">Xem</a></td>
+                <td>2023-12-23</td>
+                <td><span class="status success">Đã giao</span></td>
+                <td><a class="delete-class" href="#">Xóa</a></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Trần Thị B</td>
+                <td>0987654321</td>
+                <td>b@gmail.com</td>
+                <td>Hà Nội</td>
+                <td>Giao giờ hành chính</td>
+                <td><a href="#" class="view-detail" data-target="orders-detail">Xem</a></td>
+                <td>2023-12-25</td>
+                <td><span class="status pending">Chờ xử lý</span></td>
+                <td><a class="delete-class" href="#">Xóa</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+          attachViewDetailEvent(); // 👉 Gắn lại sự kiện sau khi load
+          return;
+        }
+
+        // === CHI TIẾT ĐƠN HÀNG ===
+        if (target === "orders-detail") {
+          mainContent.innerHTML = `
+        <div class="admin-content-main-content-order-detail">
+          <h3>Chi tiết đơn hàng #1</h3>
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+                <th>Tùy chỉnh</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><img style="width:70px" src="image.avif" alt="Đồng hồ Casio" /></td>
+                <td>Đồng hồ Casio</td>
+                <td>120,000</td>
+                <td>2</td>
+                <td>240,000</td>
+                <td><a class="delete-class" href="#">Xóa</a></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><img style="width:70px" src="image.avif" alt="Đồng hồ cổ" /></td>
+                <td>Đồng hồ cổ</td>
+                <td>150,000</td>
+                <td>1</td>
+                <td>150,000</td>
+                <td><a class="delete-class" href="#">Xóa</a></td>
+              </tr>
+              <tr>
+                <td colspan="5" style="font-weight:700">Tổng cộng</td>
+                <td style="font-weight:700">390,000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+          return;
+        }
+
+        // === DANH SÁCH SẢN PHẨM ===
+        if (target === "product-list") {
+          mainContent.innerHTML = `
+        <div class="admin-content-main-content-product-list">
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Ảnh</th>
+                <th>Tên Sản Phẩm</th>
+                <th>Giá Bán</th>
+                <th>Giá Giảm</th>
+                <th>Ngày Đăng</th>
+                <th>Tùy Chỉnh</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><img style="width:70px" src="image.avif" alt="Đồng hồ Casio" /></td>
+                <td>Đồng hồ Casio</td>
+                <td>120,000</td>
+                <td>100,000</td>
+                <td>2023-10-27</td>
+                <td><a class="edit-class">Sửa</a> | <a class="delete-class">Xóa</a></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><img style="width:70px" src="image.avif" alt="Đồng hồ cổ" /></td>
+                <td>Đồng hồ cổ</td>
+                <td>220,000</td>
+                <td>150,000</td>
+                <td>2023-10-28</td>
+                <td><a class="edit-class">Sửa</a> | <a class="delete-class">Xóa</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+          return;
+        }
+
+        // === THÊM SẢN PHẨM ===
+        if (target === "product-add") {
+          mainContent.innerHTML = `
+        <div class="admin-content-main-content-product-add">
+          <div class="admin-content-main-content-left">
+            <div class="admin-content-main-content-two-input">
+              <input type="text" placeholder="Tên sản phẩm" />
+              <input type="text" placeholder="Chất liệu" />
+            </div>
+            <div class="admin-content-main-content-two-input">
+              <input type="text" placeholder="Giá bán" />
+              <input type="text" placeholder="Giá giảm" />
+            </div>
+            <textarea placeholder="Đặc điểm"></textarea>
+            <textarea placeholder="Mô tả sản phẩm"></textarea>
+            <button class="main-btn">Thêm sản phẩm</button>
+          </div>
+          <div class="admin-content-main-content-right">
+            <div class="admin-content-main-content-right-image">
+              <label for="file">Ảnh đại diện</label>
+              <input id="file" type="file" />
+              <div class="image-show"></div>
+            </div>
+            <div class="admin-content-main-content-right-images">
+              <label for="files">Ảnh sản phẩm</label>
+              <input id="files" type="file" multiple />
+              <div class="images-show"></div>
+            </div>
+          </div>
+        </div>
+      `;
+          return;
+        }
+
+        // === Mặc định
+        mainContent.innerHTML = `<p>Chức năng <b>${title}</b> đang được phát triển...</p>`;
+      }
+
+      // 👉 Gắn sự kiện click cho các liên kết menu
+      document.querySelectorAll(".menu-link").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          loadContent(link.dataset.target, link.textContent.trim());
+        });
+      });
+
+      // 👉 Hàm gắn sự kiện cho "Xem chi tiết" trong danh sách đơn hàng
+      function attachViewDetailEvent() {
+        const viewLinks = document.querySelectorAll(".view-detail");
+        viewLinks.forEach((v) => {
+          v.addEventListener("click", (e) => {
+            e.preventDefault();
+            loadContent("orders-detail", "Chi tiết đơn hàng");
+          });
+        });
+      }
+    </script>
+  </body>
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="dangnhap.js"></script>
+</html>
