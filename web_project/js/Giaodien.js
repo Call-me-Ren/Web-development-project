@@ -80,6 +80,8 @@ searchInput.addEventListener('input', () => {
     }
 });
 
+
+
 // Quản lý đăng nhập / avatar / đăng xuất
 document.addEventListener("DOMContentLoaded", function () {
   // Cập nhật đường dẫn Đăng nhập trong index.html
@@ -341,4 +343,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Hiển thị trang đầu tiên khi tải
     showPage(currentPage);
+});
+
+// === Hiển thị chi tiết sản phẩm tự động đọc từ DOM ===
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('product-detail-overlay');
+  const closeBtn = document.getElementById('close-detail');
+  const imgEl = document.getElementById('detail-image');
+  const nameEl = document.getElementById('detail-name');
+  const descEl = document.getElementById('detail-description');
+  const categoryEl = document.getElementById('detail-category');
+  const priceEl = document.getElementById('detail-price');
+
+  document.querySelectorAll('.xem-chi-tiet').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Lấy thẻ cha .product-card
+      const card = btn.closest('.product-card');
+      if (!card) return;
+
+      const name = card.querySelector('h3')?.textContent?.trim() || 'Không rõ tên';
+      const desc = card.querySelector('.text-gray-600')?.textContent?.trim() || 'Không có mô tả';
+      const price = card.querySelector('.text-indigo-600')?.textContent?.trim() || '0 VNĐ';
+      const category = card.dataset.category || 'Không xác định';
+      const img = card.querySelector('img')?.src || '';
+
+      // Gán thông tin vào khung chi tiết
+      imgEl.src = img;
+      nameEl.textContent = name;
+      descEl.textContent = desc;
+      categoryEl.textContent = "Thể loại: " + category.charAt(0).toUpperCase() + category.slice(1);
+      priceEl.textContent = price;
+
+      // Hiện overlay
+      overlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  // Đóng overlay
+  closeBtn.addEventListener('click', () => {
+    overlay.classList.add('hidden');
+    document.body.style.overflow = '';
+  });
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) {
+      overlay.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+  });
 });
