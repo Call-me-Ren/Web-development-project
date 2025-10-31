@@ -39,6 +39,8 @@ body {
     cursor: pointer;
 }
 
+
+
 /* Thẻ sản phẩm */
 .product-card {
     background: white;
@@ -74,4 +76,23 @@ body {
 }
 #pagination button {
   transition: 0.2s;
+}
+
+.xem-chi-tiet {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Overlay chi tiết sản phẩm */
+#product-detail-overlay.hidden {
+  display: none;
+}
+#product-detail-overlay {
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.3s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
