@@ -46,7 +46,14 @@ function getFromStorage(key, defaultValue = []) {
                 saveToStorage(key, defaultCategories); return defaultCategories;
             }
             if (key === PRODUCTS_KEY) {
-                const defaultProducts = [ { id: "sp001", name: "Đồng Hồ Nam Lịch Lãm", price: 4500000, image: "../images/dong-ho-nam-1.jpg", category: "nam", description_short: "Mẫu đồng hồ cơ tự động.", description_long: "Trải nghiệm sự tinh tế..."}, { id: "sp002", name: "Đồng Hồ Nữ Thanh Lịch", price: 3200000, image: "../images/dong-ho-nu-1.jpg", category: "nu", description_short: "Thiết kế tối giản, đính đá.", description_long: "Mẫu đồng hồ Quartz..."}, { id: "sp003", name: "Đồng Hồ Nam Thể Thao", price: 5800000, image: "../images/dong-ho-nam-2.jpg", category: "nam", description_short: "Chronograph, chống nước 10ATM.", description_long: "Dành cho người đàn ông năng động..."} ];
+                // SỬA DỮ LIỆU MẪU Ở ĐÂY ĐỂ TRÙNG VỚI ẢNH CỦA BẠN
+                const defaultProducts = [
+                    { id: "sp001", name: "Đồng Hồ Nam Olevs Mặt Xanh", price: 4500000, image: "../images/ảnh đồng hồ nam 1.jpg", category: "nam", description_short: "Mẫu đồng hồ cơ tự động.", description_long: "Trải nghiệm sự tinh tế..."},
+                    { id: "sp002", name: "Đồng Hồ Nữ Đính Đá", price: 3200000, image: "../images/time_city.webp", category: "nu", description_short: "Thiết kế đính đá sang trọng.", description_long: "Mẫu đồng hồ Quartz..."},
+                    { id: "sp003", name: "Đồng Hồ Nam CRRJU Đen Vàng", price: 5800000, image: "../images/ảnh đồng hồ nam 2.jpg", category: "nam", description_short: "Chronograph, chống nước 10ATM.", description_long: "Dành cho người đàn ông năng động..."},
+                    { id: "sp004", name: "Đồng Hồ Nam Fossil Dây Da", price: 3100000, image: "../images/ảnh 8.jpg", category: "nam", description_short: "Mặt số La Mã, dây da bê.", description_long: "Ghi dấu kỷ niệm..."},
+                    { id: "sp005", name: "Đồng Hồ Nam Fossil Đen", price: 6200000, image: "../images/ảnh đồng hồ nam 3.jpg", category: "nam", description_short: "Mặt to, Chronograph.", description_long: "Sự kết hợp hoàn hảo..."}
+                ];
                 saveToStorage(key, defaultProducts); return defaultProducts;
             }
              if (key === INVENTORY_KEY) {
@@ -555,7 +562,7 @@ function loadInventoryTable() {
                     <img src="${prod.image}" alt="${prod.name}">
                     <div>
                         <strong>${prod.name}</strong>
-                        <div class="details">${prod.id}</div>
+                        <div class="details" style="font-size: 0.8rem; color: #64748b;">${prod.id}</div>
                     </div>
                 </div>
             </td>
@@ -597,7 +604,7 @@ function loadPriceTable() {
         tr.innerHTML = `
             <td>
                 <strong>${prod.name}</strong>
-                <div class="details">${prod.id}</div>
+                <div class="details" style="font-size: 0.8rem; color: #64748b;">${prod.id}</div>
             </td>
             <td class="text-cost">${formatVND(giaVon)}</td>
             <td class="text-profit">${profitMargin * 100}%</td>
