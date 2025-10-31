@@ -1,0 +1,161 @@
+/* css/admin.css */
+
+/* --- CSS cho Trang Đăng nhập --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+}
+
+.login-form {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.login-form h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.8rem;
+    color: #1c1e21;
+}
+
+.login-form p {
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    color: #606770;
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+    box-sizing: border-box; /* Quan trọng */
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #1877f2;
+    box-shadow: 0 0 0 2px #e7f3ff;
+}
+
+.login-button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    background-color: #1877f2;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-button:hover {
+    background-color: #166fe5;
+}
+
+.error-message {
+    background-color: #fde8e8;
+    color: #b91c1c;
+    border: 1px solid #fbcaca;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+/* --- CSS chung cho Admin (Sẽ dùng sau) --- */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 240px;
+    background-color: #2d3748; /* Dark blue/gray */
+    color: #e2e8f0;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-sidebar h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 2rem 0;
+    text-align: center;
+}
+
+.admin-nav a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #e2e8f0;
+    text-decoration: none;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.admin-nav a:hover,
+.admin-nav a.active {
+    background-color: #4a5568; /* Lighter gray */
+    color: #ffffff;
+}
+
+.admin-nav a.logout {
+    margin-top: auto; /* Đẩy xuống cuối */
+    background-color: #c53030; /* Red */
+    color: #ffffff;
+}
+.admin-nav a.logout:hover {
+    background-color: #e53e3e;
+}
+
+.admin-main {
+    flex-grow: 1;
+    background-color: #f7fafc; /* Very light gray */
+    padding: 2rem 2.5rem;
+    overflow-y: auto;
+}
+
+.admin-main h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 2rem 0;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 1rem;
+}

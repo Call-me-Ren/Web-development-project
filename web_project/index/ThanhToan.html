@@ -49,7 +49,6 @@
     </header>
 
     <div class="grid">
-      <!-- LEFT: Form -->
       <div>
         <div class="card" id="checkoutForm">
           <div style="margin-bottom:10px">
@@ -63,9 +62,9 @@
           </div>
 
           <div style="margin-bottom:10px">
-            <label for="address">Địa chỉ giao hàng <span class="note">(bỏ trống sẽ lấy địa chỉ trong tài khoản)</span></label>
+            <label for="address">Địa chỉ giao hàng</label>
             <textarea id="address" placeholder="Ví dụ: 123 Nguyễn Trãi, Quận 1, TP.HCM"></textarea>
-            <div class="note">Nếu bạn đã đăng ký và lưu địa chỉ trong tài khoản, để trống ô trên sẽ tự điền địa chỉ đó.</div>
+            <div class="note">Bạn có thể để trống nếu muốn sử dụng địa chỉ đã lưu trong tài khoản.</div>
           </div>
 
           <div style="margin-bottom:10px">
@@ -97,12 +96,10 @@
 
           <div style="margin-top:12px;display:flex;gap:8px">
             <button id="placeOrderBtn" class="btn">Đặt hàng</button>
-<button id="useAccountBtn" class="btn btn-back" style="background:#6b7280">Dùng địa chỉ trong tài khoản</button>
-          </div>
+            </div>
         </div>
       </div>
 
-      <!-- RIGHT: summary + editable cart -->
       <aside>
         <div class="card">
           <h3 style="margin:0 0 8px">Giỏ hàng</h3>
@@ -130,9 +127,21 @@
 
 <script>
 /* ======= Cấu hình ======= */
-const CART_KEY = 'watchtime_cart'; // key localStorage
-// Mô phỏng user account (nếu bạn có backend, thay bằng dữ liệu thật)
-const account = { fullname: "Nguyễn Văn A", phone: "0901234567", savedAddress: "12A Nguyễn Huệ, Quận 1, TP.HCM" };
+const CART_KEY = 'watchtime_cart';
+const ORDERS_KEY = 'allOrders'; // Key để lưu tất cả đơn hàng
+
+// Lấy thông tin người dùng đang đăng nhập
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+let userData = null;
+
+// KIỂM TRA ĐĂNG NHẬP (Cực kỳ quan trọng)
+if (!currentUser) {
+  alert("Vui lòng đăng nhập để thanh toán!");
+  window.location.href = "dangnhap.html";
+} else {
+  // Lấy thông tin chi tiết của người dùng từ email
+  userData = JSON.parse(localStorage.getItem(currentUser.email));
+}
 
 /* ======= Helpers lưu/đọc cart ======= */
 function getCart(){
@@ -171,7 +180,7 @@ function renderCartUI(){
 
     // sản phẩm + remove button
     const tdName = document.createElement('td');
-tdName.style.verticalAlign = 'middle';
+    tdName.style.verticalAlign = 'middle';
     tdName.innerHTML = `<div style="font-weight:700">${escapeHtml(item.name)}</div>
                         <div class="note" style="margin-top:6px">Mã: ${escapeHtml(item.id || '')}</div>`;
     const removeBtn = document.createElement('button');
@@ -212,7 +221,6 @@ tdName.style.verticalAlign = 'middle';
         saveCart(cart);
         renderCartUI();
       } else {
-        // nếu qty =1 mà bấm giảm -> hỏi xóa
         if(confirm('Giảm sẽ xóa sản phẩm. Bạn muốn xóa không?')) {
           removeItemFromCart(idx);
         }
@@ -247,6 +255,10 @@ function updateHeaderCartCount(){
   const cart = getCart();
   const count = cart.reduce((s,i)=> s + (i.qty || 0), 0);
   const el = document.getElementById('cart-count');
+  // Cập nhật luôn cho trang index.html
+  if (window.opener && typeof window.opener.updateHeaderCartCount === 'function') {
+      window.opener.updateHeaderCartCount();
+  }
   if(el) el.textContent = count;
 }
 
@@ -258,17 +270,21 @@ const formOnlineArea = document.getElementById('formOnlineArea');
 function updateFormPaymentUI(){
   const val = document.querySelector('input[name="payment"]:checked').value;
   formBankArea.classList.toggle('hidden', val !== 'bank');
-formOnlineArea.classList.toggle('hidden', val !== 'online');
+  formOnlineArea.classList.toggle('hidden', val !== 'online');
 }
 radios.forEach(r=> r.addEventListener('change', updateFormPaymentUI));
 updateFormPaymentUI();
 
-/* Dùng địa chỉ tài khoản */
-document.getElementById('useAccountBtn').addEventListener('click', ()=>{
-  document.getElementById('name').value = account.fullname;
-  document.getElementById('phone').value = account.phone;
-  document.getElementById('address').value = account.savedAddress;
-});
+/* Tự động điền thông tin tài khoản */
+function prefillUserInfo() {
+    if (userData) {
+        document.getElementById('name').value = (userData.firstname + ' ' + userData.lastname) || '';
+        document.getElementById('phone').value = userData.number || '';
+        // Địa chỉ sẽ tự động lấy nếu ô địa chỉ để trống, nên không cần điền trước
+        // Nếu muốn điền sẵn, bỏ comment dòng dưới
+        // document.getElementById('address').value = userData.address || '';
+    }
+}
 
 /* Đặt hàng */
 document.getElementById('placeOrderBtn').addEventListener('click', function(){
@@ -277,31 +293,74 @@ document.getElementById('placeOrderBtn').addEventListener('click', function(){
     alert('Giỏ hàng rỗng. Vui lòng thêm sản phẩm trước khi đặt hàng.');
     return;
   }
-  const name = document.getElementById('name').value.trim() || account.fullname;
-  const phone = document.getElementById('phone').value.trim() || account.phone;
-  let address = document.getElementById('address').value.trim() || account.savedAddress || '';
-  if(!address){
-    alert('Vui lòng nhập địa chỉ nhận hàng hoặc dùng địa chỉ trong tài khoản.');
+  
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  let address = document.getElementById('address').value.trim();
+
+  // Nếu địa chỉ để trống, dùng địa chỉ đã lưu
+  if (!address && userData && userData.address) {
+      address = userData.address;
+  }
+
+  if (!name || !phone || !address) {
+    alert('Vui lòng nhập đầy đủ Họ tên, Số điện thoại và Địa chỉ giao hàng.');
     return;
   }
+  
   const payment = document.querySelector('input[name="payment"]:checked').value;
+  
   const order = {
     id: 'ORD' + Date.now(),
+    userEmail: currentUser.email, // Gắn email người dùng vào đơn hàng
     customer: { name, phone, address },
     items: cart,
     total: sumCart(cart),
-    paymentMethod: payment
+    paymentMethod: payment,
+    status: 'Mới đặt', // Thêm trạng thái đơn hàng
+    orderDate: new Date().toISOString() // Thêm ngày đặt hàng
   };
+  
   showOrderSummary(order);
 });
 
-/* Hiển thị tóm tắt đơn hàng + payment flows (giữ nguyên khả năng tạo QR) */
+/* *** THAY ĐỔI LỚN: Hàm này sẽ lưu đơn hàng vào localStorage *** */
+function completeOrder(order) {
+    // 1. Lấy danh sách đơn hàng đã có
+    let allOrders = [];
+    try {
+        allOrders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
+    } catch (e) {
+        allOrders = [];
+    }
+    
+    // 2. Thêm đơn hàng mới vào
+    allOrders.push(order);
+    
+    // 3. Lưu lại vào localStorage
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(allOrders));
+
+    // 4. Xóa giỏ hàng
+    localStorage.removeItem(CART_KEY);
+    
+    // 5. Cập nhật lại UI
+    updateHeaderCartCount();
+    renderCartUI();
+    
+    // 6. Ẩn form, hiển thị thông báo thành công
+    document.getElementById('checkoutForm').classList.add('hidden');
+    document.getElementById('orderArea').innerHTML = `<div class="success">Cảm ơn! Đơn hàng #${order.id} đã được ghi nhận.</div>
+      <a href="index.html" class="btn" style="margin-top:10px;">Về trang chủ</a>
+      <a href="lichsu.html" class="btn" style="margin-top:10px; background: #111;">Xem lịch sử đơn hàng</a>`;
+}
+
+/* Hiển thị tóm tắt đơn hàng + payment flows */
 function showOrderSummary(order){
   const orderArea = document.getElementById('orderArea');
   orderArea.innerHTML = '';
   // summary
   const s = document.createElement('div'); s.className = 'summary-box';
-  s.innerHTML = `<div style="font-weight:800">Đơn hàng #${order.id}</div>
+  s.innerHTML = `<div style="font-weight:800">Xác nhận đơn hàng #${order.id}</div>
     <div style="margin-top:8px"><strong>Người nhận:</strong> ${escapeHtml(order.customer.name)} — ${escapeHtml(order.customer.phone)}</div>
     <div style="margin-top:6px"><strong>Địa chỉ:</strong> ${escapeHtml(order.customer.address)}</div>
     <div style="margin-top:8px"><strong>Sản phẩm:</strong><ul id="orderItems" style="margin:6px 0 0 16px;padding-left:0;"></ul></div>
@@ -327,10 +386,8 @@ function showOrderSummary(order){
     ok.style.marginTop = '10px';
     ok.onclick = ()=>{
       alert('Quét QR và thực hiện thanh toán. Đơn hàng đã được ghi nhận.');
-      localStorage.removeItem(CART_KEY);
-      updateHeaderCartCount();
-      renderCartUI();
-      orderArea.innerHTML = '<div class="success">Cảm ơn! Đơn hàng đã được ghi nhận.</div>';
+      order.status = 'Đã thanh toán (Chờ xử lý)'; // Cập nhật trạng thái
+      completeOrder(order); // <-- Thay đổi ở đây
     };
     orderArea.appendChild(ok);
 
@@ -340,7 +397,7 @@ function showOrderSummary(order){
       <div class="note" style="margin-top:6px">Ngân hàng: <strong>Vietcombank</strong><br>Chủ TK: <strong>WATCHTIME JSC</strong><br>Số TK: <strong>0123456789</strong></div>
       <div style="margin-top:8px">
         <label>Số tiền bạn đã chuyển (VNĐ)</label>
-        <input id="summaryTransferAmount" type="number" placeholder="Ví dụ: 458500000">
+        <input id="summaryTransferAmount" type="number" placeholder="Ví dụ: ${order.total}">
         <label style="margin-top:8px">Mã giao dịch (nếu có)</label>
         <input id="summaryTransferRef" type="text" placeholder="Mã giao dịch / ghi chú">
         <button id="createBankQrBtn" class="btn" style="margin-top:8px">Tạo QR chuyển khoản</button>
@@ -350,44 +407,46 @@ function showOrderSummary(order){
           <img id="bankQrImg" class="qr" src="#" alt="QR chuyển khoản">
         </div>
 
-        <div style="margin-top:8px"><button id="bankFinalBtn" class="btn" style="margin-top:8px">Hoàn tất</button></div>
+        <div style="margin-top:8px"><button id="bankFinalBtn" class="btn" style="margin-top:8px">Tôi đã chuyển khoản & Hoàn tất</button></div>
       </div>`;
     orderArea.appendChild(bankDiv);
 
     setTimeout(()=>{
+        // Tự điền số tiền
+        document.getElementById('summaryTransferAmount').value = order.total;
+      
       document.getElementById('createBankQrBtn').onclick = ()=>{
         const amt = Number(document.getElementById('summaryTransferAmount').value);
-        const ref = document.getElementById('summaryTransferRef').value.trim();
+        const ref = document.getElementById('summaryTransferRef').value.trim() || order.id;
         if(!amt || amt <= 0){ alert('Vui lòng nhập số tiền đã chuyển.'); return; }
         const acct = 'VCB-0123456789';
-        const data = `BANK|order=${order.id}|acct=${acct}|amount=${amt}|ref=${encodeURIComponent(ref)}`;
-        document.getElementById('bankQrImg').src = generateQrUrl(data);
+        // Tạo QR theo chuẩn VietQR (ngân hàng, tk, số tiền, nội dung)
+        const data = `https://img.vietqr.io/image/970436-${acct}-compact.png?amount=${amt}&addInfo=${encodeURIComponent(ref)}`;
+        document.getElementById('bankQrImg').src = data; // Dùng API VietQR cho chuẩn
         document.getElementById('bankQrWrap').classList.remove('hidden');
       };
       document.getElementById('bankFinalBtn').onclick = ()=>{
-        alert('Cảm ơn! Đơn hàng được ghi nhận.'); 
-        localStorage.removeItem(CART_KEY);
-        updateHeaderCartCount();
-        renderCartUI();
-orderArea.innerHTML = '<div class="success">Cảm ơn! Đơn hàng đã được ghi nhận.</div>';
+        alert('Cảm ơn! Đơn hàng được ghi nhận, chúng tôi sẽ kiểm tra giao dịch.'); 
+        order.status = 'Đã thanh toán (Chờ xử lý)'; // Cập nhật trạng thái
+        completeOrder(order); // <-- Thay đổi ở đây
       };
     }, 50);
 
-  } else {
+  } else { // COD
     const codDiv = document.createElement('div'); codDiv.className = 'summary-box';
     codDiv.innerHTML = `<div style="font-weight:700">Thanh toán khi nhận hàng (COD)</div><div class="note" style="margin-top:6px">Người bán sẽ liên hệ để xác nhận đơn.</div>`;
     orderArea.appendChild(codDiv);
     const ok = document.createElement('button'); ok.className = 'btn'; ok.textContent='Hoàn tất'; ok.style.marginTop='10px';
     ok.onclick = ()=>{
       alert('Đơn hàng COD đã được ghi nhận.');
-      localStorage.removeItem(CART_KEY);
-      updateHeaderCartCount();
-      renderCartUI();
-      orderArea.innerHTML = '<div class="success">Cảm ơn! Đơn hàng đã được ghi nhận.</div>';
+      order.status = 'Mới đặt (COD)'; // Cập nhật trạng thái
+      completeOrder(order); // <-- Thay đổi ở đây
     };
     orderArea.appendChild(ok);
   }
 
+  // Ẩn form đặt hàng
+  document.getElementById('checkoutForm').classList.add('hidden');
   setTimeout(()=> orderArea.scrollIntoView({behavior:'smooth'}),200);
 }
 
@@ -397,11 +456,10 @@ function generateQrUrl(text){ return 'https://api.qrserver.com/v1/create-qr-code
 document.addEventListener('DOMContentLoaded', ()=>{
   renderCartUI();
   updateHeaderCartCount();
+  prefillUserInfo(); // Tự điền thông tin khi trang tải xong
 
-  // khi bấm quay về trang chủ — localStorage không bị xóa => cart vẫn giữ
   document.getElementById('backHomeBtn').addEventListener('click', ()=> {
     // chỉ điều hướng bằng href, cart giữ nguyên trong localStorage
-    // (nếu muốn có hành vi khác, thêm ở đây)
   });
 });
 </script>
