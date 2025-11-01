@@ -87,8 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeAddToCart(); 
     initializeLanguageToggle();
     
-    // 6. Xóa bỏ logic overlay (vì đã chuyển sang chitiet.html)
-    // initializeDetailView(); // Đã xóa hàm này
+    // SỬA ĐỔI: Thêm hàm khởi tạo menu mobile
+    initializeMobileMenu();
 });
 
 /**
@@ -124,13 +124,12 @@ function initializeAddToCart() {
     }
     
     // Gắn sự kiện cho TẤT CẢ nút add-to-cart
-    // Phải tìm trong #product-grid vì các nút này được render động
     const productGrid = document.getElementById("product-grid");
     if (!productGrid) return;
 
     productGrid.addEventListener('click', (e) => {
         if (!e.target.classList.contains('add-to-cart')) {
-            return; // Bấm vào thứ khác, không phải nút "Thêm vào giỏ"
+            return; 
         }
         
         e.preventDefault(); 
@@ -148,7 +147,6 @@ function initializeAddToCart() {
         if (!card) return;
         
         const id = card.dataset.id;
-        // Tìm sản phẩm gốc từ allProducts để lấy thông tin chuẩn
         const product = allProducts.find(p => p.id === id);
         if (!product) {
             console.error("Không tìm thấy sản phẩm với ID:", id);
@@ -161,12 +159,11 @@ function initializeAddToCart() {
         if(existing){
             existing.qty = (existing.qty || 1) + 1;
         } else {
-            // Lưu thông tin đầy đủ vào giỏ hàng
             cart.push({ id: product.id, name: product.name, price: product.price, qty: 1, image: product.image });
         }
         saveCart(cart);
 
-        updateHeaderCartCount(); // Hàm này đã có ở dưới
+        updateHeaderCartCount(); 
 
         const cartCountEl = document.getElementById("cart-count");
         if (cartCountEl) {
@@ -237,10 +234,7 @@ function applyFiltersAndSearch() {
         const price = parseFloat(priceText);
         const name = product.querySelector("h3").innerText.toLowerCase();
 
-        // --- Kiểm tra theo loại ---
         const matchCategory = category === "all" || productCategory === category;
-
-        // --- Kiểm tra theo giá ---
         let matchPrice = true;
         switch (priceRange) {
             case "5": matchPrice = price < 5000000; break;
@@ -250,11 +244,8 @@ function applyFiltersAndSearch() {
             case "over20": matchPrice = price >= 20000000; break;
             default: matchPrice = true;
         }
-
-        // --- Kiểm tra theo tên tìm kiếm ---
         const matchSearch = name.includes(searchTerm);
 
-        // --- Kết hợp ---
         if (matchCategory && matchPrice && matchSearch) {
             filteredProducts.push(product);
         }
@@ -287,30 +278,22 @@ function showPage(page, productList) {
     const end = start + productsPerPage;
     const pageProducts = productList.slice(start, end);
     
-    // Thay vì render lại, chỉ cần ẩn/hiện
     const grid = document.getElementById("product-grid");
     
-    // Tạm thời xóa các thẻ đang hiển thị
     while (grid.firstChild) {
         grid.removeChild(grid.firstChild);
     }
     
-    // Chỉ thêm các thẻ của trang hiện tại
     if (pageProducts.length > 0) {
          pageProducts.forEach(card => {
-            card.style.display = "block"; // Đảm bảo thẻ được hiển thị
-            grid.appendChild(card); // Thêm thẻ vào grid
+            card.style.display = "block"; 
+            grid.appendChild(card); 
         });
     } else {
-        // Xử lý trường hợp không có sản phẩm nào sau khi lọc
         if (productList.length === 0 && allProductCards.length > 0) {
              grid.innerHTML = "<p class='text-center col-span-full text-gray-600'>Không tìm thấy sản phẩm nào khớp với bộ lọc.</p>";
         }
     }
-    
-    // Cần gọi lại hàm gắn sự kiện add-to-cart VÌ các thẻ vừa được thêm lại vào DOM
-    // ... thực ra không cần, vì 'allProductCards' là tham chiếu DOM, chúng ta chỉ đang di chuyển chúng
-    // GHI CHÚ: Sửa logic 'initializeAddToCart' để dùng 'event delegation' sẽ tốt hơn
 }
 
 
@@ -377,12 +360,17 @@ function initializeLoginUI() {
   const userAvatar = document.getElementById("user-avatar");
   const userMenu = document.getElementById("user-menu");
   
+  // Thêm cho menu mobile
+  const mobileLoginLink = document.querySelector('#mobile-menu a[href="dangnhap.html"]');
+  const mobileUserMenu = document.getElementById('mobile-user-menu');
+  const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+
   if (!loginLink || !userAvatar || !userMenu) {
       console.warn("Một số element của UI đăng nhập không tìm thấy.");
       return;
   }
   
-  const logoutBtn = userMenu.querySelector("a[href='#']"); // Nút đăng xuất
+  const logoutBtn = userMenu.querySelector("a[href='#']"); 
   const infoBtn = userMenu.querySelector("a[href='xuathongtin.html']");
   const historyBtn = userMenu.querySelector("a[href='lichsu.html']");
 
@@ -390,13 +378,22 @@ function initializeLoginUI() {
 
   function updateLoginUI() {
     if (isLoggedIn) {
-      loginLink.classList.add("hidden");
+      // Desktop
+      loginLink.parentElement.classList.add("hidden"); // Ẩn cả div cha
       userAvatar.classList.remove("hidden");
       userAvatar.classList.add("flex");
+      // Mobile
+      if(mobileLoginLink) mobileLoginLink.classList.add("hidden");
+      if(mobileUserMenu) mobileUserMenu.classList.remove("hidden");
+      
     } else {
-      loginLink.classList.remove("hidden");
+      // Desktop
+      loginLink.parentElement.classList.remove("hidden");
       userAvatar.classList.add("hidden");
-      localStorage.removeItem("isLoggedIn"); 
+      localStorage.removeItem("isLoggedIn");
+      // Mobile
+      if(mobileLoginLink) mobileLoginLink.classList.remove("hidden");
+      if(mobileUserMenu) mobileUserMenu.classList.add("hidden");
     }
   }
 
@@ -413,20 +410,32 @@ function initializeLoginUI() {
     }
   });
 
+  // Hàm đăng xuất
+  function doLogout() {
+     if (confirm("Bạn có chắc muốn đăng xuất?")) {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("currentUser");
+        localStorage.removeItem("watchtime_cart"); 
+        isLoggedIn = false;
+        updateLoginUI();
+        userMenu.classList.add("hidden");
+        updateHeaderCartCount(); 
+        window.location.reload(); 
+    }
+  }
+
   if(logoutBtn) {
     logoutBtn.addEventListener("click", function (e) {
         e.preventDefault();
-        if (confirm("Bạn có chắc muốn đăng xuất?")) {
-            localStorage.removeItem("isLoggedIn");
-            localStorage.removeItem("currentUser");
-            localStorage.removeItem("watchtime_cart"); 
-            isLoggedIn = false;
-            updateLoginUI();
-            userMenu.classList.add("hidden");
-            updateHeaderCartCount(); 
-            window.location.reload(); 
-        }
+        doLogout();
     });
+  }
+  // Gắn sự kiện cho nút logout mobile
+  if(mobileLogoutBtn) {
+      mobileLogoutBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          doLogout();
+      });
   }
 
   if (infoBtn) {
@@ -442,6 +451,43 @@ function initializeLoginUI() {
         window.location.href = "lichsu.html";
     });
   }
+}
+
+/**
+ * THÊM MỚI: Gắn sự kiện cho menu mobile (hamburger)
+ */
+function initializeMobileMenu() {
+    const menuBtn = document.getElementById("mobile-menu-btn");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    if (!menuBtn || !mobileMenu) {
+        console.warn("Không tìm thấy nút hoặc menu mobile.");
+        return;
+    }
+
+    menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        mobileMenu.classList.toggle("hidden");
+    });
+
+    // Tùy chọn: Đóng menu khi nhấp vào một link
+    mobileMenu.querySelectorAll("a").forEach(link => {
+        // Không đóng menu nếu là link đăng xuất/thông tin (vì chúng không cuộn trang)
+        if(link.getAttribute('href') === '#' || link.getAttribute('href') === 'xuathongtin.html' || link.getAttribute('href') === 'lichsu.html') {
+            return;
+        }
+        
+        link.addEventListener("click", () => {
+            mobileMenu.classList.add("hidden");
+        });
+    });
+    
+    // Đóng menu khi bấm ra ngoài
+    document.addEventListener("click", function (e) {
+        if (!mobileMenu.classList.contains('hidden') && !mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+            mobileMenu.classList.add("hidden");
+        }
+    });
 }
 
 
