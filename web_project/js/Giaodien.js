@@ -163,46 +163,6 @@ function initializeAddToCart() {
     });
 }
 
-/**
- * Gắn sự kiện cho Đa ngôn ngữ
- */
-function initializeLanguageToggle() {
-    let currentLang = "vi";
-    const langToggleBtn = document.querySelector(".btn"); // Lưu ý: nên đặt ID/class cụ thể hơn
-
-    const translations = {
-        vi: {
-            Home: "Trang Chủ", Products: "Sản Phẩm", About: "Về Chúng Tôi", Contact: "Liên Hệ",
-            "hero-title": "Bộ Sưu Tập Đồng Hồ Đẳng Cấp",
-            "hero-sub": "Khẳng định phong cách và vị thế của bạn với những chiếc đồng hồ tinh xảo nhất.",
-            explore: "Khám Phá Ngay", Login:"Đăng nhập", AToCard: "Thêm vào giỏ",
-        },
-        en: {
-            Home: "Home", Products: "Products", About: "About Us", Contact: "Contact",
-            "hero-title": "Luxury Watch Collection",
-            "hero-sub": "Define your style and status with the finest timepieces.",
-            explore: "Explore Now", Login: "Login", AToCard: "Add to Cart",
-        },
-    };
-
-    function updateLanguage() {
-        const lang = translations[currentLang];
-        document.querySelectorAll("[data-key]").forEach((el) => {
-            const key = el.getAttribute("data-key");
-            if (lang[key]) el.textContent = lang[key];
-        });
-    }
-
-    if (langToggleBtn && langToggleBtn.textContent.trim() === 'VI') {
-        langToggleBtn.addEventListener("click", () => {
-            currentLang = currentLang === "vi" ? "en" : "vi";
-            langToggleBtn.textContent = currentLang === "vi" ? "VI" : "EN";
-            updateLanguage();
-        });
-    }
-}
-
-
 /* === PHẦN 3: CÁC HÀM TIỆN ÍCH (Lấy từ code gốc của bạn) === */
 
 /**
@@ -246,6 +206,31 @@ function applyFiltersAndSearch() {
             product.style.display = "none"; // Ẩn nếu không khớp
         }
     });
+// --- Nếu KHÔNG có sản phẩm nào khớp theo tên tìm kiếm ---
+    if (filteredProducts.length === 0) {
+        allProductCards.forEach((product) => {
+            const productCategory = product.dataset.category;
+            const priceText = product.querySelector(".text-indigo-600").textContent.replace(/[^\d]/g, "");
+            const price = parseFloat(priceText);
+
+            const matchCategory = category === "all" || productCategory === category;
+            let matchPrice = true;
+            switch (priceRange) {
+                case "5": matchPrice = price < 5000000; break;
+                case "10": matchPrice = price < 10000000; break;
+                case "15": matchPrice = price < 15000000; break;
+                case "20": matchPrice = price < 20000000; break;
+                case "over20": matchPrice = price >= 20000000; break;
+                default: matchPrice = true;
+            }
+
+            if (matchCategory && matchPrice) {
+                product.style.display = "block"; // Hiển thị lại toàn bộ trong phạm vi lọc
+            } else {
+                product.style.display = "none";
+            }
+        });
+    }
 
     // Sau khi lọc, áp dụng lại phân trang cho KẾT QUẢ ĐÃ LỌC
     currentPage = 1; // Reset về trang 1
@@ -345,50 +330,50 @@ function renderPagination(productList) {
  * Quản lý đăng nhập / avatar / đăng xuất
  */
 function initializeLoginUI() {
-  const loginLink = document.querySelector('a[href="dangnhap.html"]');
-  const userAvatar = document.getElementById("user-avatar");
-  const userMenu = document.getElementById("user-menu");
-  
+    const loginLink = document.querySelector('a[href="dangnhap.html"]');
+    const userAvatar = document.getElementById("user-avatar");
+    const userMenu = document.getElementById("user-menu");
+    
   // Kiểm tra nếu các element tồn tại
-  if (!loginLink || !userAvatar || !userMenu) {
-      console.warn("Một số element của UI đăng nhập không tìm thấy.");
-      return;
-  }
-  
-  const logoutBtn = userMenu.querySelector("a:last-child");
-  const infoBtn = userMenu.querySelector("a:first-child");
+    if (!loginLink || !userAvatar || !userMenu) {
+        console.warn("Một số element của UI đăng nhập không tìm thấy.");
+        return;
+    }
+    
+    const logoutBtn = userMenu.querySelector("a:last-child");
+    const infoBtn = userMenu.querySelector("a:first-child");
 
-  let isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    let isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
-  function updateLoginUI() {
+    function updateLoginUI() {
     if (isLoggedIn) {
-      loginLink.classList.add("hidden");
-      userAvatar.classList.remove("hidden");
-      userAvatar.classList.add("flex");
+        loginLink.classList.add("hidden");
+        userAvatar.classList.remove("hidden");
+        userAvatar.classList.add("flex");
     } else {
-      loginLink.classList.remove("hidden");
-      userAvatar.classList.add("hidden");
+        loginLink.classList.remove("hidden");
+        userAvatar.classList.add("hidden");
       localStorage.removeItem("isLoggedIn"); // Đảm bảo dọn dẹp
     }
-  }
+    }
 
-  updateLoginUI();
+    updateLoginUI();
 
   // Khi bấm avatar -> mở menu
-  userAvatar.addEventListener("click", function (e) {
+    userAvatar.addEventListener("click", function (e) {
     e.stopPropagation();
     userMenu.classList.toggle("hidden");
-  });
+    });
 
   // Khi click ra ngoài -> đóng menu
-  document.addEventListener("click", function (e) {
+    document.addEventListener("click", function (e) {
     if (!userAvatar.contains(e.target) && !userMenu.contains(e.target)) {
-      userMenu.classList.add("hidden");
+        userMenu.classList.add("hidden");
     }
-  });
+    });
 
   // Khi click "Đăng xuất"
-  logoutBtn.addEventListener("click", function (e) {
+    logoutBtn.addEventListener("click", function (e) {
     e.preventDefault();
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("currentUser");
@@ -397,13 +382,13 @@ function initializeLoginUI() {
     updateLoginUI();
     userMenu.classList.add("hidden");
     updateHeaderCartCount(); // Cập nhật giỏ hàng về 0
-  });
+    });
 
   // Khi click "Thông tin cá nhân"
-  infoBtn.addEventListener("click", function (e) {
+    infoBtn.addEventListener("click", function (e) {
     e.preventDefault();
     window.location.href = "xuathongtin.html";
-  });
+    });
 }
 
 
@@ -411,19 +396,19 @@ function initializeLoginUI() {
  * Đồng bộ cart-count từ localStorage (Code gốc của bạn)
  */
 (function syncHeaderCartCount(){
-  const CART_KEY = 'watchtime_cart';
-  function getCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; } }
-  
-  function updateHeaderCount(){
+    const CART_KEY = 'watchtime_cart';
+    function getCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; } }
+    
+    function updateHeaderCount(){
     const cart = getCart();
     const count = cart.reduce((s,i)=> s + (i.qty || 0), 0);
     const el = document.getElementById('cart-count');
     if(el) el.textContent = count;
-  }
-  
+    }
+    
   // update ngay khi load
-  document.addEventListener('DOMContentLoaded', updateHeaderCount);
-  
+    document.addEventListener('DOMContentLoaded', updateHeaderCount);
+    
   // cung cấp hàm toàn cục để các trang khác gọi khi thay đổi cart
-  window.updateHeaderCartCount = updateHeaderCount;
+    window.updateHeaderCartCount = updateHeaderCount;
 })();
