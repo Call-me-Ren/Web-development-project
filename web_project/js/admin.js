@@ -46,13 +46,53 @@ function getFromStorage(key, defaultValue = []) {
                 saveToStorage(key, defaultCategories); return defaultCategories;
             }
             if (key === PRODUCTS_KEY) {
-                // SỬA DỮ LIỆU MẪU Ở ĐÂY ĐỂ TRÙNG VỚI ẢNH CỦA BẠN
+                // DỮ LIỆU MẪU ĐÃ ĐƯỢC RÚT GỌN CÒN 5 SẢN PHẨM
                 const defaultProducts = [
-                    { id: "sp001", name: "Đồng Hồ Nam Olevs Mặt Xanh", price: 4500000, image: "../images/ảnh đồng hồ nam 1.jpg", category: "nam", description_short: "Mẫu đồng hồ cơ tự động.", description_long: "Trải nghiệm sự tinh tế..."},
-                    { id: "sp002", name: "Đồng Hồ Nữ Đính Đá", price: 3200000, image: "../images/time_city.webp", category: "nu", description_short: "Thiết kế đính đá sang trọng.", description_long: "Mẫu đồng hồ Quartz..."},
-                    { id: "sp003", name: "Đồng Hồ Nam CRRJU Đen Vàng", price: 5800000, image: "../images/ảnh đồng hồ nam 2.jpg", category: "nam", description_short: "Chronograph, chống nước 10ATM.", description_long: "Dành cho người đàn ông năng động..."},
-                    { id: "sp004", name: "Đồng Hồ Nam Fossil Dây Da", price: 3100000, image: "../images/ảnh 8.jpg", category: "nam", description_short: "Mặt số La Mã, dây da bê.", description_long: "Ghi dấu kỷ niệm..."},
-                    { id: "sp005", name: "Đồng Hồ Nam Fossil Đen", price: 6200000, image: "../images/ảnh đồng hồ nam 3.jpg", category: "nam", description_short: "Mặt to, Chronograph.", description_long: "Sự kết hợp hoàn hảo..."}
+                    { 
+                      id: "sp_ben10", 
+                      name: "BEN 10 OMNITRIX", 
+                      price: 999999999, 
+                      image: "../images/ben10.webp", 
+                      category: "nam", 
+                      description_short: "Chỉ dành cho người được chọn...", 
+                      description_long: "Chỉ dành cho người được chọn hoặc người có đủ tiền mua."
+                    },
+                    { 
+                      id: "sp_conan", 
+                      name: "Đồng hồ Conan", 
+                      price: 67000000, 
+                      image: "../images/conan.jpg", 
+                      category: "nu", 
+                      description_short: "Trang bị cơ bản của thám tử.", 
+                      description_long: "Trang bị cơ bản của thám tử lừng danh. Có thể bắn kim gây mê."
+                    },
+                    { 
+                      id: "sp_doraemon", 
+                      name: "Time stop watch", 
+                      price: 8500000, 
+                      image: "../images/doraemon.jpg", 
+                      category: "nam", 
+                      description_short: "Chất lượng Nhật Bản.", 
+                      description_long: "Chất lượng Nhật Bản, bền bỉ với thời gian. Bảo bối của Doraemon."
+                    },
+                    { 
+                      id: "sp_oip", 
+                      name: "Đồng hồ OIP", 
+                      price: 4200000, 
+                      image: "../images/oip.webp", 
+                      category: "doi", 
+                      description_short: "Thiết kế hầm hố.", 
+                      description_long: "Thiết kế hầm hố, chống va đập tuyệt đối. Đến từ The Amazing World of Gumball."
+                    },
+                    { 
+                      id: "sp_timecity", 
+                      name: "Đồng hồ Time City", 
+                      price: 696500000, 
+                      image: "../images/time_city.webp", 
+                      category: "doi", 
+                      description_short: "Chỉ dành cho giới thượng lưu.", 
+                      description_long: "Chỉ dành cho giới thượng lưu. Thiết kế đính kim cương toàn bộ."
+                    }
                 ];
                 saveToStorage(key, defaultProducts); return defaultProducts;
             }
@@ -66,12 +106,10 @@ function getFromStorage(key, defaultValue = []) {
             saveToStorage(key, defaultValue);
             return defaultValue;
         }
-        // Riêng key PROFIT_MARGIN_KEY trả về số
         if (key === PROFIT_MARGIN_KEY) return parseFloat(data);
-        // Riêng key INVENTORY_KEY trả về object
         if (key === INVENTORY_KEY) return JSON.parse(data);
         
-        return JSON.parse(data); // Mặc định trả về mảng
+        return JSON.parse(data); 
     } catch (e) {
         console.error(`Lỗi khi đọc ${key}:`, e);
         if (key === INVENTORY_KEY) return {};
@@ -141,7 +179,7 @@ function toggleUserLock(email) {
      try {
         const userData = JSON.parse(localStorage.getItem(email));
         if (userData) { userData.isLocked = !userData.isLocked; localStorage.setItem(email, JSON.stringify(userData)); alert(`Đã ${userData.isLocked ? 'khóa' : 'mở khóa'} tài khoản ${email}.`); loadUserTable(); }
-    } catch (e) { alert("Có lỗi xảy ra."); }
+    } catch (e) { alert("Có lỗi xảyá."); }
 }
 
 
@@ -528,6 +566,7 @@ function updateInventoryOnOrderCompletion(order) {
     let inventory = getInventory();
     let updated = false;
     order.items.forEach(item => {
+        // ID sản phẩm trong giỏ hàng chính là ID sản phẩm
         const id = item.id; 
         if (!inventory[id]) { inventory[id] = { nhap: 0, xuat: 0, giaVon: 0 }; }
         inventory[id].xuat += item.qty;
@@ -548,7 +587,7 @@ function loadInventoryTable() {
     
     products.forEach(prod => {
         const id = prod.id;
-        const inv = inventory[id] || { nhap: 0, xuat: 0 }; // Lấy dữ liệu kho, hoặc 0 nếu chưa nhập
+        const inv = inventory[id] || { nhap: 0, xuat: 0 }; 
         const ton = inv.nhap - inv.xuat;
         
         let status = '<span class="text-success">Còn hàng</span>';
@@ -576,7 +615,7 @@ function loadInventoryTable() {
 }
 
 /* ================================================================
-  PHẦN 7: QUẢN LÝ GIÁ BÁN (I.6) (CODE MỚI)
+  PHẦN 7: QUẢN LÝ GIÁ BÁN (I.6)
 ================================================================
 */
 function getProfitMargin() { return getFromStorage(PROFIT_MARGIN_KEY, 50); }

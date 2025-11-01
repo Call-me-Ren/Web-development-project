@@ -1,184 +1,186 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WatchTime - Cửa Hàng Đồng Hồ Uy Tín</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/Giaodien.css" />
-    <link rel="stylesheet" href="../css/bootstrap.css" />
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WatchTime - Cửa Hàng Đồng Hồ Uy Tín</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/Giaodien.css" />
+    <link rel="stylesheet" href="../css/bootstrap.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+
 </head>
-<body class="bg-gray-100 text-gray-800" style="font-family: 'Be Vietnam Pro', sans-serif;">
+<body class="bg-gray-100 text-gray-800">
 
-    <header class="bg-white shadow-md sticky top-0 z-50">
-        <nav class="container mx-auto px-8 py-4 flex justify-between items-center">
-            <a href="index.html" class="text-2xl font-bold text-gray-800 flex-shrink-0">
-                Watch<span class="text-indigo-600">Time</span>
-            </a>
-            <div class="hidden md:flex space-x-10 items-center ml-6">
-                <a href="#home" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="Home">Trang Chủ</a>
-                <a href="#products" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="Products">Sản Phẩm</a>
-                <a href="#about" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="About">Về Chúng Tôi</a>
-                <a href="#contact" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="Contact">Liên Hệ</a>
-                <div class="flex items-center gap-6">
-                <div class="search">
-                    <input
-                    type="search"
-                    id="search"
-                    placeholder="Tìm kiếm..."
-                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600"
-                />
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-8 py-4 flex justify-between items-center">
+            <a href="#" onclick="location.reload(); return false;" class="text-2xl font-bold text-gray-800 flex-shrink-0">
+                Watch<span class="text-indigo-600">Time</span>
+            </a>
+            <div class="hidden md:flex space-x-10 items-center ml-6">
+                <a href="#home" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="Home">Trang Chủ</a>
+                <a href="#products" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="Products">Sản Phẩm</a>
+                <a href="#about" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="About">Về Chúng Tôi</a>
+                <a href="#contact" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="Contact">Liên Hệ</a>
+                <div class="flex items-center gap-6">
+                <div class="search">
+                    <input
+                    type="search"
+                    id="search"
+                    placeholder="Tìm kiếm..."
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600"
+                />
 
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" style = "right: calc(20px); cursor: pointer; ">
-                    <i data-lucide="search"></i>
-                </span></div>
-                <div class="actions flex items-center gap-6" >
-                    <button class="text-gray-600 hover:text-indigo-600 smooth-transition btn">VI</button>
-                </div>
-            </div>
-            <div class="actions flex items-center gap-6">
-        <a href="ThanhToan.html" class="relative text-gray-600 hover:text-indigo-600 focus:outline-none">
-        <i class="fa-solid fa-cart-plus text-2xl"></i>
-        <span id="cart-count"
-              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
-              0
-        </span>
-    </a>
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" style = "right: calc(20px); cursor: pointer; ">
+                    <a href="#products">
+                    <i data-lucide="search"></i></a>
+                </span></div>
+                <div class="actions flex items-center gap-6" >
+                    <button class="text-gray-600 hover:text-indigo-600 smooth-transition btn">VI</button>
+                </div>
+            </div>
+            <div class="actions flex items-center gap-6">
+    <a href="ThanhToan.html" class="relative text-gray-600 hover:text-indigo-600 focus:outline-none">
+        <i class="fa-solid fa-cart-plus text-2xl"></i>
+        <span id="cart-count"
+                class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                0
+        </span>
+    </a>
 
-    <button class="md:hidden text-gray-600 hover:text-indigo-600 focus:outline-none">
-        <i data-lucide="menu"></i>
-    </button>
+    <button class="md:hidden text-gray-600 hover:text-indigo-600 focus:outline-none">
+        <i data-lucide="menu"></i>
+    </button>
 </div>
 
-            <div class="actions flex items-center gap-6" >
-            <a href="dangnhap.html"
-            class="text-gray-600 hover:text-indigo-600 smooth-transition btn" data-key = "Login">
-            Đăng nhập
-            </a>
+            <div class="actions flex items-center gap-6" >
+            <a href="dangnhap.html"
+            class="text-gray-600 hover:text-indigo-600 smooth-transition btn" data-key = "Login">
+            Đăng nhập
+            </a>
 
-            <div id="user-avatar" class="hidden relative items-center gap-3 cursor-pointer">
-            <button>
-                <img src="../images/Avatar.jpg"
-                alt="Avatar"
-                class="w-10 h-10 rounded-full border-2 border-indigo-500"
-                />
-            </button>
-            <div id="user-menu" class="hidden absolute right-0 top-12 bg-white shadow-lg rounded-lg py-2 w-48">
-                <a href="xuathongtin.html" class="block px-4 py-2 hover:bg-gray-100">Thông tin cá nhân</a>
-                <a href="lichsu.html" class="block px-4 py-2 hover:bg-gray-100">Lịch sử đơn hàng</a>
-                <a href="#" class="block px-4 py-2 hover:bg-gray-100 text-red-600">Đăng xuất</a>
-            </div>
-            </div>
-            </div>
-        </nav>
-    </header>
+            <div id="user-avatar" class="hidden relative items-center gap-3 cursor-pointer">
+            <button>
+                <img src="../images/Avatar.jpg"
+                alt="Avatar"
+                class="w-10 h-10 rounded-full border-2 border-indigo-500"
+                />
+            </button>
+            <div id="user-menu" class="hidden absolute right-0 top-12 bg-white shadow-lg rounded-lg py-2 w-40">
+                <a href="xuathongtin.html" class="block px-4 py-2 hover:bg-gray-100">Thông tin cá nhân</a>
+                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Đăng xuất</a>
+            </div>
+            </div>
+            </div>
+        </nav>
+    </header>
 
-    <main>
-        <section id="home" class="relative bg-cover bg-center h-[60vh] md:h-[80vh]" style="background-image: url('https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop');">
-            <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-            <div class="relative container mx-auto px-6 h-full flex flex-col justify-center items-start text-white">
-                <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4" data-key="hero-title">Bộ Sưu Tập Đồng Hồ Đẳng Cấp</h1>
-                <p class="text-lg md:text-xl mb-8 max-w-xl" data-key="hero-sub">Khẳng định phong cách và vị thế của bạn với những chiếc đồng hồ tinh xảo nhất.</p>
-                <a href="#products" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 smooth-transition shadow-lg"  data-key="explore">
-                    Khám Phá Ngay
-                </a>
-            </div>
-        </section>
+    <main>
+        <section id="home" class="relative bg-cover bg-center h-[60vh] md:h-[80vh]" style="background-image: url('https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop');">
+            <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+            <div class="relative container mx-auto px-6 h-full flex flex-col justify-center items-start text-white">
+                <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4" data-key="hero-title">Bộ Sưu Tập Đồng Hồ Đẳng Cấp</h1>
+                <p class="text-lg md:text-xl mb-8 max-w-xl" data-key="hero-sub">Khẳng định phong cách và vị thế của bạn với những chiếc đồng hồ tinh xảo nhất.</p>
+                <a href="#products" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 smooth-transition shadow-lg"  data-key="explore">
+                    Khám Phá Ngay
+                </a>
+            </div>
+        </section>
 
-        <section id="products" class="py-16">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center mb-2">Sản Phẩm Nổi Bật</h2>
-                <p class="text-center text-gray-600 mb-12">Những mẫu đồng hồ được yêu thích nhất tại WatchTime</p>
+        <section id="products" class="py-16">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-2">Sản Phẩm Nổi Bật</h2>
+                <p class="text-center text-gray-600 mb-12">Những mẫu đồng hồ được yêu thích nhất tại WatchTime</p>
 
 
-        <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-10">
-    <p class="text-center text-gray-600" >Thể loại:</p>
-    <select id="filter-category" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
-        <option value="all">Tất cả</option>
-        <option value="nam">Đồng hồ Nam</option>
-        <option value="nu">Đồng hồ Nữ</option>
-        <option value="doi">Đồng hồ Đôi</option>
-    </select>
-    <select id="filter-price" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
-        <option value="all">Tất cả giá</option>
-        <option value="5">Dưới 5 triệu</option>
-        <option value="10">Dưới 10 triệu</option>
-        <option value="15">Dưới 15 triệu</option>
-        <option value="20">Dưới 20 triệu</option>
-        <option value="over20">Trên 20 triệu</option>
-    </select>
+        <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-10">
+    <p class="text-center text-gray-600" >Thể loại:</p>
+    <select id="filter-category" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
+        <option value="all">Tất cả</option>
+        <option value="nam">Đồng hồ Nam</option>
+        <option value="nu">Đồng hồ Nữ</option>
+        <option value="doi">Đồng hồ Đôi</option>
+    </select>
+    <select id="filter-price" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
+        <option value="all">Tất cả giá</option>
+        <option value="5">Dưới 5 triệu</option>
+        <option value="10">Dưới 10 triệu</option>
+        <option value="15">Dưới 15 triệu</option>
+        <option value="20">Dưới 20 triệu</option>
+        <option value="over20">Trên 20 triệu</option>
+    </select>
 </div>
 
-                                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                                    </div>
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    </div>
 
-            </div>
-            <div id="pagination" class="flex justify-center mt-8 space-x-2"></div>
-        </section>
+            </div>
+            <div id="pagination" class="flex justify-center mt-8 space-x-2"></div>
+        </section>
 
-        <section id="about" class="bg-white py-16">
-            <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
-                <div class="md:w-1/2">
-                    <img src="https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=1932&auto=format&fit=crop" alt="Cửa hàng đồng hồ" class="rounded-lg shadow-xl w-full"> 
-                </div>
-                <div class="md:w-1/2">
-                    <h2 class="text-3xl font-bold mb-4">Về WatchTime</h2>
-                    <p class="text-gray-600 mb-4 leading-relaxed">
-                        WatchTime được thành lập với niềm đam mê cháy bỏng dành cho những cỗ máy thời gian. Chúng tôi cam kết mang đến cho khách hàng những sản phẩm đồng hồ chính hãng từ các thương hiệu hàng đầu thế giới, cùng với dịch vụ khách hàng chuyên nghiệp và tận tâm.
-                    </p>
-                    <p class="text-gray-600 leading-relaxed">
-                        Mỗi chiếc đồng hồ tại WatchTime không chỉ là một công cụ xem giờ, mà còn là một tác phẩm nghệ thuật, một người bạn đồng hành và một lời khẳng định cho phong cách cá nhân của bạn.
-                    </p>
-                </div>
-            </div>
-        </section>
+        <section id="about" class="bg-white py-16">
+            <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=1932&auto=format&fit=crop" alt="Cửa hàng đồng hồ" class="rounded-lg shadow-xl w-full"> 
+                </div>
+                <div class="md:w-1/2">
+                    <h2 class="text-3xl font-bold mb-4">Về WatchTime</h2>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        WatchTime được thành lập với niềm đam mê cháy bỏng dành cho những cỗ máy thời gian. Chúng tôi cam kết mang đến cho khách hàng những sản phẩm đồng hồ chính hãng từ các thương hiệu hàng đầu thế giới, cùng với dịch vụ khách hàng chuyên nghiệp và tận tâm.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed">
+                        Mỗi chiếc đồng hồ tại WatchTime không chỉ là một công cụ xem giờ, mà còn là một tác phẩm nghệ thuật, một người bạn đồng hành và một lời khẳng định cho phong cách cá nhân của bạn.
+                    </p>
+                </div>
+            </div>
+        </section>
 
-    </main>
-    
-    <footer id="contact" class="bg-gray-800 text-white pt-12">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-                <div>
-                    <h3 class="text-xl font-bold mb-4">WatchTime</h3>
-                    <p class="text-gray-400">Nơi thời gian và phong cách hội tụ. Cung cấp đồng hồ chính hãng, uy tín và chất lượng.</p>
-                </div>
-
-                <div>
-                    <h3 class="text-xl font-bold mb-4">Liên kết</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#home" class="text-gray-400 hover:text-white smooth-transition">Trang Chủ</a></li>
-                        <li><a href="#products" class="text-gray-400 hover:text-white smooth-transition">Sản Phẩm</a></li>
-                        <li><a href="#about" class="text-gray-400 hover:text-white smooth-transition">Về Chúng Tôi</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white smooth-transition">Chính sách bảo hành</a></li>
-                  _B_ </ul>
-                </div>
-
-                <div>
-                    <h3 class="text-xl font-bold mb-4">Thông Tin Liên Hệ</h3>
-                    <p class="text-gray-400 mb-2 flex items-center justify-center md:justify-start"><i data-lucide="map-pin" class="w-4 h-4 mr-2"></i> 123 Đường ABC, Quận 1, TP. Hồ Chí Minh</p>
-                    <p class="text-gray-400 mb-2 flex items-center justify-center md:justify-start"><i data-lucide="phone" class="w-4 h-4 mr-2"></i> (028) 3812 3456</p>
-                    <p class="text-gray-400 mb-4 flex items-center justify-center md:justify-start"><i data-lucide="mail" class="w-4 h-4 mr-2"></i> support@watchtime.vn</p>
-                    <div class="flex space-x-4 justify-center md:justify-start">
-                      s   <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="facebook"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="instagram"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="twitter"></i></a>
-                    </div>
-              _B_ </div>
-            </div>
-
-            <div class="mt-8 py-4 border-t border-gray-700 text-center text-gray-500">
-S             <p>&copy; 2024 WatchTime. Đã đăng ký bản quyền.</p>
-            </div>
-        </div>
-  _B_ </footer>
+    </main>
     
-        <script src="../js/products.js"></script>
-    <script src="../js/Giaodien.js"></script>
-    <script src="../js/bootstrap.js"></script>
+    <footer id="contact" class="bg-gray-800 text-white pt-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">WatchTime</h3>
+                    <p class="text-gray-400">Nơi thời gian và phong cách hội tụ. Cung cấp đồng hồ chính hãng, uy tín và chất lượng.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Liên kết</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white smooth-transition">Trang Chủ</a></li>
+                        <li><a href="#products" class="text-gray-400 hover:text-white smooth-transition">Sản Phẩm</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white smooth-transition">Về Chúng Tôi</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white smooth-transition">Chính sách bảo hành</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Thông Tin Liên Hệ</h3>
+                    <p class="text-gray-400 mb-2 flex items-center justify-center md:justify-start"><i data-lucide="map-pin" class="w-4 h-4 mr-2"></i> 123 Đường ABC, Quận 1, TP. Hồ Chí Minh</p>
+                    <p class="text-gray-400 mb-2 flex items-center justify-center md:justify-start"><i data-lucide="phone" class="w-4 h-4 mr-2"></i> (028) 3812 3456</p>
+                    <p class="text-gray-400 mb-4 flex items-center justify-center md:justify-start"><i data-lucide="mail" class="w-4 h-4 mr-2"></i> support@watchtime.vn</p>
+                    <div class="flex space-x-4 justify-center md:justify-start">
+                        <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 py-4 border-t border-gray-700 text-center text-gray-500">
+                <p>&copy; 2024 WatchTime. Đã đăng ký bản quyền.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="../js/products.js"></script> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/Giaodien.js"></script>
+
 </body>
 </html>

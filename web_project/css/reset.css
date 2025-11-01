@@ -13,8 +13,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 15px; /* Thêm padding cho màn hình nhỏ */
 }
-#form-login {
+#form-login,
+#form-reset { /* Áp dụng cho cả 2 form */
   max-width: 400px;
   background: rgb(36, 42, 50);
   flex-grow: 1;
@@ -53,8 +55,8 @@ body {
   padding-right: 0;
 }
 
-/*dang nhap*/
-#form-login input[type="submit"] {
+/* Nút Submit (cho cả 2 form) */
+.form-submit {
   border: none;
   outline: none;
   padding: 9px 25px;
@@ -70,17 +72,18 @@ body {
   text-transform: uppercase;
 }
 
-#form-login input[type="submit"]:hover {
+.form-submit:hover {
   background-color: #c70039;
   color: #fff;
   transform: scale(1.02);
 }
 
-#form-login input[type="submit"]:active {
+.form-submit:active {
   opacity: 0.8;
   transform: scale(0.98);
 }
-/* LIÊN KẾT giữa "Quên mật khẩu" và "Đăng ký" */
+
+/* LIÊN KẾT (Chỉ dùng cho form-login) */
 #form-login .link {
   display: flex;
   justify-content: space-between;
@@ -94,7 +97,6 @@ body {
   transition: all 0.3s ease;
 }
 
-/* Hiệu ứng hover và tô sáng link "Đăng ký" */
 #form-login .link a:hover,
 #form-login .link a:nth-child(2) {
   color: #97fff4;
@@ -104,4 +106,25 @@ body {
   text-align: center;
   margin-bottom: 10px;
   font-size: 14px;
+}
+
+/* === PHẦN SỬA ĐỔI: Thêm Responsive === */
+@media (max-width: 450px) {
+  #form-login,
+  #form-reset {
+    /* Cho form vừa với màn hình, bớt lề */
+    padding: 20px;
+  }
+
+  .form-heading {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  /* Sửa link để vừa màn hình nhỏ */
+  #form-login .link {
+    flex-direction: column; /* Xếp chồng lên nhau */
+    gap: 10px; /* Thêm khoảng cách */
+    align-items: center; /* Căn giữa */
+  }
 }

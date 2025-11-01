@@ -15,6 +15,7 @@ body {
   align-items: center;
   min-height: 100vh;
   background: rgb(240, 242, 245);
+  padding: 15px 0; /* Thêm padding cho body */
 }
 
 /* KHUNG NGOÀI */
@@ -175,4 +176,51 @@ select:focus {
 
 .btn-register button:hover {
   background-color: #36a420;
+}
+
+/* === PHẦN SỬA ĐỔI: Thêm Responsive === */
+@media (max-width: 450px) {
+  .container {
+    width: 95%; /* Cho container rộng gần hết màn hình điện thoại */
+    padding: 10px 0 0 0; /* Xóa padding mặc định */
+  }
+
+  .form-register {
+    padding: 15px; /* Giảm padding cho form */
+  }
+  
+  h1 {
+    font-size: 1.2em; /* Giảm cỡ chữ tiêu đề */
+  }
+
+  /* Cho phép Họ và Tên xếp chồng lên nhau */
+  .full-name {
+    flex-direction: column;
+    gap: 10px; /* Thêm khoảng cách giữa 2 ô */
+  }
+
+  .full-name input {
+    width: 100%; /* Đảm bảo ô input rộng hết */
+  }
+
+  /* Sửa ô chọn ngày sinh cho vừa */
+  .c-birthday {
+    flex-wrap: wrap; /* Cho phép rớt hàng nếu quá chật */
+    gap: 10px;
+  }
+  .c-birthday div {
+    flex-basis: 100%; /* Mặc định 100% */
+  }
+  .c-birthday div.day,
+  .c-birthday div.month {
+     flex-basis: 48%; /* Cho ngày và tháng nằm chung hàng */
+  }
+   .c-birthday div.year {
+     flex-basis: 100%; /* Năm xuống hàng riêng */
+  }
+  
+  /* Sửa ô giới tính */
+  .f-sex {
+     flex-direction: column;
+  }
 }
