@@ -7,8 +7,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    
+    /* SỬA LỖI: Cố định 100% chiều cao và ẩn scrollbar */
+    height: 100vh;
     margin: 0;
+    overflow: hidden; 
 }
 
 .login-container {
@@ -98,8 +101,9 @@ body {
 
 /* --- CSS chung cho Admin (Sẽ dùng sau) --- */
 .admin-layout {
-    display: flex;
-    min-height: 100vh;
+    /* SỬA LỖI: Xóa 'display: flex' */
+    width: 100%;
+    height: 100vh;
 }
 
 .admin-sidebar {
@@ -109,6 +113,13 @@ body {
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
+
+    /* SỬA LỖI: Dùng position: fixed để ghim sidebar */
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh; 
+    box-sizing: border-box; /* Đảm bảo padding không làm tăng width */
 }
 
 .admin-sidebar h1 {
@@ -145,10 +156,16 @@ body {
 }
 
 .admin-main {
-    flex-grow: 1;
     background-color: #f7fafc; /* Very light gray */
     padding: 2rem 2.5rem;
-    overflow-y: auto;
+    
+    /* SỬA LỖI: Đẩy nội dung sang phải 240px */
+    margin-left: 240px; 
+
+    /* SỬA LỖI: Cho nội dung chính tự cuộn */
+    height: 100vh;
+    overflow-y: auto; 
+    box-sizing: border-box; /* Đảm bảo padding không làm tăng width */
 }
 
 .admin-main h2 {
