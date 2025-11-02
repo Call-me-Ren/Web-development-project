@@ -29,7 +29,7 @@ function createProductCard(product) {
             ${description}
             <p class="text-2xl font-bold text-indigo-600">${price}</p>
             
-            <a href="chitiet.html?id=${product.id}" class="btn btn-outline-primary mt-3 xem-chi-tiet">Xem chi tiết</a>
+            <a href="chitiet.html?id=${product.id}" class="btn btn-outline-primary flex justify-center mt-3 mt-3 xem-chi-tiet">Xem chi tiết</a>
         </div>
     </div>
     `;
@@ -251,6 +251,27 @@ function applyFiltersAndSearch() {
         }
         product.style.display = "none";
     });
+
+
+        if (filteredProducts.length === 0 && searchTerm !== "") {
+        // Hiện lại toàn bộ sản phẩm theo bộ lọc (bỏ qua tìm kiếm)
+        filteredProducts = allProductCards.filter((product) => {
+            const productCategory = product.dataset.category;
+            const priceText = product.querySelector(".text-indigo-600").textContent.replace(/[^\d]/g, "");
+            const price = parseFloat(priceText);
+
+            const matchCategory = category === "all" || productCategory === category;
+            let matchPrice = true;
+            switch (priceRange) {
+                case "5": matchPrice = price < 5000000; break;
+                case "10": matchPrice = price < 10000000; break;
+                case "15": matchPrice = price < 15000000; break;
+                case "20": matchPrice = price < 20000000; break;
+                case "over20": matchPrice = price >= 20000000; break;
+            }
+            return matchCategory && matchPrice;
+        });
+    }
 
     currentPage = 1; 
     showPage(currentPage, filteredProducts); 
