@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thông tin cá nhân</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/Giaodien.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+    
+    <style>
+      /* Custom styles to refine form layout and input appearance */
+      body {
+        background-color: #f3f4f6; /* bg-gray-100 */
+      }
+      /* Ẩn hiện chung */
+      .hidden { display: none; }
+      
+      /* Form inputs */
+      input[type="text"], 
+      input[type="email"], 
+      select,
+      input[type="tel"] {
+        padding: 10px;
+        margin: 5px 0 15px;
+        border: 1px solid #d1d5db; /* border-gray-300 */
+        border-radius: 8px; /* rounded-lg */
+        width: 100%;
+        transition: all 0.2s;
+      }
+      
+      input:focus,
+      select:focus {
+        border-color: #4f46e5; /* focus:ring-indigo-500 */
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+      }
+
+      .info-label {
+        color: #4b5563; /* text-gray-600 */
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+    </style>
+  </head>
+
+  <body class="font-sans">
+    <div class="container mx-auto p-4 md:p-8 min-h-screen flex items-start justify-center">
+      <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 md:p-10">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center border-b pb-3">
+          <i class="fas fa-user-circle text-indigo-600 mr-2"></i> Thông tin cá nhân
+        </h1>
+
+        <div id="user-info" class="user-info space-y-4">
+          </div>
+
+        <div id="edit-form" class="hidden mt-8 space-y-3">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="info-label">Họ:</label>
+              <input type="text" id="edit-firstname" />
+            </div>
+            <div>
+              <label class="info-label">Tên:</label>
+              <input type="text" id="edit-lastname" />
+            </div>
+          </div>
+
+          <div>
+            <label class="info-label">Email (Không thể sửa):</label>
+            <input type="email" id="edit-email" disabled class="bg-gray-100 cursor-not-allowed"/>
+          </div>
+
+          <div>
+            <label class="info-label">Số điện thoại:</label>
+            <input type="tel" id="edit-number" />
+          </div>
+
+          <div>
+            <label class="info-label">Địa chỉ:</label>
+            <input type="text" id="edit-address" />
+          </div>
+
+          <div class="mt-4">
+            <label class="info-label">Ngày sinh:</label>
+            <div class="flex space-x-3">
+              <div class="day flex-1">
+                <select id="day"><option value="">Ngày</option></select>
+              </div>
+              <div class="month flex-1">
+                <select id="month"><option value="">Tháng</option></select>
+              </div>
+              <div class="year flex-1">
+                <select id="year"><option value="">Năm</option></select>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="info-label">Giới tính:</label>
+            <select id="edit-gender">
+              <option value="Nam">Nam</option>
+              <option value="Nữ">Nữ</option>
+              <option value="Khác">Khác</option>
+            </select>
+          </div>
+          
+          <div class="flex gap-4 pt-6">
+            <button id="save-btn" class="flex-1 bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 smooth-transition">
+              <i class="fas fa-save mr-1"></i> Lưu thay đổi
+            </button>
+            <button id="cancel-btn" class="flex-1 bg-gray-300 text-gray-800 font-semibold py-3 rounded-lg hover:bg-gray-400 smooth-transition">
+              <i class="fas fa-times-circle mr-1"></i> Hủy
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-4 mt-8 pt-4 border-t">
+          <button id="edit-btn" class="flex-1 bg-green-500 text-white font-semibold py-3 rounded-lg hover:bg-green-600 smooth-transition">
+            <i class="fas fa-edit mr-1"></i> Sửa thông tin
+          </button>
+          <button id="back-btn" class="flex-1 bg-gray-500 text-white font-semibold py-3 rounded-lg hover:bg-gray-600 smooth-transition">
+            <i class="fas fa-arrow-left mr-1"></i> Quay lại Trang chủ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ==== DỮ LIỆU NGƯỜI DÙNG ====
+      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+      if (!currentUser) {
+        alert("Vui lòng đăng nhập để xem thông tin!");
+        window.location.href = "dangnhap.html";
+      }
+
+      // Lấy userData từ localStorage (key là email)
+      let userData = JSON.parse(localStorage.getItem(currentUser.email));
+
+      const userInfoDiv = document.getElementById("user-info");
+      const editForm = document.getElementById("edit-form");
+      const editBtn = document.getElementById("edit-btn");
+      const saveBtn = document.getElementById("save-btn");
+      const cancelBtn = document.getElementById("cancel-btn");
+      const backBtn = document.getElementById("back-btn");
+
+      // ==== HIỂN THỊ THÔNG TIN ====
+      function renderUserInfo() {
+        userInfoDiv.innerHTML = `
+          <div class="grid grid-cols-2 gap-4">
+            <p><strong class="info-label">Họ tên:</strong></p>
+            <p>${userData.firstname} ${userData.lastname}</p>
+            <p><strong class="info-label">Email:</strong></p>
+            <p>${userData.email}</p>
+            <p><strong class="info-label">Số điện thoại:</strong></p>
+            <p>${userData.number}</p>
+            <p><strong class="info-label">Địa chỉ:</strong></p>
+            <p>${userData.address}</p>
+            <p><strong class="info-label">Ngày sinh:</strong></p>
+            <p>${userData.birthday}</p>
+            <p><strong class="info-label">Giới tính:</strong></p>
+            <p>${userData.gender}</p>
+          </div>
+        `;
+      }
+      renderUserInfo();
+
+      // ==== KHỞI TẠO DANH SÁCH NGÀY / THÁNG / NĂM ====
+      function initDateSelects() {
+        const daySelect = document.getElementById("day");
+        const monthSelect = document.getElementById("month");
+        const yearSelect = document.getElementById("year");
+        
+        // Clear existing options
+        daySelect.innerHTML = '<option value="">Ngày</option>';
+        monthSelect.innerHTML = '<option value="">Tháng</option>';
+        yearSelect.innerHTML = '<option value="">Năm</option>';
+
+
+        // Thêm ngày (1–31)
+        for (let d = 1; d <= 31; d++) {
+          const opt = document.createElement("option");
+          opt.value = d.toString();
+          opt.textContent = d;
+          daySelect.appendChild(opt);
+        }
+
+        // Thêm tháng (1–12)
+        for (let m = 1; m <= 12; m++) {
+          const opt = document.createElement("option");
+          opt.value = m.toString();
+          opt.textContent = m;
+          monthSelect.appendChild(opt);
+        }
+
+        // Thêm năm (1950–2025)
+        for (let y = 2025; y >= 1900; y--) {
+          const opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = y;
+          yearSelect.appendChild(opt);
+        }
+      }
+      initDateSelects();
+
+      // ==== KHI NHẤN "SỬA" ====
+      editBtn.addEventListener("click", () => {
+        userInfoDiv.classList.add("hidden");
+        editForm.classList.remove("hidden");
+        editBtn.classList.add("hidden");
+        backBtn.classList.add("hidden"); // Ẩn nút Quay lại khi đang sửa
+
+        document.getElementById("edit-firstname").value = userData.firstname || "";
+        document.getElementById("edit-lastname").value = userData.lastname || "";
+        document.getElementById("edit-email").value = userData.email || "";
+        document.getElementById("edit-number").value = userData.number || "";
+        document.getElementById("edit-address").value = userData.address || "";
+        document.getElementById("edit-gender").value = userData.gender || "Khác";
+
+        // Gán ngày sinh cũ (tách từ chuỗi "D/M/Y")
+        if (userData.birthday) {
+          const parts = userData.birthday.split('/');
+          if (parts.length === 3) {
+            document.getElementById("day").value = parseInt(parts[0]).toString() || "";
+            document.getElementById("month").value = parseInt(parts[1]).toString() || "";
+            document.getElementById("year").value = parts[2] || "";
+          }
+        }
+      });
+
+      // ==== KHI NHẤN "LƯU" ====
+      saveBtn.addEventListener("click", () => {
+        const day = document.getElementById("day").value;
+        const month = document.getElementById("month").value;
+        const year = document.getElementById("year").value;
+
+        // Định dạng ngày sinh giống như đăng ký (D/M/Y)
+        const birthday = (year && month && day) ? `${parseInt(day)}/${parseInt(month)}/${year}` : "";
+
+        // Kiểm tra thông tin trống cơ bản trước khi lưu
+        if (!document.getElementById("edit-firstname").value || 
+            !document.getElementById("edit-lastname").value || 
+            !document.getElementById("edit-number").value || 
+            !document.getElementById("edit-address").value) 
+        {
+             alert("Vui lòng nhập đầy đủ Họ, Tên, Số điện thoại và Địa chỉ!");
+             return;
+        }
+
+        // Tạo đối tượng dữ liệu mới, giữ lại password cũ
+        const newUserData = {
+          password: userData.password, 
+          firstname: document.getElementById("edit-firstname").value,
+          lastname: document.getElementById("edit-lastname").value,
+          email: document.getElementById("edit-email").value, // Email không đổi
+          number: document.getElementById("edit-number").value,
+          address: document.getElementById("edit-address").value,
+          birthday: birthday,
+          gender: document.getElementById("edit-gender").value
+        };
+        
+        // Cập nhật biến userData và localStorage
+        userData = newUserData;
+        localStorage.setItem(userData.email, JSON.stringify(userData));
+        
+        // Cập nhật giao diện
+        renderUserInfo();
+        editForm.classList.add("hidden");
+        userInfoDiv.classList.remove("hidden");
+        editBtn.classList.remove("hidden");
+        backBtn.classList.remove("hidden");
+
+        alert("Cập nhật thông tin thành công!");
+      });
+
+      // ==== HỦY ====
+      cancelBtn.addEventListener("click", () => {
+        editForm.classList.add("hidden");
+        userInfoDiv.classList.remove("hidden");
+        editBtn.classList.remove("hidden");
+        backBtn.classList.remove("hidden");
+      });
+
+      // ==== QUAY LẠI ====
+      backBtn.addEventListener("click", () => {
+        window.location.href = "index.html"; // Trở về index.html trong cùng folder index/
+      });
+    </script>
+  </body>
+</html>
