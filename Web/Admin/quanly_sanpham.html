@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Sản phẩm - Admin WatchTime</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <style>
+        /* CSS nội bộ giữ nguyên */
+        .admin-table { width: 100%; border-collapse: collapse; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; margin-bottom: 2rem; }
+        .admin-table th, .admin-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
+        .admin-table th { background-color: #f7fafc; font-weight: 600; color: #4a5568; text-transform: uppercase; font-size: 0.85rem; }
+        .admin-table td img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
+        .btn-action { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.8rem; margin-right: 5px; }
+        .btn-edit { background-color: #3b82f6; color: white; }
+        .btn-delete { background-color: #ef4444; color: white; }
+        .admin-form { background-color: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4b5563; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .btn-submit { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 700; color: #ffffff; background-color: #16a34a; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-cancel { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 700; color: #333; background-color: #e5e7eb; border: none; border-radius: 6px; cursor: pointer; margin-left: 10px; }
+        
+        /* Căn chỉnh lại input[type=file] cho đẹp hơn */
+        .form-group input[type="file"] {
+            padding: 0.6rem 1rem; /* Điều chỉnh padding */
+        }
+        /* Tùy chỉnh nút "Browse" (Tùy chọn, khác nhau trên các trình duyệt) */
+        .form-group input[type="file"]::file-selector-button {
+            margin-right: 1rem;
+            border: none;
+            background: #e5e7eb;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .form-group input[type="file"]::file-selector-button:hover {
+            background: #d1d5db;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="admin-overlay"></div>
+
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <h1>WatchTime</h1>
+            <nav class="admin-nav">
+                <a href="dashboard.html">Bảng điều khiển</a>
+                <a href="quanly_khachhang.html">Quản lý Khách hàng</a>
+                <a href="quanly_loaisp.html">Quản lý Loại Sản phẩm</a>
+                <a href="quanly_sanpham.html" class="active">Quản lý Sản phẩm</a>
+                <a href="quanly_nhaphang.html">Quản lý Nhập hàng</a>
+                <a href="quanly_giaban.html">Quản lý Giá bán</a>
+                <a href="quanly_donhang.html">Quản lý Đơn hàng</a>
+                <a href="quanly_tonkho.html">Quản lý Tồn kho</a>
+                
+                <a href="#" id="admin-logout-btn" class="logout">Đăng xuất</a>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-header">
+                <button id="mobile-menu-btn">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 6H20M4 12H20M4 18H20" />
+                    </svg>
+                </button>
+                <h2>Quản lý Sản phẩm</h2>
+            </div>
+            
+            <form id="product-form" class="admin-form">
+                <h3 id="product-form-title" class="text-xl font-bold mb-4">Thêm sản phẩm mới</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="product-id">Mã sản phẩm (ID)</label>
+                        <input type="text" id="product-id" placeholder="ví dụ: sp001, sp002..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-name">Tên sản phẩm</label>
+                        <input type="text" id="product-name" placeholder="ví dụ: Đồng Hồ Nam Lịch Lãm" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-category">Loại sản phẩm</label>
+                        <select id="product-category" required>
+                            <option value="">-- Chọn loại --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">Giá (VNĐ)</label>
+                        <input type="number" id="product-price" placeholder="ví dụ: 4500000 (chỉ nhập số)" required>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="product-image">Chọn hình ảnh</label>
+                        <input type="file" id="product-image" accept="image/png, image/jpeg, image/jpg, image/webp" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="product-desc-short">Mô tả ngắn (hiển thị ở trang chủ)</label>
+                        <textarea id="product-desc-short"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="product-desc-long">Mô tả chi tiết (hiển thị ở trang chi tiết)</label>
+                        <textarea id="product-desc-long"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Lưu sản phẩm</button>
+                <button type="button" id="btn-cancel-product-edit" class="btn-cancel hidden">Hủy sửa</button>
+            </form>
+
+            <h3 class="text-xl font-bold mt-8 mb-4">Danh sách sản phẩm</h3>
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Mã SP</th>
+                            <th>Hình</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Loại</th>
+                            <th>Giá</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="product-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            checkAdminLogin();
+            attachLogoutEvent();
+            attachMobileMenuEvents(); // <-- THÊM MỚI
+            loadCategoriesIntoSelect();
+            loadProductTable();
+            attachProductFormEvents();
+        });
+    </script>
+</body>
+</html>

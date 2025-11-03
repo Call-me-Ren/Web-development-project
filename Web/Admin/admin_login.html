@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - WatchTime</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="login-container">
+        <form id="form-admin-login" class="login-form">
+            <h2>Admin WatchTime</h2>
+            <p>Đăng nhập vào trang quản trị</p>
+            
+            <div id="error-message" class="error-message hidden"></div>
+
+            <div class="input-group">
+                <label for="admin-user">Tên đăng nhập</label>
+                <input type="text" id="admin-user" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="admin-pass">Mật khẩu</label>
+                <input type="password" id="admin-pass" required>
+            </div>
+            
+            <button type="submit" class="login-button">Đăng nhập</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("form-admin-login").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const user = document.getElementById("admin-user").value;
+            const pass = document.getElementById("admin-pass").value;
+            const errorMsg = document.getElementById("error-message");
+
+            // --- TÀI KHOẢN ADMIN (Hard-code) ---
+            // Vì không có CSDL, chúng ta sẽ gán cứng tài khoản admin
+            const ADMIN_USER = "admin";
+            const ADMIN_PASS = "123456";
+
+            if (user === ADMIN_USER && pass === ADMIN_PASS) {
+                // Đăng nhập thành công
+                // Lưu trạng thái đăng nhập admin vào sessionStorage
+                // (Dùng sessionStorage để admin tự đăng xuất khi đóng trình duyệt)
+                sessionStorage.setItem("isAdminLoggedIn", "true");
+                
+                // Chuyển hướng tới trang dashboard
+                alert("Đăng nhập admin thành công!");
+                window.location.href = "dashboard.html"; // Trang này chúng ta sẽ tạo ở bước sau
+                
+            } else {
+                // Đăng nhập thất bại
+                errorMsg.textContent = "Sai tên đăng nhập hoặc mật khẩu!";
+                errorMsg.classList.remove("hidden");
+            }
+        });
+    </script>
+</body>
+</html>
