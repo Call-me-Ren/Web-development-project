@@ -2,24 +2,29 @@
 
 /**
  * Tạo HTML cho một thẻ sản phẩm
- * @param {object} product - Đối tượng sản phẩm từ allProducts
+ * @param {object} product - Đối tượng sản phẩm
  * @returns {string} - Chuỗi HTML
  */
 function createProductCard(product) {
     const description = product.description_short ? `<p class="text-gray-600 mb-4">${product.description_short}</p>` : '<p class="text-gray-600 mb-4">&nbsp;</p>';
     const price = Number(product.price).toLocaleString('vi-VN') + ' VNĐ';
 
-    // === BẮT ĐẦU THAY ĐỔI: LOGIC TỒN KHO ===
+    // === Sửa lỗi ngôn ngữ ===
     const stock = globalInventory.get(product.id) || 0;
     let stockHtml = '';
     let cartButtonHtml = '';
 
     if (stock > 0) {
-        // Nếu còn hàng, hiển thị số lượng và nút 'Thêm vào giỏ'
-        stockHtml = `<p><span data-key="Stock">Tồn kho:</span> <span> ${stock}</span></p>`;
+        // Tách label (có data-key) và value (không có data-key) ra 2 span
+        stockHtml = `
+            <p class="text-sm text-gray-500">
+                <span data-key="Stock">Tồn kho:</span>
+                <span class="font-semibold text-green-600"> ${stock}</span>
+            </p>`;
+        
         cartButtonHtml = `<button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart" data-key="AToCard">Thêm vào giỏ</button>`;
     } else {
-        // Nếu hết hàng, hiển thị thông báo và vô hiệu hóa nút
+        // "Hết hàng" là một chuỗi đơn, không có số, nên giữ nguyên
         stockHtml = `<p class="text-sm text-red-500 font-bold" data-key="OutOfStock">Hết hàng</p>`;
         cartButtonHtml = `<button class="text-white bg-gray-400 py-2 px-4 rounded-lg cursor-not-allowed" disabled data-key="OutOfStock">Hết hàng</button>`;
     }
@@ -31,7 +36,8 @@ function createProductCard(product) {
                 <img src="${product.image}" alt="${product.name}" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
             </a>
             <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
-                ${cartButtonHtml} </div>
+                ${cartButtonHtml}
+            </div>
         </div>
         <div class="p-6">
             <h3 class="text-xl font-semibold mb-2" data-name="${product.name}">${product.name}</h3>
@@ -59,6 +65,7 @@ function renderProducts(products) {
         return;
     }
     
+    // Nếu mảng rỗng, gán innerHTML (để xóa sản phẩm cũ)
     if (!products || products.length === 0) {
         grid.innerHTML = "<p class='text-center col-span-full'>Không có sản phẩm nào để hiển thị. Vui lòng thêm sản phẩm ở trang Admin.</p>";
     } else {
@@ -72,42 +79,55 @@ function renderProducts(products) {
 let allProductCards = []; // Biến global để lưu trữ các thẻ DOM
 let currentPage = 1;
 const productsPerPage = 8; // số sản phẩm mỗi trang
-let globalInventory = new Map(); // Biến global lưu tồn kho
+let globalInventory = new Map(); 
+
+// Tạo một biến cục bộ để lưu trữ dữ liệu sản phẩm,
+// thay vì phụ thuộc vào 'allProducts' (chỉ tải 1 lần) từ 'products.js'
+let currentProductData = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     
-    // 1. Kiểm tra 'allProducts' đã tải chưa
-    if (typeof allProducts !== 'undefined') {
-        // Tốt, 'allProducts' đã có
-    } else {
-        console.error("'allProducts' is not defined. Make sure 'products.js' is loaded first and correct.");
+    // 1. Kiểm tra 'allProducts' (từ products.js) và 'allCategories' (từ categories.js)
+    if (typeof allProducts === 'undefined') {
+        console.error("'allProducts' is not defined. Make sure 'products.js' is loaded first.");
         const grid = document.getElementById("product-grid");
         if(grid) grid.innerHTML = "<p class='text-red-500 text-center col-span-full'>Lỗi: Không thể tải dữ liệu sản phẩm.</p>";
         return;
     }
-    // TÍNH TOÁN TỒN KHO CHO TẤT CẢ SẢN PHẨM
-    globalInventory = calculateAllInventory();
+    if (typeof allCategories === 'undefined') {
+        console.error("'allCategories' is not defined. Make sure 'categories.js' is loaded first.");
+    }
 
-    // 1. Render sản phẩm lên giao diện
-    renderProducts(allProducts);
+    // 2. Sao chép dữ liệu ban đầu vào biến cục bộ
+    //    Chúng ta dùng biến 'allProducts' (từ products.js) làm dữ liệu ban đầu
+    currentProductData = [...allProducts];
 
-    // 2. Tự động gọi hàm render icon của Lucide
+    // 3. Tính tồn kho (dựa trên dữ liệu cục bộ)
+    globalInventory = calculateAllInventory(currentProductData);
+
+    // 4. Render sản phẩm (dựa trên dữ liệu cục bộ)
+    renderProducts(currentProductData);
+
+    // 5. Tự động gọi hàm render icon của Lucide
     lucide.createIcons();
 
-    // 3. Lấy danh sách các thẻ DOM vừa render
+    // 6. Lấy danh sách các thẻ DOM vừa render
     allProductCards = Array.from(document.querySelectorAll(".product-card"));
 
-    // 4. Khởi tạo Phân trang
+    // 7. Khởi tạo Phân trang
     initializePagination();
 
-    // 5. Gắn sự kiện cho các chức năng khác
-    loadCategoryFilter();
+    // 8. Gắn sự kiện cho các chức năng khác
+    loadCategoryFilter(); // Sẽ dùng 'allCategories'
     initializeFilters();
     initializeSearch();
     initializeLoginUI();
-    initializeAddToCart(); // Hàm này cũng được cập nhật
-    initializeLanguageToggle(); // Hàm này cũng được cập nhật
+    initializeAddToCart();
+    initializeLanguageToggle();
     initializeMobileMenu();
+
+    // Khởi chạy bộ lắng nghe thay đổi
+    initializeStorageListener();
 });
 
 /**
@@ -130,7 +150,7 @@ function initializeSearch() {
 }
 
 /**
- * Gắn sự kiện cho các nút "Thêm vào giỏ"
+ * Gắn sự kiện cho các nút "Thêm vào giỏ" 
  */
 function initializeAddToCart() {
     const CART_KEY = 'watchtime_cart';
@@ -138,7 +158,7 @@ function initializeAddToCart() {
     function getCart(){
         try{ return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; }
     }
-    function saveCart(cart){
+    function saveCart(cart){ 
         localStorage.setItem(CART_KEY, JSON.stringify(cart)); 
     }
     
@@ -155,8 +175,7 @@ function initializeAddToCart() {
 
         const btn = e.target;
 
-
-        // 1. Kiểm tra nút bị vô hiệu hóa
+        // 1. Kiểm tra nút bị vô hiệu hóa (HẾT HÀNG)
         if (btn.disabled) {
             alert("Sản phẩm này hiện đã hết hàng!");
             return;
@@ -185,7 +204,7 @@ function initializeAddToCart() {
             return;
         }
 
-        const product = allProducts.find(p => p.id === id);
+        const product = currentProductData.find(p => p.id === id); // Sửa: Dùng currentProductData
         if (!product) {
             console.error("Không tìm thấy sản phẩm với ID:", id);
             return;
@@ -194,9 +213,10 @@ function initializeAddToCart() {
         let cart = getCart();
         const existing = cart.find(it => it.id === id);
         
+        // === KIỂM TRA SỐ LƯỢNG TRONG GIỎ ===
         const qtyInCart = existing ? existing.qty : 0;
         if (qtyInCart >= stock) {
-            alert("Bạn đã thêm số lượng tối đa của sản phẩm này vào giỏ hàng.");
+            alert("Bạn đã thêm số lượng tối đa của sản phẩm này vào giỏ hàng (dựa trên tồn kho).");
             return;
         }
         
@@ -253,7 +273,6 @@ function initializeLanguageToggle() {
             PriceUnder15: "Dưới 15 triệu",
             PriceUnder20: "Dưới 20 triệu",
             PriceOver20: "Trên 20 triệu",
-            ViewDetails: "Xem chi tiết",
             AboutWatchTime: "Về WatchTime",
             AboutP1: "WatchTime được thành lập với niềm đam mê cháy bỏng dành cho những cỗ máy thời gian. Chúng tôi cam kết mang đến cho khách hàng những sản phẩm đồng hồ chính hãng từ các thương hiệu hàng đầu thế giới, cùng với dịch vụ khách hàng chuyên nghiệp và tận tâm.",
             AboutP2: "Mỗi chiếc đồng hồ tại WatchTime không chỉ là một công cụ xem giờ, mà còn là một tác phẩm nghệ thuật, một người bạn đồng hành và một lời khẳng định cho phong cách cá nhân của bạn.",
@@ -293,7 +312,6 @@ function initializeLanguageToggle() {
             PriceUnder15: "Under 15 mil",
             PriceUnder20: "Under 20 mil",
             PriceOver20: "Over 20 mil",
-            ViewDetails: "View Details",
             AboutWatchTime: "About WatchTime",
             AboutP1: "WatchTime was founded with a burning passion for timepieces. We are committed to providing customers with genuine watch products from the world's leading brands, along with professional and dedicated customer service.",
             AboutP2: "Each watch at WatchTime is not just a time-telling tool, but also a work of art, a companion, and a statement of your personal style.",
@@ -308,8 +326,6 @@ function initializeLanguageToggle() {
         },
     };
 
-    window.runLanguageUpdater = updateLanguage;
-
     function updateLanguage() {
         const lang = translations[currentLang];
         document.querySelectorAll("[data-key]").forEach((el) => {
@@ -323,6 +339,9 @@ function initializeLanguageToggle() {
             }
         });
     }
+
+    // Đưa hàm updateLanguage ra ngoài để code khác có thể gọi
+    window.runLanguageUpdater = updateLanguage;
 
     if (langToggleBtns.length > 0) {
         langToggleBtns.forEach(btn => {
@@ -339,21 +358,35 @@ function initializeLanguageToggle() {
 /* === PHẦN 3: CÁC HÀM TIỆN ÍCH (Lọc, Phân trang, Login) === */
 
 /**
- * TẢI DYNAMIC: Tải danh sách loại sản phẩm từ LocalStorage
+ * TẢI DYNAMIC: Tải danh sách loại sản phẩm
  */
 function loadCategoryFilter() {
     const categorySelect = document.getElementById('filter-category');
     if (!categorySelect) return;
-    const KEY_NAME = 'watchtime_categories';
-    const categories = JSON.parse(localStorage.getItem(KEY_NAME)) || [];
-    categories.forEach(category => {
+
+    // === Xóa các option cũ (trừ option "Tất cả") ===
+    const options = categorySelect.querySelectorAll('option:not([value="all"])');
+    options.forEach(o => o.remove());
+    // === KẾT THÚC NÂNG CẤP ===
+
+    // 1. Kiểm tra biến global 'allCategories' (từ file categories.js)
+    if (typeof allCategories === 'undefined' || allCategories.length === 0) {
+        console.error("Lỗi: Biến 'allCategories' không tồn tại hoặc bị rỗng.");
+        return;
+    }
+
+    // 2. Lặp qua mảng allCategories và tạo <option>
+    allCategories.forEach(category => {
         const option = document.createElement('option');
+        
         option.value = category.id;
         option.textContent = category.name;
-        option.dataset.key = category.name;
+        option.dataset.key = category.name; // Giữ lại để đổi ngôn ngữ
+
         categorySelect.appendChild(option);
     });
 }
+
 
 /**
  * Lọc và tìm kiếm kết hợp
@@ -365,6 +398,7 @@ function applyFiltersAndSearch() {
 
     let filteredProducts = [];
 
+    // Lọc trên 'allProductCards'
     allProductCards.forEach((product) => {
         const productCategory = product.dataset.category;
         const priceText = product.querySelector(".text-indigo-600").textContent.replace(/[^\d]/g, "");
@@ -386,32 +420,14 @@ function applyFiltersAndSearch() {
         if (matchCategory && matchPrice && matchSearch) {
             filteredProducts.push(product);
         }
-        product.style.display = "none";
     });
 
 
-        if (filteredProducts.length === 0 && searchTerm !== "") {
-        filteredProducts = allProductCards.filter((product) => {
-            const productCategory = product.dataset.category;
-const priceText = product.querySelector(".text-indigo-600").textContent.replace(/[^\d]/g, "");
-            const price = parseFloat(priceText);
-
-            const matchCategory = category === "all" || productCategory === category;
-            let matchPrice = true;
-            switch (priceRange) {
-                case "5": matchPrice = price < 5000000; break;
-                case "10": matchPrice = price < 10000000; break;
-                case "15": matchPrice = price < 15000000; break;
-                case "20": matchPrice = price < 20000000; break;
-                case "over20": matchPrice = price >= 20000000; break;
-            }
-            return matchCategory && matchPrice;
-        });
-    }
+    // BỎ logic tìm kiếm lại
 
     currentPage = 1;
-    showPage(currentPage, filteredProducts);
-    renderPagination(filteredProducts);
+    showPage(currentPage, filteredProducts); // Lọc trên danh sách đã lọc
+    renderPagination(filteredProducts); // Phân trang trên danh sách đã lọc
 }
 
 
@@ -427,7 +443,8 @@ function initializePagination() {
  * Hiển thị sản phẩm cho một trang cụ thể
  */
 function showPage(page, productList) {
-    productList.forEach((card) => {
+    // Tắt tất cả sản phẩm đang có trong DOM
+    allProductCards.forEach((card) => {
         card.style.display = "none";
     });
 
@@ -437,19 +454,23 @@ function showPage(page, productList) {
     
     const grid = document.getElementById("product-grid");
     
-    while (grid.firstChild) {
-        grid.removeChild(grid.firstChild);
-    }
-    
+    // Nâng cấp: Không xóa grid.innerHTML
+    // Chỉ hiển thị các card trong trang này
     if (pageProducts.length > 0) {
         pageProducts.forEach(card => {
             card.style.display = "block";
-            grid.appendChild(card);
+            // Đảm bảo card có trong grid (cho lần render đầu tiên)
+            if (!grid.contains(card)) {
+                    grid.appendChild(card);
+            }
         });
     } else {
-        if (productList.length === 0 && allProductCards.length > 0) {
-            grid.innerHTML = "<p class='text-center col-span-full text-gray-600'>Không tìm thấy sản phẩm nào khớp với bộ lọc.</p>";
+        // Nếu không có sản phẩm nào (do lọc), hiển thị thông báo
+        // Xóa các sản phẩm cũ (nếu có)
+        while (grid.firstChild) {
+            grid.removeChild(grid.firstChild);
         }
+        grid.innerHTML = "<p class='text-center col-span-full text-gray-600'>Không tìm thấy sản phẩm nào khớp với bộ lọc.</p>";
     }
 }
 
@@ -611,7 +632,7 @@ function initializeLoginUI() {
 }
 
 /**
- *  Gắn sự kiện cho menu mobile (hamburger)
+ * Gắn sự kiện cho menu mobile (hamburger)
  */
 function initializeMobileMenu() {
     const menuBtn = document.getElementById("mobile-menu-btn");
@@ -634,7 +655,7 @@ function initializeMobileMenu() {
         mobileMenu.classList.toggle("hidden");
     });
 
-    // Tùy chọn: Đóng menu khi nhấp vào một link
+    // Đóng menu khi nhấp vào một link
     mobileMenu.querySelectorAll("a").forEach(link => {
         // Không đóng menu nếu là link đăng xuất/thông tin (vì chúng không cuộn trang)
         if(link.getAttribute('href') === '#' || link.getAttribute('href') === 'xuathongtin.html' || link.getAttribute('href') === 'lichsu.html') {
@@ -689,7 +710,6 @@ window.addEventListener('scroll', function() {
 
 
 /* === PHẦN 4: CODE TÍNH TỒN KHO === */
-
 const IMPORTS_KEY = 'watchtime_imports';
 const ORDERS_KEY = 'allOrders';
 
@@ -699,7 +719,6 @@ const ORDERS_KEY = 'allOrders';
 function getStorageData(key, defaultValue = []) {
     try {
         const data = localStorage.getItem(key);
-        // Kiểm tra null/undefined trước khi parse
         return data ? JSON.parse(data) : defaultValue;
     } catch (e) {
         console.error(`Lỗi khi đọc ${key}:`, e);
@@ -709,21 +728,16 @@ function getStorageData(key, defaultValue = []) {
 
 /**
  * TÍNH TOÁN TỒN KHO
- * Tính tồn kho thực tế cho tất cả sản phẩm.
+ * Chấp nhận một mảng sản phẩm làm tham số
  */
-function calculateAllInventory() {
-    // Lấy tất cả sản phẩm (từ biến global 'allProducts' hoặc từ localStorage)
-    const products = (typeof allProducts !== 'undefined' && allProducts.length > 0) 
-                    ? allProducts 
-                   : getStorageData(PRODUCTS_KEY, []); // Giờ sẽ dùng biến PRODUCTS_KEY toàn cục
-
+function calculateAllInventory(productsToCalc) {
     // Lấy TẤT CẢ phiếu nhập/xuất đã hoàn thành
-    const allImports = getStorageData(IMPORTS_KEY, []).filter(i => i.status === 'Đã hoàn thành'); // Dùng IMPORTS_KEY toàn cục
-    const allOrders = getStorageData(ORDERS_KEY, []).filter(o => o.status === 'Đã giao'); // Dùng ORDERS_KEY toàn cục
+    const allImports = getStorageData(IMPORTS_KEY, []).filter(i => i.status === 'Đã hoàn thành'); 
+    const allOrders = getStorageData(ORDERS_KEY, []).filter(o => o.status === 'Đã giao'); 
     
     const inventoryMap = new Map();
 
-    products.forEach(prod => {
+    productsToCalc.forEach(prod => {
         const id = prod.id;
         let tongNhap = 0;
         let tongXuat = 0;
@@ -738,8 +752,7 @@ function calculateAllInventory() {
 
         // 2. Tính toán Xuất
         allOrders.forEach(order => {
-            // Tìm item trong đơn hàng
-            const item = order.items.find(i => i.id === id);
+            const item = order.items.find(i => i.id === id); 
             if (item) {
                 tongXuat += item.qty;
             }
@@ -752,30 +765,77 @@ function calculateAllInventory() {
     
     return inventoryMap;
 }
-/* === PHẦN 5: TỰ ĐỘNG CẬP NHẬT TỒN KHO (THÊM MỚI) === */
-window.addEventListener('storage', function(e) {
-    // Chỉ chạy khi tab admin (imports) hoặc tab thanh toán (orders) thay đổi dữ liệu
-    if (e.key === IMPORTS_KEY || e.key === ORDERS_KEY) {
-        
-        console.log('Phát hiện thay đổi kho từ tab khác, đang tự động cập nhật...');
-        
-        // 1. Tính toán lại tồn kho
-        globalInventory = calculateAllInventory();
-        
-        // 2. Vẽ lại toàn bộ thẻ HTML (để cập nhật số tồn kho)
-        renderProducts(allProducts);
-        
-        // 3. Lấy lại tham chiếu đến các thẻ MỚI
-        allProductCards = Array.from(document.querySelectorAll(".product-card"));
-        
-        // 4. Áp dụng lại bộ lọc/tìm kiếm (hàm này sẽ tự xử lý phân trang)
-        // Điều này giữ nguyên bộ lọc của người dùng
-        applyFiltersAndSearch();
 
-        // 5. Cập nhật lại icon và ngôn ngữ cho các thẻ MỚI
-        lucide.createIcons();
-        if (typeof window.runLanguageUpdater === 'function') {
-            window.runLanguageUpdater();
-        }
+/* === PHẦN 5: TỰ ĐỘNG CẬP NHẬT (NÂNG CẤP) === */
+
+/**
+ * (Helper) Hàm này thực hiện refresh lại toàn bộ lưới sản phẩm
+ */
+function runFullProductUpdate() {
+    // 1. Tính toán lại tồn kho (dựa trên 'currentProductData' đã được cập nhật)
+    globalInventory = calculateAllInventory(currentProductData);
+    
+    // 2. Vẽ lại toàn bộ thẻ HTML
+    renderProducts(currentProductData);
+    
+    // 3. Lấy lại tham chiếu đến các thẻ MỚI
+    allProductCards = Array.from(document.querySelectorAll(".product-card"));
+    
+    // 4. Áp dụng lại bộ lọc/tìm kiếm (hàm này sẽ tự xử lý phân trang)
+    applyFiltersAndSearch();
+
+    // 5. Cập nhật lại icon và ngôn ngữ cho các thẻ MỚI
+    lucide.createIcons();
+    if (typeof window.runLanguageUpdater === 'function') {
+        window.runLanguageUpdater();
     }
-});
+}
+
+/**
+ * Xử lý các thay đổi từ localStorage
+ */
+function handleStorageChange(e) {
+    if (!e.key) return; // Bỏ qua nếu không có key
+    
+    console.log(`Phát hiện thay đổi localStorage từ tab khác: ${e.key}`);
+
+    switch (e.key) {
+        // TRƯỜNG HỢP 1: ADMIN SỬA THỂ LOẠI
+        case CATEGORY_KEY:
+            // 1. Lấy dữ liệu thể loại mới
+            const newCategories = getStorageData(CATEGORY_KEY);
+            // 2. Cập nhật biến global (mà file categories.js đã tạo)
+            window.allCategories = newCategories;
+            // 3. Vẽ lại chỉ bộ lọc <select>
+            loadCategoryFilter();
+            // 4. Cập nhật ngôn ngữ cho bộ lọc
+            if (typeof window.runLanguageUpdater === 'function') {
+                window.runLanguageUpdater();
+            }
+            break;
+
+        // TRƯỜNG HỢP 2: ADMIN SỬA SẢN PHẨM
+        case PRODUCTS_KEY:
+            // 1. Lấy dữ liệu sản phẩm mới
+            const newProducts = getStorageData(PRODUCTS_KEY);
+            // 2. Cập nhật biến dữ liệu cục bộ
+            currentProductData = newProducts;
+            // 3. Chạy refresh toàn bộ lưới sản phẩm
+            runFullProductUpdate();
+            break;
+
+        // TRƯỜNG HỢP 3: ADMIN NHẬP HÀNG HOẶC USER MUA HÀNG
+        case IMPORTS_KEY:
+        case ORDERS_KEY:
+            // Chỉ cần tính lại tồn kho và refresh lưới (sản phẩm không đổi)
+            runFullProductUpdate();
+            break;
+    }
+}
+
+/**
+ * Khởi chạy bộ lắng nghe
+ */
+function initializeStorageListener() {
+    window.addEventListener('storage', handleStorageChange);
+}
