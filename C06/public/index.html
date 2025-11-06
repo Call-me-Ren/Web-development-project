@@ -104,14 +104,19 @@
     <main>
         <section id="home" class="relative h-[60vh] md:h-[80vh] overflow-hidden">
         <!-- Video nền -->
-        <video
-          src="../images/dongho.mp4"
-          autoplay
-          loop
-          muted
-          playsinline
-          class="absolute inset-0 w-full h-full object-cover"
-        ></video>
+      <video
+    autoplay
+    loop
+    muted
+    playsinline
+    preload="auto"
+    class="absolute inset-0 w-full h-full object-cover"
+    >
+  <source src="../images/dongho.mp4" type="video/mp4" />
+  <img src="../images/nen.jpg" alt="Nền WatchTime" class="absolute inset-0 w-full h-full object-cover" />
+</video>
+
+
 
         <!-- Lớp phủ tối để làm nổi chữ -->
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
