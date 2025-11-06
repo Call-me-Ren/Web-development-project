@@ -527,6 +527,7 @@ function renderPagination(productList) {
             currentPage--;
             showPage(currentPage, productList);
             renderPagination(productList);
+            scrollToProductTop();
         }
     };
     paginationContainer.appendChild(prevBtn);
