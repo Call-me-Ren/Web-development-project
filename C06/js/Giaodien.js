@@ -506,9 +506,16 @@ function renderPagination(productList) {
     if (!paginationContainer) return;
 
     const totalPages = Math.ceil(productList.length / productsPerPage);
+    const currentHeight = paginationContainer.offsetHeight;
+    if (currentHeight > 0) {
+        paginationContainer.style.minHeight = `${currentHeight}px`;
+    }
     paginationContainer.innerHTML = "";
 
-    if (totalPages <= 1) return; //Nếu có 1 trang thì không cần phân trang
+    if (totalPages <= 1) {
+        paginationContainer.style.minHeight = 'auto';
+        return;
+    }//Nếu có 1 trang thì không cần phân trang
 
     // Nút "Trước"
     const prevBtn = document.createElement("button");
@@ -533,6 +540,7 @@ btn.className = `px-3 py-1 rounded-md ${i === currentPage ? 'bg-indigo-600 text-
             currentPage = i;
             showPage(currentPage, productList);
             renderPagination(productList);
+            scrollToProductTop();
         };
         paginationContainer.appendChild(btn);
     }
@@ -547,11 +555,34 @@ btn.className = `px-3 py-1 rounded-md ${i === currentPage ? 'bg-indigo-600 text-
             currentPage++;
             showPage(currentPage, productList);
             renderPagination(productList);
+            scrollToProductTop();
         }
     };
     paginationContainer.appendChild(nextBtn);
+    paginationContainer.style.minHeight = 'auto';
 }
 
+/**
+ * Cuộn màn hình lên đầu lưới sản phẩm
+ */
+function scrollToProductTop() {
+    // 1. Ưu tiên tìm tiêu đề "Sản Phẩm Nổi Bật"
+    // (Dựa trên data-key mà bạn đã có trong hàm ngôn ngữ)
+    let targetElement = document.querySelector('[data-key="FeaturedProducts"]');
+    
+    // 2. Nếu không tìm thấy tiêu đề, cuộn lên chính lưới sản phẩm
+    if (!targetElement) {
+        targetElement = document.getElementById("product-grid");
+    }
+
+    // 3. Nếu tìm thấy 1 trong 2, cuộn mượt lên
+    if (targetElement) {
+        targetElement.scrollIntoView({
+            behavior: 'smooth', // 'smooth' (cuộn mượt) hoặc 'auto' (nhảy tức thì)
+            block: 'start'      // Căn lề trên cùng của element
+        });
+    }
+}
 
 /**
  * Quản lý đăng nhập / avatar / đăng xuất
