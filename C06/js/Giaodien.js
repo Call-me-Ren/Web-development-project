@@ -308,6 +308,8 @@ function initializeLanguageToggle() {
         },
     };
 
+    window.runLanguageUpdater = updateLanguage;
+
     function updateLanguage() {
         const lang = translations[currentLang];
         document.querySelectorAll("[data-key]").forEach((el) => {
@@ -750,3 +752,30 @@ function calculateAllInventory() {
     
     return inventoryMap;
 }
+/* === PHẦN 5: TỰ ĐỘNG CẬP NHẬT TỒN KHO (THÊM MỚI) === */
+window.addEventListener('storage', function(e) {
+    // Chỉ chạy khi tab admin (imports) hoặc tab thanh toán (orders) thay đổi dữ liệu
+    if (e.key === IMPORTS_KEY || e.key === ORDERS_KEY) {
+        
+        console.log('Phát hiện thay đổi kho từ tab khác, đang tự động cập nhật...');
+        
+        // 1. Tính toán lại tồn kho
+        globalInventory = calculateAllInventory();
+        
+        // 2. Vẽ lại toàn bộ thẻ HTML (để cập nhật số tồn kho)
+        renderProducts(allProducts);
+        
+        // 3. Lấy lại tham chiếu đến các thẻ MỚI
+        allProductCards = Array.from(document.querySelectorAll(".product-card"));
+        
+        // 4. Áp dụng lại bộ lọc/tìm kiếm (hàm này sẽ tự xử lý phân trang)
+        // Điều này giữ nguyên bộ lọc của người dùng
+        applyFiltersAndSearch();
+
+        // 5. Cập nhật lại icon và ngôn ngữ cho các thẻ MỚI
+        lucide.createIcons();
+        if (typeof window.runLanguageUpdater === 'function') {
+            window.runLanguageUpdater();
+        }
+    }
+});
