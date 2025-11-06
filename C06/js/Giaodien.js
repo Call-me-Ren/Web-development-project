@@ -396,14 +396,15 @@ function applyFiltersAndSearch() {
     const priceRange = document.getElementById("filter-price").value;
     const searchTerm = document.querySelector('#search').value.toLowerCase().trim();
 
-    let filteredProducts = [];
+    // THAY ĐỔI: Đổi tên biến để rõ nghĩa hơn
+    let filterMatchedProducts = []; // Danh sách lọc theo Category và Price
 
-    // Lọc trên 'allProductCards'
+    // === BƯỚC 1: Lọc theo Category và Price ===
     allProductCards.forEach((product) => {
         const productCategory = product.dataset.category;
         const priceText = product.querySelector(".text-indigo-600").textContent.replace(/[^\d]/g, "");
         const price = parseFloat(priceText);
-        const name = product.querySelector("h3").innerText.toLowerCase();
+        // THAY ĐỔI: Không cần lấy 'name' ở bước này nữa
 
         const matchCategory = category === "all" || productCategory === category;
         let matchPrice = true;
@@ -415,19 +416,41 @@ function applyFiltersAndSearch() {
             case "over20": matchPrice = price >= 20000000; break;
             default: matchPrice = true;
         }
-        const matchSearch = name.includes(searchTerm);
-
-        if (matchCategory && matchPrice && matchSearch) {
-            filteredProducts.push(product);
+        // THAY ĐỔI: Bỏ điều kiện 'matchSearch' khỏi đây
+        
+        // THAY ĐỔI: Chỉ kiểm tra 2 điều kiện lọc
+        if (matchCategory && matchPrice) {
+            filterMatchedProducts.push(product);
         }
     });
 
+    // === BƯỚC 2: Xử lý tìm kiếm (Search) dựa trên yêu cầu mới ===
+    
+    // THAY ĐỔI: (Đây là phần logic mới hoàn toàn)
+    // 1. Mặc định, danh sách cuối cùng là danh sách đã lọc (Cat/Price)
+    let finalProductList = filterMatchedProducts;
 
-    // BỎ logic tìm kiếm lại
+    // 2. Chỉ chạy tìm kiếm nếu người dùng có nhập chữ
+    if (searchTerm.length > 0) {
+        // 3. Thử lọc tìm kiếm từ danh sách BƯỚC 1
+        const searchMatchedProducts = filterMatchedProducts.filter(product => {
+            const name = product.querySelector("h3").innerText.toLowerCase();
+            return name.includes(searchTerm);
+        });
 
+        // 4. Chỉ cập nhật danh sách cuối cùng NẾU tìm kiếm có kết quả
+        if (searchMatchedProducts.length > 0) {
+            finalProductList = searchMatchedProducts;
+        }
+        // 5. Nếu không (tìm sai), finalProductList sẽ giữ nguyên kết quả của BƯỚC 1
+    }
+    
+    // === BƯỚC 3: Render dựa trên danh sách cuối cùng ===
     currentPage = 1;
-    showPage(currentPage, filteredProducts); // Lọc trên danh sách đã lọc
-    renderPagination(filteredProducts); // Phân trang trên danh sách đã lọc
+    
+    // THAY ĐỔI: Sử dụng 'finalProductList' thay vì 'filteredProducts'
+    showPage(currentPage, finalProductList); 
+    renderPagination(finalProductList);
 }
 
 
@@ -483,9 +506,16 @@ function renderPagination(productList) {
     if (!paginationContainer) return;
 
     const totalPages = Math.ceil(productList.length / productsPerPage);
+    const currentHeight = paginationContainer.offsetHeight;
+    if (currentHeight > 0) {
+        paginationContainer.style.minHeight = `${currentHeight}px`;
+    }
     paginationContainer.innerHTML = "";
 
-    if (totalPages <= 1) return; //Nếu có 1 trang thì không cần phân trang
+    if (totalPages <= 1) {
+        paginationContainer.style.minHeight = 'auto';
+        return;
+    }//Nếu có 1 trang thì không cần phân trang
 
     // Nút "Trước"
     const prevBtn = document.createElement("button");
@@ -497,6 +527,7 @@ function renderPagination(productList) {
             currentPage--;
             showPage(currentPage, productList);
             renderPagination(productList);
+            scrollToProductTop();
         }
     };
     paginationContainer.appendChild(prevBtn);
@@ -510,6 +541,7 @@ btn.className = `px-3 py-1 rounded-md ${i === currentPage ? 'bg-indigo-600 text-
             currentPage = i;
             showPage(currentPage, productList);
             renderPagination(productList);
+            scrollToProductTop();
         };
         paginationContainer.appendChild(btn);
     }
@@ -524,11 +556,34 @@ btn.className = `px-3 py-1 rounded-md ${i === currentPage ? 'bg-indigo-600 text-
             currentPage++;
             showPage(currentPage, productList);
             renderPagination(productList);
+            scrollToProductTop();
         }
     };
     paginationContainer.appendChild(nextBtn);
+    paginationContainer.style.minHeight = 'auto';
 }
 
+/**
+ * Cuộn màn hình lên đầu lưới sản phẩm
+ */
+function scrollToProductTop() {
+    // 1. Ưu tiên tìm tiêu đề "Sản Phẩm Nổi Bật"
+    // (Dựa trên data-key mà bạn đã có trong hàm ngôn ngữ)
+    let targetElement = document.querySelector('[data-key="FeaturedProducts"]');
+    
+    // 2. Nếu không tìm thấy tiêu đề, cuộn lên chính lưới sản phẩm
+    if (!targetElement) {
+        targetElement = document.getElementById("product-grid");
+    }
+
+    // 3. Nếu tìm thấy 1 trong 2, cuộn mượt lên
+    if (targetElement) {
+        targetElement.scrollIntoView({
+            behavior: 'smooth', // 'smooth' (cuộn mượt) hoặc 'auto' (nhảy tức thì)
+            block: 'start'      // Căn lề trên cùng của element
+        });
+    }
+}
 
 /**
  * Quản lý đăng nhập / avatar / đăng xuất
@@ -593,12 +648,12 @@ function initializeLoginUI() {
         if (confirm("Bạn có chắc muốn đăng xuất?")) {
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("currentUser");
-        localStorage.removeItem("watchtime_cart"); 
+        localStorage.removeItem("watchtime_cart");
         isLoggedIn = false;
         updateLoginUI();
         userMenu.classList.add("hidden");
-        updateHeaderCartCount(); 
-        window.location.reload(); 
+        updateHeaderCartCount();
+        window.location.reload();
     }
     }
 
