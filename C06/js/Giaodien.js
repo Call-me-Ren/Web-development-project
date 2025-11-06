@@ -9,6 +9,21 @@ function createProductCard(product) {
     const description = product.description_short ? `<p class="text-gray-600 mb-4">${product.description_short}</p>` : '<p class="text-gray-600 mb-4">&nbsp;</p>';
     const price = Number(product.price).toLocaleString('vi-VN') + ' VNĐ';
 
+    // === BẮT ĐẦU THAY ĐỔI: LOGIC TỒN KHO ===
+    const stock = globalInventory.get(product.id) || 0;
+    let stockHtml = '';
+    let cartButtonHtml = '';
+
+    if (stock > 0) {
+        // Nếu còn hàng, hiển thị số lượng và nút 'Thêm vào giỏ'
+        stockHtml = `<p><span data-key="Stock">Tồn kho:</span> <span> ${stock}</span></p>`;
+        cartButtonHtml = `<button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart" data-key="AToCard">Thêm vào giỏ</button>`;
+    } else {
+        // Nếu hết hàng, hiển thị thông báo và vô hiệu hóa nút
+        stockHtml = `<p class="text-sm text-red-500 font-bold" data-key="OutOfStock">Hết hàng</p>`;
+        cartButtonHtml = `<button class="text-white bg-gray-400 py-2 px-4 rounded-lg cursor-not-allowed" disabled data-key="OutOfStock">Hết hàng</button>`;
+    }
+
     return `
     <div class="product-card bg-white rounded-lg shadow-md overflow-hidden group" data-category="${product.category}" data-id="${product.id}">
         <div class="relative overflow-hidden">
@@ -16,15 +31,18 @@ function createProductCard(product) {
                 <img src="${product.image}" alt="${product.name}" class="w-full h-64 object-cover group-hover:scale-110 smooth-transition">
             </a>
             <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 smooth-transition">
-                <button class="text-white bg-indigo-600 py-2 px-4 rounded-lg add-to-cart" data-key="AToCard">Thêm vào giỏ</button>
-            </div>
+                ${cartButtonHtml} </div>
         </div>
         <div class="p-6">
             <h3 class="text-xl font-semibold mb-2" data-name="${product.name}">${product.name}</h3>
             ${description}
             <p class="text-2xl font-bold text-indigo-600">${price}</p>
             
-            <a href="chitiet.html?id=${product.id}" class="btn btn-outline-primary flex justify-center mt-3 mt-3 xem-chi-tiet">Xem chi tiết</a>
+            <div class="mt-3">
+                ${stockHtml}
+            </div>
+            
+            <a href="chitiet.html?id=${product.id}" class="btn btn-outline-primary flex justify-center mt-3 mt-3 xem-chi-tiet" data-key="ViewDetails">Xem chi tiết</a>
         </div>
     </div>
     `;
@@ -54,17 +72,24 @@ function renderProducts(products) {
 let allProductCards = []; // Biến global để lưu trữ các thẻ DOM
 let currentPage = 1;
 const productsPerPage = 8; // số sản phẩm mỗi trang
+let globalInventory = new Map(); // Biến global lưu tồn kho
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Render tất cả sản phẩm từ 'allProducts'
+    
+    // 1. Kiểm tra 'allProducts' đã tải chưa
     if (typeof allProducts !== 'undefined') {
-        renderProducts(allProducts);
+        // Tốt, 'allProducts' đã có
     } else {
         console.error("'allProducts' is not defined. Make sure 'products.js' is loaded first and correct.");
         const grid = document.getElementById("product-grid");
-if(grid) grid.innerHTML = "<p class='text-red-500 text-center col-span-full'>Lỗi: Không thể tải dữ liệu sản phẩm.</p>";
+        if(grid) grid.innerHTML = "<p class='text-red-500 text-center col-span-full'>Lỗi: Không thể tải dữ liệu sản phẩm.</p>";
         return;
     }
+    // TÍNH TOÁN TỒN KHO CHO TẤT CẢ SẢN PHẨM
+    globalInventory = calculateAllInventory();
+
+    // 1. Render sản phẩm lên giao diện
+    renderProducts(allProducts);
 
     // 2. Tự động gọi hàm render icon của Lucide
     lucide.createIcons();
@@ -76,18 +101,12 @@ if(grid) grid.innerHTML = "<p class='text-red-500 text-center col-span-full'>L�
     initializePagination();
 
     // 5. Gắn sự kiện cho các chức năng khác
-    // ===========================================
-    // === THAY ĐỔI: Tải loại SP trước khi gắn filter
     loadCategoryFilter();
-    // ===========================================
-
     initializeFilters();
     initializeSearch();
     initializeLoginUI();
-    initializeAddToCart();
-    initializeLanguageToggle();
-    
-    // SỬA ĐỔI: Thêm hàm khởi tạo menu mobile
+    initializeAddToCart(); // Hàm này cũng được cập nhật
+    initializeLanguageToggle(); // Hàm này cũng được cập nhật
     initializeMobileMenu();
 });
 
@@ -119,11 +138,10 @@ function initializeAddToCart() {
     function getCart(){
         try{ return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; }
     }
-    function saveCart(cart){ 
+    function saveCart(cart){
         localStorage.setItem(CART_KEY, JSON.stringify(cart)); 
     }
     
-    // Gắn sự kiện cho TẤT CẢ nút add-to-cart
     const productGrid = document.getElementById("product-grid");
     if (!productGrid) return;
 
@@ -137,16 +155,36 @@ function initializeAddToCart() {
 
         const btn = e.target;
 
+
+        // 1. Kiểm tra nút bị vô hiệu hóa
+        if (btn.disabled) {
+            alert("Sản phẩm này hiện đã hết hàng!");
+            return;
+        }
+        
+        const card = btn.closest('.product-card');
+        if (!card) return;
+        
+        const id = card.dataset.id;
+
+        // 2. Kiểm tra tồn kho thực tế
+        const stock = globalInventory.get(id) || 0;
+        if (stock <= 0) {
+            alert("Sản phẩm này hiện đã hết hàng!");
+            // Cập nhật lại UI nút lỡ như có lỗi
+            btn.disabled = true;
+            btn.textContent = "Hết hàng";
+            btn.classList.remove("bg-indigo-600");
+            btn.classList.add("bg-gray-400", "cursor-not-allowed");
+            return;
+        }
+
         if (localStorage.getItem("isLoggedIn") !== "true") {
             alert("Bạn cần đăng nhập để mua hàng!");
             window.location.href = "dangnhap.html";
             return;
         }
 
-        const card = btn.closest('.product-card');
-        if (!card) return;
-        
-        const id = card.dataset.id;
         const product = allProducts.find(p => p.id === id);
         if (!product) {
             console.error("Không tìm thấy sản phẩm với ID:", id);
@@ -156,10 +194,16 @@ function initializeAddToCart() {
         let cart = getCart();
         const existing = cart.find(it => it.id === id);
         
+        const qtyInCart = existing ? existing.qty : 0;
+        if (qtyInCart >= stock) {
+            alert("Bạn đã thêm số lượng tối đa của sản phẩm này vào giỏ hàng.");
+            return;
+        }
+        
         if(existing){
             existing.qty = (existing.qty || 1) + 1;
         } else {
-cart.push({ id: product.id, name: product.name, price: product.price, qty: 1, image: product.image });
+            cart.push({ id: product.id, name: product.name, price: product.price, qty: 1, image: product.image });
         }
         saveCart(cart);
 
@@ -175,11 +219,10 @@ cart.push({ id: product.id, name: product.name, price: product.price, qty: 1, im
 
 
 /**
- * Gắn sự kiện cho Đa ngôn ngữ
+ * Gắn sự kiện cho Đa ngôn ngữ (ĐÃ CẬP NHẬT)
  */
 function initializeLanguageToggle() {
     let currentLang = "vi";
-    // Chọn tất cả các nút chuyển ngôn ngữ
     const langToggleBtns = document.querySelectorAll('[data-role="lang-switcher"]'); 
 
     const translations = {
@@ -218,14 +261,17 @@ function initializeLanguageToggle() {
             FooterLinks: "Liên kết",
             FooterContact: "Thông Tin Liên Hệ",
             Address: "123 Đường ABC, Quận 1, TP. Hồ Chí Minh",
-            Copyright: "© 2024 WatchTime. Đã đăng ký bản quyền."
+            Copyright: "© 2024 WatchTime. Đã đăng ký bản quyền.",
+            Stock: "Tồn kho:",
+            OutOfStock: "Hết hàng",
+            ViewDetails: "Xem chi tiết"
         },
         en: {
             Home: "Home",
             Products: "Products",
             About: "About Us",
             Contact: "Contact",
-"hero-title": "Luxury Watch Collection",
+            "hero-title": "Luxury Watch Collection",
             "hero-sub": "Define your style and status with the finest timepieces.",
             explore: "Explore Now",
             Login: "Login",
@@ -255,7 +301,10 @@ function initializeLanguageToggle() {
             FooterLinks: "Links",
             FooterContact: "Contact Info",
             Address: "123 ABC Street, District 1, Ho Chi Minh City",
-            Copyright: "© 2024 WatchTime. All rights reserved."
+            Copyright: "© 2024 WatchTime. All rights reserved.",
+            Stock: "Stock:",
+            OutOfStock: "Out of Stock",
+            ViewDetails: "View Details"
         },
     };
 
@@ -264,11 +313,9 @@ function initializeLanguageToggle() {
         document.querySelectorAll("[data-key]").forEach((el) => {
             const key = el.getAttribute("data-key");
             
-            // Xử lý riêng cho placeholder
             if (key === "SearchPlaceholder" && el.tagName === "INPUT") {
                 if (lang[key]) el.placeholder = lang[key];
             }
-            // Xử lý cho các text thông thường
             else {
                 if (lang[key]) el.textContent = lang[key];
             }
@@ -279,7 +326,6 @@ function initializeLanguageToggle() {
         langToggleBtns.forEach(btn => {
             btn.addEventListener("click", () => {
                 currentLang = currentLang === "vi" ? "en" : "vi";
-                // Cập nhật tất cả các nút
                 langToggleBtns.forEach(b => b.textContent = currentLang === "vi" ? "VI" : "EN");
                 updateLanguage();
             });
@@ -290,42 +336,22 @@ function initializeLanguageToggle() {
 
 /* === PHẦN 3: CÁC HÀM TIỆN ÍCH (Lọc, Phân trang, Login) === */
 
-// ===========================================
-// === THAY ĐỔI: Thêm hàm loadCategoryFilter
-// ===========================================
 /**
  * TẢI DYNAMIC: Tải danh sách loại sản phẩm từ LocalStorage
  */
 function loadCategoryFilter() {
-    // 1. Lấy thẻ <select>
     const categorySelect = document.getElementById('filter-category');
     if (!categorySelect) return;
-
-    // 2. Lấy dữ liệu từ Local Storage
-    // (KEY_NAME phải giống hệt key mà trang admin.js đang dùng, ví dụ 'categories')
     const KEY_NAME = 'watchtime_categories';
     const categories = JSON.parse(localStorage.getItem(KEY_NAME)) || [];
-
-    // 3. Lặp qua mảng và tạo <option>
     categories.forEach(category => {
-        // Tạo một thẻ <option> mới
         const option = document.createElement('option');
-        
-        // Dựa trên code admin, key là 'id' và tên là 'name'
-        option.value = category.id;       // Ví dụ: "nam"
-        option.textContent = category.name;  // Ví dụ: "Đồng hồ Nam"
-
-        // Gán data-key để logic đa ngôn ngữ không bị lỗi
+        option.value = category.id;
+        option.textContent = category.name;
         option.dataset.key = category.name;
-
-        // 4. Thêm <option> mới vào trong thẻ <select>
         categorySelect.appendChild(option);
     });
 }
-// ===========================================
-// === Kết thúc phần thêm mới
-// ===========================================
-
 
 /**
  * Lọc và tìm kiếm kết hợp
@@ -363,7 +389,6 @@ function applyFiltersAndSearch() {
 
 
         if (filteredProducts.length === 0 && searchTerm !== "") {
-        // Hiện lại toàn bộ sản phẩm theo bộ lọc (bỏ qua tìm kiếm)
         filteredProducts = allProductCards.filter((product) => {
             const productCategory = product.dataset.category;
 const priceText = product.querySelector(".text-indigo-600").textContent.replace(/[^\d]/g, "");
@@ -584,7 +609,7 @@ function initializeLoginUI() {
 }
 
 /**
- * THÊM MỚI: Gắn sự kiện cho menu mobile (hamburger)
+ *  Gắn sự kiện cho menu mobile (hamburger)
  */
 function initializeMobileMenu() {
     const menuBtn = document.getElementById("mobile-menu-btn");
@@ -647,17 +672,81 @@ function getCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || [
 })();
 // Hiệu ứng xuất hiện khi cuộn
 window.addEventListener('scroll', function() {
-  const cards = document.querySelectorAll('.product-card');
+    const cards = document.querySelectorAll('.product-card');
   const triggerBottom = window.innerHeight * 0.85;
 
-  cards.forEach(card => {
+    cards.forEach(card => {
     const cardTop = card.getBoundingClientRect().top;
     if (cardTop < triggerBottom) {
-      card.classList.add('show');
+        card.classList.add('show');
     } else {
-      card.classList.remove('show');
+        card.classList.remove('show');
     }
-  });
+    });
 });
 
 
+/* === PHẦN 4: CODE TÍNH TỒN KHO === */
+
+const IMPORTS_KEY = 'watchtime_imports';
+const ORDERS_KEY = 'allOrders';
+
+/**
+ * Hàm helper để đọc data từ LocalStorage
+ */
+function getStorageData(key, defaultValue = []) {
+    try {
+        const data = localStorage.getItem(key);
+        // Kiểm tra null/undefined trước khi parse
+        return data ? JSON.parse(data) : defaultValue;
+    } catch (e) {
+        console.error(`Lỗi khi đọc ${key}:`, e);
+        return defaultValue;
+    }
+}
+
+/**
+ * TÍNH TOÁN TỒN KHO
+ * Tính tồn kho thực tế cho tất cả sản phẩm.
+ */
+function calculateAllInventory() {
+    // Lấy tất cả sản phẩm (từ biến global 'allProducts' hoặc từ localStorage)
+    const products = (typeof allProducts !== 'undefined' && allProducts.length > 0) 
+                    ? allProducts 
+                   : getStorageData(PRODUCTS_KEY, []); // Giờ sẽ dùng biến PRODUCTS_KEY toàn cục
+
+    // Lấy TẤT CẢ phiếu nhập/xuất đã hoàn thành
+    const allImports = getStorageData(IMPORTS_KEY, []).filter(i => i.status === 'Đã hoàn thành'); // Dùng IMPORTS_KEY toàn cục
+    const allOrders = getStorageData(ORDERS_KEY, []).filter(o => o.status === 'Đã giao'); // Dùng ORDERS_KEY toàn cục
+    
+    const inventoryMap = new Map();
+
+    products.forEach(prod => {
+        const id = prod.id;
+        let tongNhap = 0;
+        let tongXuat = 0;
+
+        // 1. Tính toán Nhập
+        allImports.forEach(imp => {
+            const item = imp.items.find(i => i.productId === id);
+            if (item) {
+                tongNhap += item.qty;
+            }
+        });
+
+        // 2. Tính toán Xuất
+        allOrders.forEach(order => {
+            // Tìm item trong đơn hàng
+            const item = order.items.find(i => i.id === id);
+            if (item) {
+                tongXuat += item.qty;
+            }
+        });
+        
+        // 3. Tính Tồn
+        const ton = tongNhap - tongXuat;
+        inventoryMap.set(id, ton);
+    });
+    
+    return inventoryMap;
+}
