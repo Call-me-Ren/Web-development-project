@@ -25,8 +25,8 @@
                 <a href="ThanhToan.html" class="relative text-gray-600 hover:text-indigo-600">
                     <i class="fa-solid fa-cart-plus text-2xl"></i>
                     <span id="cart-count"
-                          class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
-                          0
+                            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                            0
                     </span>
                 </a>
             </div>
@@ -49,120 +49,173 @@
     
     <script src="../js/Giaodien.js"></script>
     <script>
-        lucide.createIcons(); // Vẫn gọi để render icon "arrow-left"
+    lucide.createIcons(); // Vẫn gọi để render icon "arrow-left"
 
-        // === Logic chính của trang chi tiết ===
-        document.addEventListener("DOMContentLoaded", () => {
-            const productContainer = document.getElementById("product-detail-container");
+    // === Logic chính của trang chi tiết ===
+    document.addEventListener("DOMContentLoaded", () => {
+        const productContainer = document.getElementById("product-detail-container");
 
-            // 1. Lấy ID sản phẩm từ URL
-            const params = new URLSearchParams(window.location.search);
-            const productId = params.get('id');
+        // 1. Lấy ID sản phẩm từ URL
+        const params = new URLSearchParams(window.location.search);
+        const productId = params.get('id');
 
-            if (!productId) {
-                productContainer.innerHTML = "<p class='text-red-500 font-bold'>Không tìm thấy ID sản phẩm.</p>";
-                return;
-            }
+        if (!productId) {
+            productContainer.innerHTML = "<p class='text-red-500 font-bold'>Không tìm thấy ID sản phẩm.</p>";
+            return;
+        }
 
-            // 2. Tìm sản phẩm trong mảng 'allProducts' (từ file products.js)
-            const product = allProducts.find(p => p.id === productId);
+        // 2. Tìm sản phẩm trong mảng 'allProducts' (từ file products.js)
+        // Lưu ý: allProducts được định nghĩa trong products.js và được tải trước Giaodien.js
+        if (typeof allProducts === 'undefined') {
+            productContainer.innerHTML = "<p class='text-red-500 font-bold'>Lỗi: Không thể tải dữ liệu sản phẩm (allProducts).</p>";
+            return;
+        }
+        
+        const product = allProducts.find(p => p.id === productId);
 
-            if (!product) {
-                productContainer.innerHTML = `<p class='text-red-500 font-bold'>Không tìm thấy sản phẩm với ID: ${productId}</p>`;
-                return;
-            }
+        if (!product) {
+            productContainer.innerHTML = `<p class='text-red-500 font-bold'>Không tìm thấy sản phẩm với ID: ${productId}</p>`;
+            return;
+        }
 
-            // 3. Render HTML cho sản phẩm
-            renderProductDetails(product);
+        // 3. Render HTML cho sản phẩm
+        renderProductDetails(product);
 
-            // 4. Gắn sự kiện cho nút "Thêm vào giỏ"
-            attachAddToCartEvent(product);
-        });
+        // 4. Gắn sự kiện cho nút "Thêm vào giỏ"
+        // Thêm kiểm tra tồn kho ban đầu để cập nhật trạng thái nút
+        const inventoryMap = typeof calculateAllInventory === 'function' ? calculateAllInventory(allProducts) : new Map();
+        const stock = inventoryMap.get(product.id) || 0;
+        
+        attachAddToCartEvent(product, stock);
+    });
 
-        function renderProductDetails(product) {
-            const container = document.getElementById("product-detail-container");
-            
-            // SỬA ĐỔI CODE RENDER BÊN DƯỚI
-            container.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <img id="product-img" src="${product.image}" alt="${product.name}" class="w-full h-auto object-cover rounded-lg shadow-md">
-                    </div>
-
-                    <div class="flex flex-col justify-center">
-                        <h1 id="product-name" class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">${product.name}</h1>
-                        
-                        <p id="product-desc" class="text-gray-600 mb-6 leading-relaxed">
-                            ${product.description_long || product.description_short || 'Chưa có mô tả chi tiết cho sản phẩm này.'}
-                        </p>
-                        
-                        <div class="mb-6">
-                            <span class="text-gray-500 text-sm">Phân loại:</span>
-                            <span class="font-semibold text-indigo-600">${product.category === 'nam' ? 'Đồng hồ Nam' : (product.category === 'nu' ? 'Đồng hồ Nữ' : 'Đồng hồ Đôi')}</span>
-                        </div>
-
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between bg-gray-100 p-4 rounded-lg">
-                            <div class="mb-4 md:mb-0">
-                                <span class="text-gray-600 text-lg">Giá bán:</span>
-                                <p id="product-price" class="text-3xl font-bold text-indigo-600">
-                                    ${Number(product.price).toLocaleString('vi-VN')}₫
-                                </p>
-                            </div>
-                            <button id="detail-add-to-cart" class="w-full md:w-auto bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 smooth-transition text-lg">
-                                <i class="fa-solid fa-cart-plus mr-2"></i>
-                                Thêm vào giỏ
-                            </button>
-                        </div>
-                    </div>
-                </div>
+    function renderProductDetails(product) {
+        const container = document.getElementById("product-detail-container");
+        
+        // Cập nhật trạng thái Hết hàng/Trong kho ban đầu
+        const inventoryMap = typeof calculateAllInventory === 'function' ? calculateAllInventory(allProducts) : new Map();
+        const stock = inventoryMap.get(product.id) || 0;
+        
+        let buttonHtml = '';
+        if (stock > 0) {
+            buttonHtml = `
+                <button id="detail-add-to-cart" class="w-full md:w-auto bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 smooth-transition text-lg">
+                    <i class="fa-solid fa-cart-plus mr-2"></i>
+                    Thêm vào giỏ
+                </button>
+            `;
+        } else {
+            buttonHtml = `
+                <button id="detail-add-to-cart" class="w-full md:w-auto bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed text-lg" disabled>
+                    <i class="fa-solid fa-ban mr-2"></i>
+                    Hết hàng
+                </button>
             `;
         }
 
-        function attachAddToCartEvent(product) {
-            const btn = document.getElementById("detail-add-to-cart");
-            if (!btn) return;
+        container.innerHTML = `
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <img id="product-img" src="${product.image}" alt="${product.name}" class="w-full h-auto object-cover rounded-lg shadow-md">
+                </div>
 
-            btn.addEventListener("click", () => {
-                // Kiểm tra đăng nhập
-                if (localStorage.getItem("isLoggedIn") !== "true") {
-                    alert("Bạn cần đăng nhập để mua hàng!");
-                    window.location.href = "dangnhap.html";
-                    return;
-                }
-                
-                // Logic thêm vào giỏ hàng
-                const CART_KEY = 'watchtime_cart';
-                
-                function getCart(){
-                    try{ return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; }
-                }
-                function saveCart(cart){ 
-                    localStorage.setItem(CART_KEY, JSON.stringify(cart)); 
-                }
+                <div class="flex flex-col justify-center">
+                    <h1 id="product-name" class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">${product.name}</h1>
+                    
+                    <p id="product-desc" class="text-gray-600 mb-6 leading-relaxed">
+                        ${product.description_long || product.description_short || 'Chưa có mô tả chi tiết cho sản phẩm này.'}
+                    </p>
+                    
+                    <div class="mb-6">
+                        <span class="text-gray-500 text-sm">Phân loại:</span>
+                        <span class="font-semibold text-indigo-600">${product.category === 'nam' ? 'Đồng hồ Nam' : (product.category === 'nu' ? 'Đồng hồ Nữ' : 'Đồng hồ Đôi')}</span>
+                    </div>
 
-                let cart = getCart();
-                const existing = cart.find(it => it.id === product.id);
-                
-                if(existing){
-                    existing.qty = (existing.qty || 1) + 1;
-                } else {
-                    // Sửa lỗi: Thêm image vào giỏ hàng
-                    cart.push({ id: product.id, name: product.name, price: product.price, qty: 1, image: product.image });
-                }
-                
-                saveCart(cart);
-                
-                // Cập nhật số lượng trên header
-                if (typeof window.updateHeaderCartCount === 'function') {
-                    window.updateHeaderCartCount();
-                }
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between bg-gray-100 p-4 rounded-lg">
+                        <div class="mb-4 md:mb-0">
+                            <span class="text-gray-600 text-lg">Giá bán:</span>
+                            <p id="product-price" class="text-3xl font-bold text-indigo-600">
+                                ${Number(product.price).toLocaleString('vi-VN')}₫
+                            </p>
+                        </div>
+                        ${buttonHtml}
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500 font-semibold">Tồn kho: 
+                        <span class="${stock > 5 ? 'text-green-600' : (stock > 0 ? 'text-orange-500' : 'text-red-500')}">${stock > 0 ? stock : 'Hết hàng'}</span>
+                    </p>
+                </div>
+            </div>
+        `;
+    }
 
-                alert(`Đã thêm "${product.name}" vào giỏ hàng!`);
-                
-                btn.classList.add('animate-pulse');
-                setTimeout(() => btn.classList.remove('animate-pulse'), 1000);
-            });
-        }
-    </script>
+    // ĐÃ SỬA: Thêm logic kiểm tra tồn kho
+    function attachAddToCartEvent(product) {
+        const btn = document.getElementById("detail-add-to-cart");
+        if (!btn || btn.disabled) return;
+
+        btn.addEventListener("click", () => {
+            // Kiểm tra đăng nhập
+            if (localStorage.getItem("isLoggedIn") !== "true") {
+                alert("Bạn cần đăng nhập để mua hàng!");
+                window.location.href = "dangnhap.html";
+                return;
+            }
+            
+            // Logic thêm vào giỏ hàng
+            const CART_KEY = 'watchtime_cart';
+            
+            function getCart(){
+                try{ return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; }
+            }
+            function saveCart(cart){ 
+                localStorage.setItem(CART_KEY, JSON.stringify(cart)); 
+            }
+// === BƯỚC SỬA: KIỂM TRA TỒN KHO THỰC TẾ (Sử dụng hàm từ Giaodien.js) ===
+            // allProducts được tải từ products.js
+            const inventoryMap = typeof calculateAllInventory === 'function' ? calculateAllInventory(allProducts) : new Map(); 
+            const stock = inventoryMap.get(product.id) || 0;
+            
+            if (stock <= 0) {
+                alert("Sản phẩm này hiện đã hết hàng!");
+                btn.disabled = true;
+                btn.textContent = "Hết hàng";
+                btn.classList.add("bg-gray-400", "cursor-not-allowed");
+                btn.classList.remove("bg-indigo-600", "hover:bg-indigo-700");
+                return;
+            }
+            // === KẾT THÚC KIỂM TRA TỒN KHO THỰC TẾ ===
+            
+            let cart = getCart();
+            const existing = cart.find(it => it.id === product.id);
+            
+            // === BƯỚC SỬA: KIỂM TRA SỐ LƯỢNG TỐI ĐA TRONG GIỎ ===
+            const qtyInCart = existing ? existing.qty : 0;
+            if (qtyInCart >= stock) {
+                alert("Bạn đã thêm số lượng tối đa (" + stock + ") của sản phẩm này vào giỏ hàng.");
+                return;
+            }
+            // === KẾT THÚC KIỂM TRA SỐ LƯỢNG TỐI ĐA TRONG GIỎ ===
+            
+            if(existing){
+                existing.qty = (existing.qty || 1) + 1;
+            } else {
+                // Sửa lỗi: Thêm image vào giỏ hàng
+                cart.push({ id: product.id, name: product.name, price: product.price, qty: 1, image: product.image });
+            }
+            
+            saveCart(cart);
+            
+            // Cập nhật số lượng trên header
+            if (typeof window.updateHeaderCartCount === 'function') {
+                window.updateHeaderCartCount();
+            }
+
+            alert(`Đã thêm "${product.name}" vào giỏ hàng!`);
+            
+            btn.classList.add('animate-pulse');
+            setTimeout(() => btn.classList.remove('animate-pulse'), 1000);
+        });
+    }
+</script>
 </body>
 </html>
