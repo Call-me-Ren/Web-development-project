@@ -1,220 +1,215 @@
 <!DOCTYPE html>
 <html lang="vi">
-    <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WatchTime - Cửa Hàng Đồng Hồ Uy Tín</title>
     <script src="../js/tailwind/tailwind.js"></script>
-    <link rel="stylesheet" href="../css/font-awesome/css/all.min.css" />
-    <link rel="preconnect" href="../css/custom-fonts/custom-fonts.css" />
-    <link
-        rel="preconnect"
-        href="../css/custom-fonts/custom-fonts.css"
-        crossorigin
-    />
-    <link href="../css/custom-fonts/custom-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/font-awesome/css/all.min.css"/>
+    <link rel="preconnect" href="../css/custom-fonts/custom-fonts.css">
+    <link rel="preconnect" href="../css/custom-fonts/custom-fonts.css" crossorigin>
+    <link href="../css/custom-fonts/custom-fonts.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/Giaodien.css" />
     <link rel="stylesheet" href="../css/bootstrap.css" />
     <script src="../js/lucide/lucide.min.js"></script>
-    </head>
-    <body class="bg-gray-100 text-gray-800">
+
+</head>
+<body class="bg-gray-100 text-gray-800">
+
     <header class="bg-white shadow-md sticky top-0 z-50">
-        <nav
-        class="container mx-auto px-4 md:px-8 py-4 flex justify-between items-center"
-        >
-        <a
-            href="#"
-            onclick="location.reload(); return false;"
-            class="text-2xl font-bold text-gray-800 flex-shrink-0"
-        >
-            Watch<span class="text-indigo-600">Time</span>
-        </a>
-
-        <div class="hidden md:flex space-x-10 items-center ml-6">
-            <a
-            href="#home"
-            class="text-gray-600 hover:text-indigo-600 smooth-transition"
-            data-key="Home"
-            >Trang Chủ</a
-            >
-            <a
-            href="#products"
-            class="text-gray-600 hover:text-indigo-600 smooth-transition"
-            data-key="Products"
-            >Sản Phẩm</a
-            >
-            <a
-            href="#about"
-            class="text-gray-600 hover:text-indigo-600 smooth-transition"
-            data-key="About"
-            >Về Chúng Tôi</a
-            >
-            <a
-            href="#contact"
-            class="text-gray-600 hover:text-indigo-600 smooth-transition"
-            data-key="Contact"
-            >Liên Hệ</a
-            >
-        </div>
-
-        <div class="flex items-center gap-3 md:gap-6">
-            <div class="search relative">
-            <input
-                type="search"
-                id="search"
-                placeholder="Tìm kiếm..."
-                data-key="SearchPlaceholder"
-                class="w-24 sm:w-40 md:w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600 text-sm md:text-base"
-            />
-            <span
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"
-                style="cursor: pointer"
-            >
-                <a href="#products"> <i data-lucide="search"></i></a>
-            </span>
+        <nav class="container mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
+            <a href="#" onclick="location.reload(); return false;" class="text-2xl font-bold text-gray-800 flex-shrink-0">
+                Watch<span class="text-indigo-600">Time</span>
+            </a>
+            
+            <div class="hidden md:flex space-x-10 items-center ml-6">
+                <a href="#home" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="Home">Trang Chủ</a>
+                <a href="#products" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="Products">Sản Phẩm</a>
+                <a href="#about" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="About">Về Chúng Tôi</a>
+                <a href="#contact" class="text-gray-600 hover:text-indigo-600 smooth-transition" data-key="Contact">Liên Hệ</a>
             </div>
 
-            <button
-            class="hidden md:block text-gray-600 hover:text-indigo-600 smooth-transition btn"
-            data-role="lang-switcher"
-            >
-            VI
-            </button>
-<a
-            href="ThanhToan.html"
-            class="relative text-gray-600 hover:text-indigo-600 focus:outline-none flex-shrink-0"
-            >
-            <i class="fa-solid fa-cart-plus text-2xl"></i>
-            <span
-                id="cart-count"
-                class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full"
-            >
-                0
-            </span>
-            </a>
-
-            <div class="hidden md:flex items-center">
-            <a
-                href="dangnhap.html"
-                class="text-gray-600 hover:text-indigo-600 smooth-transition btn"
-                data-key="Login"
-            >
-                Đăng nhập
-            </a>
-            <div
-                id="user-avatar"
-                class="hidden relative items-center gap-3 cursor-pointer"
-            >
-                <button>
-                <img
-                    src="../images/Avatar.jpg"
-                    alt="Avatar"
-                    class="w-10 h-10 rounded-full border-2 border-indigo-500"
-                />
-                </button>
-                <div
-                id="user-menu"
-                class="hidden absolute right-0 top-12 bg-white shadow-lg rounded-lg py-2 w-40"
-                >
-                <a
-                    href="xuathongtin.html"
-                    class="block px-4 py-2 hover:bg-gray-100"
-                    data-key="Profile"
-                    >Thông tin cá nhân</a
-                >
-                <a
-                    href="lichsu.html"
-                    class="block px-4 py-2 hover:bg-gray-100"
-                    data-key="OrderHistory"
-                    >Đơn hàng đã đặt</a
-                >
-                <a
-                    href="#"
-                    class="block px-4 py-2 hover:bg-gray-100"
-                    data-key="Logout"
-                    >Đăng xuất</a
-                >
+            <div class="flex items-center gap-3 md:gap-6">
+            
+                <div class="search relative">
+                    <input
+                    type="search"
+                    id="search"
+                    placeholder="Tìm kiếm..."
+                    data-key="SearchPlaceholder"
+                    class="w-24 sm:w-40 md:w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600 text-sm md:text-base"
+                    />
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" style="cursor: pointer;">
+                        <a href="#products">
+                        <i data-lucide="search"></i></a>
+                    </span>
                 </div>
-            </div>
-            </div>
 
-            <button
-            id="mobile-menu-btn"
-            class="md:hidden text-gray-600 hover:text-indigo-600 focus:outline-none flex-shrink-0"
-            >
-            <i data-lucide="menu"></i>
-            </button>
-        </div>
+                <button class="hidden md:block text-gray-600 hover:text-indigo-600 smooth-transition btn" data-role="lang-switcher">VI</button>
+            
+                <a href="ThanhToan.html" class="relative text-gray-600 hover:text-indigo-600 focus:outline-none flex-shrink-0">
+                    <i class="fa-solid fa-cart-plus text-2xl"></i>
+<span id="cart-count"
+                            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                            0
+                    </span>
+                </a>
+
+                <div class="hidden md:flex items-center"> <a href="dangnhap.html"
+                    class="text-gray-600 hover:text-indigo-600 smooth-transition btn" data-key = "Login">
+                    Đăng nhập
+                    </a>
+                    <div id="user-avatar" class="hidden relative items-center gap-3 cursor-pointer">
+                        <button>
+                            <img src="../images/Avatar.jpg"
+                            alt="Avatar"
+                            class="w-10 h-10 rounded-full border-2 border-indigo-500"
+                            />
+                        </button>
+                        <div id="user-menu" class="hidden absolute right-0 top-12 bg-white shadow-lg rounded-lg py-2 w-40">
+                            <a href="xuathongtin.html" class="block px-4 py-2 hover:bg-gray-100" data-key="Profile">Thông tin cá nhân</a>
+                            <a href="lichsu.html" class="block px-4 py-2 hover:bg-gray-100" data-key="OrderHistory">Đơn hàng đã đặt</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-key="Logout">Đăng xuất</a>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="mobile-menu-btn" class="md:hidden text-gray-600 hover:text-indigo-600 focus:outline-none flex-shrink-0">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
         </nav>
 
-        <div
-        id="mobile-menu"
-        class="hidden md:hidden bg-white shadow-lg absolute top-full left-0 w-full border-t border-gray-200"
-        >
-        <a
-            href="#home"
-            class="block px-6 py-3 text-gray-600 hover:bg-gray-100"
-            data-key="Home"
-            >Trang Chủ</a
-        >
-        <a
-            href="#products"
-            class="block px-6 py-3 text-gray-600 hover:bg-gray-100"
-            data-key="Products"
-            >Sản Phẩm</a
-        >
-        <a
-            href="#about"
-            class="block px-6 py-3 text-gray-600 hover:bg-gray-100"
-            data-key="About"
-            >Về Chúng Tôi</a
-        >
-        <a
-            href="#contact"
-class="text-3xl font-bold text-center mb-2"
-            data-key="FeaturedProducts"
-            >
-            Sản Phẩm Nổi Bật
-            </h2>
-            <p
-            class="text-center text-gray-600 mb-12"
-            data-key="FeaturedProductsSub"
-            >
-            Những mẫu đồng hồ được yêu thích nhất tại WatchTime
-            </p>
-
-            <div
-            class="flex flex-col md:flex-row justify-center items-center gap-4 mb-10"
-            >
-            <p class="text-center text-gray-600" data-key="Category">
-                Thể loại:
-            </p>
-
-
-            <select
-                id="filter-category"
-                class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
-            >
-                <option value="all" data-key="All">Tất cả</option>
-            </select>
-            <select
-                id="filter-price"
-                class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
-            >
-                <option value="all" data-key="AllPrices">Tất cả giá</option>
-                <option value="5" data-key="PriceUnder5">Dưới 5 triệu</option>
-                <option value="10" data-key="PriceUnder10">Dưới 10 triệu</option>
-                <option value="15" data-key="PriceUnder15">Dưới 15 triệu</option>
-                <option value="20" data-key="PriceUnder20">Dưới 20 triệu</option>
-                <option value="over20" data-key="PriceOver20">
-                Trên 20 triệu
-                </option>
-            </select>
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg absolute top-full left-0 w-full border-t border-gray-200">
+            <a href="#home" class="block px-6 py-3 text-gray-600 hover:bg-gray-100" data-key="Home">Trang Chủ</a>
+            <a href="#products" class="block px-6 py-3 text-gray-600 hover:bg-gray-100" data-key="Products">Sản Phẩm</a>
+            <a href="#about" class="block px-6 py-3 text-gray-600 hover:bg-gray-100" data-key="About">Về Chúng Tôi</a>
+            <a href="#contact" class="block px-6 py-3 text-gray-600 hover:bg-gray-100" data-key="Contact">Liên Hệ</a>
+            <hr class="mx-6">
+            
+            <div class="px-6 py-3">
+                    <a href="dangnhap.html" class="block text-gray-600 hover:bg-gray-100 py-2" data-key="Login">Đăng nhập</a>
+                    <div id="mobile-user-menu" class="hidden">
+                    <a href="xuathongtin.html" class="block py-2 hover:bg-gray-100" data-key="Profile">Thông tin cá nhân</a>
+                    <a href="lichsu.html" class="block py-2 hover:bg-gray-100" data-key="OrderHistory">Đơn hàng đã đặt</a>
+<a href="#" id="mobile-logout-btn" class="block py-2 hover:bg-gray-100" data-key="Logout">Đăng xuất</a>
+                    </div>
             </div>
-            <div
-            id="product-grid"
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
-            ></div>
+            <hr class="mx-6">
+                <div class="px-6 py-3">
+                    <button class="text-gray-600 hover:text-indigo-600 smooth-transition btn w-full text-left" data-role="lang-switcher">VI</button>
+                </div>
+        </div>
+    </header>
+    <main>
+        <section id="home" class="relative h-[60vh] md:h-[80vh] overflow-hidden">
+        <!-- Video nền -->
+      <video
+    autoplay
+    loop
+    muted
+    playsinline
+    preload="auto"
+    class="absolute inset-0 w-full h-full object-cover"
+    >
+  <source src="../images/dongho.mp4" type="video/mp4" />
+  <img src="../images/nen.jpg" alt="Nền WatchTime" class="absolute inset-0 w-full h-full object-cover" />
+</video>
+
+
+
+        <!-- Lớp phủ tối để làm nổi chữ -->
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+
+        <!-- Nội dung -->
+        <div
+          class="relative container mx-auto px-6 h-full flex flex-col justify-center items-start text-white"
+        >
+          <h1
+            class="text-4xl md:text-6xl font-bold leading-tight mb-4"
+            data-key="hero-title"
+          >
+            Bộ Sưu Tập Đồng Hồ Đẳng Cấp
+          </h1>
+          <p class="text-lg md:text-xl mb-8 max-w-xl" data-key="hero-sub">
+            Khẳng định phong cách và vị thế của bạn với những chiếc đồng hồ tinh
+            xảo nhất.
+          </p>
+          <a
+            href="#products"
+            class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 smooth-transition shadow-lg"
+            data-key="explore"
+          >
+            Khám Phá Ngay
+          </a>
+        </div>
+      </section>
+
+
+        <section id="products" class="py-16">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-2" data-key="FeaturedProducts">Sản Phẩm Nổi Bật</h2>
+                <p class="text-center text-gray-600 mb-12" data-key="FeaturedProductsSub">Những mẫu đồng hồ được yêu thích nhất tại WatchTime</p>
+
+
+                <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-10">
+                    <p class="text-center text-gray-600" data-key="Category">Thể loại:</p>
+                    
+                    <select id="filter-category" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
+                        <option value="all" data-key="All">Tất cả</option>
+                        </select>
+                    <select id="filter-price" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
+                        <option value="all" data-key="AllPrices">Tất cả giá</option>
+                        <option value="5" data-key="PriceUnder5">Dưới 5 triệu</option>
+                        <option value="10" data-key="PriceUnder10">Dưới 10 triệu</option>
+                        <option value="15" data-key="PriceUnder15">Dưới 15 triệu</option>
+                        <option value="20" data-key="PriceUnder20">Dưới 20 triệu</option>
+                        <option value="over20" data-key="PriceOver20">Trên 20 triệu</option>
+                    </select>
+                </div>
+<div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    </div>
+
+            </div>
+            <div id="pagination" class="flex justify-center mt-8 space-x-2"></div>
+        </section>
+
+        <section id="about" class="bg-white py-16">
+            <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <img src="../images/AboutWatchTime.jpg" alt="Cửa hàng đồng hồ" class="rounded-lg shadow-xl w-full"> 
+                </div>
+                <div class="md:w-1/2">
+                    <h2 class="text-3xl font-bold mb-4" data-key="AboutWatchTime">Về WatchTime</h2>
+                    <p class="text-gray-600 mb-4 leading-relaxed" data-key="AboutP1">
+                        WatchTime được thành lập với niềm đam mê cháy bỏng dành cho những cỗ máy thời gian. Chúng tôi cam kết mang đến cho khách hàng những sản phẩm đồng hồ chính hãng từ các thương hiệu hàng đầu thế giới, cùng với dịch vụ khách hàng chuyên nghiệp và tận tâm.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed" data-key="AboutP2">
+                        Mỗi chiếc đồng hồ tại WatchTime không chỉ là một công cụ xem giờ, mà còn là một tác phẩm nghệ thuật, một người bạn đồng hành và một lời khẳng định cho phong cách cá nhân của bạn.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer id="contact" class="bg-gray-800 text-white pt-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">WatchTime</h3>
+                    <p class="text-gray-400" data-key="FooterSlogan">Nơi thời gian và phong cách hội tụ. Cung cấp đồng hồ chính hãng, uy tín và chất lượng.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-4" data-key="FooterLinks">Liên kết</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white smooth-transition" data-key="Home">Trang Chủ</a></li>
+                        <li><a href="#products" class="text-gray-400 hover:text-white smooth-transition" data-key="Products">Sản Phẩm</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white smooth-transition" data-key="About">Về Chúng Tôi</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white smooth-transition" data-key="WarrantyPolicy">Chính sách bảo hành</a></li>
+                    </ul>
+                </div>
 
                 <div>
                     <h3 class="text-xl font-bold mb-4" data-key="FooterContact">Thông Tin Liên Hệ</h3>
@@ -228,245 +223,16 @@ class="text-3xl font-bold text-center mb-2"
                     </div>
                 </div>
             </div>
-<a class="block px-6 py-3 text-gray-600 hover:bg-gray-100"
-            data-key="Contact"
-            >Liên Hệ</a
-        >
-        <hr class="mx-6" />
 
-        <div class="px-6 py-3">
-            <a
-            href="dangnhap.html"
-            class="block text-gray-600 hover:bg-gray-100 py-2"
-            data-key="Login"
-            >Đăng nhập</a
-            >
-            <div id="mobile-user-menu" class="hidden">
-            <a
-                href="xuathongtin.html"
-                class="block py-2 hover:bg-gray-100"
-                data-key="Profile"
-                >Thông tin cá nhân</a
-            >
-            <a
-                href="lichsu.html"
-                class="block py-2 hover:bg-gray-100"
-                data-key="OrderHistory"
-                >Đơn hàng đã đặt</a
-            >
-            <a
-                href="#"
-                id="mobile-logout-btn"
-                class="block py-2 hover:bg-gray-100"
-                data-key="Logout"
-                >Đăng xuất</a
-            >
+            <div class="mt-8 py-4 border-t border-gray-700 text-center text-gray-500">
+                <p data-key="Copyright">&copy; 2024 WatchTime. Đã đăng ký bản quyền.</p>
             </div>
-        </div>
-        <hr class="mx-6" />
-        <div class="px-6 py-3">
-            <button
-            class="text-gray-600 hover:text-indigo-600 smooth-transition btn w-full text-left"
-            data-role="lang-switcher"
-            >
-            VI
-            </button>
-        </div>
-        </div>
-    </header>
-    <main>
-        <section id="home" class="relative h-[60vh] md:h-[80vh] overflow-hidden">
-        <!-- Video nền -->
-        <video
-            autoplay
-            loop
-            muted
-            playsinline
-            preload="auto"
-            class="absolute inset-0 w-full h-full object-cover"
-        >
-            <source src="../images/dongho.mp4" type="video/mp4" />
-            <img
-            src="../images/nen.jpg"
-            alt="Nền WatchTime"
-            class="absolute inset-0 w-full h-full object-cover"
-            />
-        </video>
-
-        <!-- Lớp phủ tối để làm nổi chữ -->
-        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-
-        <!-- Nội dung -->
-        <div
-            class="relative container mx-auto px-6 h-full flex flex-col justify-center items-start text-white"
-        >
-            <h1
-            class="text-4xl md:text-6xl font-bold leading-tight mb-4"
-            data-key="hero-title"
-            >
-            Bộ Sưu Tập Đồng Hồ Đẳng Cấp
-            </h1>
-            <p class="text-lg md:text-xl mb-8 max-w-xl" data-key="hero-sub">
-            Khẳng định phong cách và vị thế của bạn với những chiếc đồng hồ tinh
-            xảo nhất.
-            </p>
-            <a
-            href="#products"
-            class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 smooth-transition shadow-lg"
-            data-key="explore"
-            >
-            Khám Phá Ngay
-            </a>
-        </div>
-        </section>
-
-        <section id="products" class="py-16">
-    <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center mb-8">Sản phẩm</h2>
-
-        <!-- Các sản phẩm hiển thị ở đây -->
-        <div id="pagination" class="flex justify-center mt-8 space-x-2"></div>
-
-        <!-- Footer -->
-        <div class="mt-8 py-4 border-t border-gray-700 text-center text-gray-500">
-            <p data-key="Copyright">&copy; 2024 WatchTime. Đã đăng ký bản quyền.</p>
-        </div>
-    </div>
-</section>
-
-        <section id="about" class="bg-white py-16">
-        <div
-            class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12"
-        >
-            <div class="md:w-1/2">
-            <img
-                src="../images/AboutWatchTime.jpg"
-                alt="Cửa hàng đồng hồ"
-                class="rounded-lg shadow-xl w-full"
-            />
-            </div>
-            <div class="md:w-1/2">
-            <h2 class="text-3xl font-bold mb-4" data-key="AboutWatchTime">
-                Về WatchTime
-            </h2>
-            <p class="text-gray-600 mb-4 leading-relaxed" data-key="AboutP1">
-                WatchTime được thành lập với niềm đam mê cháy bỏng dành cho những
-                cỗ máy thời gian. Chúng tôi cam kết mang đến cho khách hàng những
-                sản phẩm đồng hồ chính hãng từ các thương hiệu hàng đầu thế giới,
-                cùng với dịch vụ khách hàng chuyên nghiệp và tận tâm.
-            </p>
-            <p class="text-gray-600 leading-relaxed" data-key="AboutP2">
-                Mỗi chiếc đồng hồ tại WatchTime không chỉ là một công cụ xem giờ,
-                mà còn là một tác phẩm nghệ thuật, một người bạn đồng hành và một
-                lời khẳng định cho phong cách cá nhân của bạn.
-            </p>
-            </div>
-        </div>
-        </section>
-    </main>
-
-    <footer id="contact" class="bg-gray-800 text-white pt-12">
-        <div class="container mx-auto px-6">
-        <div
-            class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left"
-        >
-            <div>
-            <h3 class="text-xl font-bold mb-4">WatchTime</h3>
-            <p class="text-gray-400" data-key="FooterSlogan">
-                Nơi thời gian và phong cách hội tụ. Cung cấp đồng hồ chính hãng,
-                uy tín và chất lượng.
-            </p>
-            </div>
-
-            <div>
-            <h3 class="text-xl font-bold mb-4" data-key="FooterLinks">
-                Liên kết
-            </h3>
-            <ul class="space-y-2">
-                <li>
-                <a
-                    href="#home"
-                    class="text-gray-400 hover:text-white smooth-transition"
-                    data-key="Home"
-                    >Trang Chủ</a
-                >
-                </li>
-                <li>
-                <a
-                    href="#products"
-                    class="text-gray-400 hover:text-white smooth-transition"
-                    data-key="Products"
-                    >Sản Phẩm</a
-                >
-                </li>
-                <li>
-                <a
-                    href="#about"
-class="text-gray-400 hover:text-white smooth-transition"
-                    data-key="About"
-                    >Về Chúng Tôi</a
-                >
-                </li>
-                <li>
-                <a
-                    href="#"
-                    class="text-gray-400 hover:text-white smooth-transition"
-                    data-key="WarrantyPolicy"
-                    >Chính sách bảo hành</a
-                >
-                </li>
-            </ul>
-            </div>
-
-            <div>
-            <h3 class="text-xl font-bold mb-4" data-key="FooterContact">
-                Thông Tin Liên Hệ
-            </h3>
-            <p
-                class="text-gray-400 mb-2 flex items-center justify-center md:justify-start"
-                data-key="Address"
-            >
-                <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i> 123 Đường ABC,
-                Quận 1, TP. Hồ Chí Minh
-            </p>
-            <p
-                class="text-gray-400 mb-2 flex items-center justify-center md:justify-start"
-            >
-                <i data-lucide="phone" class="w-4 h-4 mr-2"></i> (028) 3812 3456
-            </p>
-            <p
-                class="text-gray-400 mb-4 flex items-center justify-center md:justify-start"
-            >
-                <i data-lucide="mail" class="w-4 h-4 mr-2"></i>
-                support@watchtime.vn
-            </p>
-            <div class="flex space-x-4 justify-center md:justify-start">
-                <a href="https://facebook.com" class="text-gray-400 hover:text-white"
-                ><i data-lucide="facebook"></i
-                ></a>
-                <a href="https://instagram.com" class="text-gray-400 hover:text-white"
-                ><i data-lucide="instagram"></i
-                ></a>
-                <a href="htpps://x.com/" class="text-gray-400 hover:text-white"
-                ><i data-lucide="twitter"></i
-                ></a>
-            </div>
-            </div>
-        </div>
-
-        <div
-            class="mt-8 py-4 border-t border-gray-700 text-center text-gray-500"
-        >
-            <p data-key="Copyright">
-            &copy; 2024 WatchTime. Đã đăng ký bản quyền.
-            </p>
-        </div>
         </div>
     </footer>
-
+    
     <script src="../js/products.js"></script>
-    <script src="../js/categories.js"></script>
-    <script src="../asset/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/categories.js"></script> <script src="../asset/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../js/Giaodien.js"></script>
-    </body>
+
+</body>
 </html>
