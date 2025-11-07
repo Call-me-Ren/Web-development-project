@@ -85,6 +85,89 @@
     .muted{color:var(--muted)}
     .hidden{display:none}
     .qr-img{max-width:320px;width:90%;height:auto;border-radius:8px;border:8px solid #fff;box-shadow:0 6px 20px rgba(2,6,23,0.06);display:block;margin:12px auto}
+  /* === CSS TỐI ƯU CHO MOBILE (màn hình nhỏ) === */
+@media (max-width: 820px) {
+  body {
+    background: #f9fafb;
+  }
+
+  /* Giảm khoảng cách viền để vừa màn hình nhỏ */
+  .page {
+    padding: 8px;
+  }
+
+  /* Tiêu đề & header */
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  header h1 {
+    font-size: 16px;
+  }
+  .brand a {
+    font-size: 14px;
+  }
+
+  /* Form card */
+  .card {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  label {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  input, textarea, select {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  textarea {
+    min-height: 70px;
+  }
+
+  /* Nút đặt hàng nổi bật hơn */
+  .btn {
+    font-size: 15px;
+    padding: 10px 12px;
+  }
+
+  /* Giỏ hàng */
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .cart-item .meta {
+    width: 100%;
+  }
+  .cart-item .price {
+    text-align: left;
+  }
+
+  /* Thanh tổng tiền (đã có sticky ở bản gốc) */
+  #totalWrap {
+    font-size: 15px;
+  }
+
+  /* QR hoặc xác nhận đơn hàng */
+  #mobileOrderArea .card {
+    margin-top: 10px;
+    padding: 14px;
+  }
+
+  .qr-img {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  /* Bo tròn nhẹ và đổ bóng nhỏ cho toàn trang */
+  .card, #totalWrap {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+}
   </style>
 </head>
 <body>
