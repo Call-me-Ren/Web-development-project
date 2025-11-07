@@ -129,11 +129,28 @@
     min-height: 70px;
   }
 
-  /* Nút đặt hàng nổi bật hơn */
-  .btn {
-    font-size: 15px;
-    padding: 10px 12px;
-  }
+ .payment-methods {
+        display: flex; /* Đảm bảo là flex container */
+        gap: 6px; 
+        flex-wrap: wrap; /* Cho phép các ô xuống dòng */
+        justify-content: space-around; /* Phân bổ đều các ô */
+    }
+    
+    .pay-pill {
+        min-width: unset; /* Bỏ giới hạn min-width: 140px của desktop */
+        flex-grow: 1; /* Cho phép các ô mở rộng ra */
+        padding: 8px 6px; 
+        
+        /* FIX: Điều chỉnh hiển thị để chữ không bị tràn */
+        display: block; /* Quan trọng: Dùng block để chữ có thể xuống dòng */
+        text-align: center; /* Căn giữa nội dung */
+        white-space: normal; /* Đảm bảo chữ xuống dòng */
+    }
+
+    .pay-pill input {
+        display: inline-block; /* Giữ radio button không chiếm hết dòng */
+        margin-right: 4px;
+    }
 
   /* Giỏ hàng */
   .cart-item {
@@ -168,6 +185,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   }
 }
+
   </style>
 </head>
 <body>

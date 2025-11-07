@@ -908,14 +908,3 @@ function handleStorageChange(e) {
 function initializeStorageListener() {
     window.addEventListener('storage', handleStorageChange);
 }
-/* === PHẦN 6: XỬ LÝ TỰ ĐỘNG PHÁT VIDEO (MOBILE) === */
-document.addEventListener('DOMContentLoaded', () => {
-    const video = document.querySelector('video');
-    const playVideo = () => {
-    video.play().catch(()=>{});
-    document.removeEventListener('touchstart', playVideo);
-    document.removeEventListener('click', playVideo);
-    };
-    document.addEventListener('touchstart', playVideo);
-    document.addEventListener('click', playVideo);
-});
