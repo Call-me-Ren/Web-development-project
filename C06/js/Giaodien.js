@@ -216,7 +216,7 @@ function initializeAddToCart() {
         // === KIỂM TRA SỐ LƯỢNG TRONG GIỎ ===
         const qtyInCart = existing ? existing.qty : 0;
         if (qtyInCart >= stock) {
-            alert("Bạn đã thêm số lượng tối đa của sản phẩm này vào giỏ hàng (dựa trên tồn kho).");
+            alert("Bạn đã thêm số lượng tối đa của sản phẩm này vào giỏ hàng.");
             return;
         }
         
@@ -566,21 +566,35 @@ btn.className = `px-3 py-1 rounded-md ${i === currentPage ? 'bg-indigo-600 text-
 /**
  * Cuộn màn hình lên đầu lưới sản phẩm
  */
+/**
+ * Cuộn màn hình lên đầu lưới sản phẩm (ĐÃ NÂNG CẤP CHO MOBILE)
+ */
 function scrollToProductTop() {
-    // 1. Ưu tiên tìm tiêu đề "Sản Phẩm Nổi Bật"
-    // (Dựa trên data-key mà bạn đã có trong hàm ngôn ngữ)
+    // 1. Tìm element mục tiêu
     let targetElement = document.querySelector('[data-key="FeaturedProducts"]');
-    
-    // 2. Nếu không tìm thấy tiêu đề, cuộn lên chính lưới sản phẩm
     if (!targetElement) {
         targetElement = document.getElementById("product-grid");
     }
 
-    // 3. Nếu tìm thấy 1 trong 2, cuộn mượt lên
     if (targetElement) {
-        targetElement.scrollIntoView({
-            behavior: 'smooth', // 'smooth' (cuộn mượt) hoặc 'auto' (nhảy tức thì)
-            block: 'start'      // Căn lề trên cùng của element
+        // 2. Lấy chiều cao của header (nếu có)
+        // Chúng ta giả định header của bạn là <header>
+        // Nếu nó là một ID khác (ví dụ: #main-nav), hãy thay 'header' bên dưới
+        const header = document.querySelector('header'); 
+        const headerHeight = header ? header.offsetHeight : 0;
+
+        // 3. Tính toán vị trí
+        // Lấy vị trí của element so với top của toàn bộ trang
+        const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+        
+        // Vị trí cuộn cuối cùng, trừ đi chiều cao header và thêm 1 chút đệm (10px)
+        const offsetPosition = elementPosition - headerHeight - 10; 
+
+        // 4. Sử dụng window.scrollTo() - đáng tin cậy hơn 'scrollIntoView'
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth' 
+            // Nếu 'smooth' vẫn giật, hãy thử đổi thành 'auto'
         });
     }
 }
