@@ -270,11 +270,55 @@
   </div>
 
 <script>
-/* ======= Data keys & helpers ======= */
-const CART_KEY = 'watchtime_cart';
+/* === CODE TÍNH TỒN KHO & HELPERS (Được chuyển lên đầu) === */
+const IMPORTS_KEY = 'watchtime_imports';
 const ORDERS_KEY = 'allOrders';
+const CART_KEY = 'watchtime_cart';
 const currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 let userData = currentUser ? (JSON.parse(localStorage.getItem(currentUser.email)) || null) : null;
+
+function getStorageData(key, defaultValue = []) {
+    try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : defaultValue;
+    } catch (e) {
+        console.error(`Lỗi khi đọc ${key}:`, e);
+        return defaultValue;
+    }
+}
+
+function calculateAllInventory() {
+    const allImports = getStorageData(IMPORTS_KEY, []).filter(i => i.status === 'Đã hoàn thành'); 
+    const allOrders = getStorageData(ORDERS_KEY, []).filter(o => o.status === 'Đã giao'); 
+    
+    const inventoryMap = new Map();
+    const productIdsInCart = getCart().map(i => i.id);
+
+    productIdsInCart.forEach(id => {
+        let tongNhap = 0;
+        let tongXuat = 0;
+
+        allImports.forEach(imp => {
+            const item = imp.items.find(i => i.productId === id);
+            if (item) {
+                tongNhap += item.qty;
+            }
+        });
+
+        allOrders.forEach(order => {
+            const item = order.items.find(i => i.id === id); 
+            if (item) {
+                tongXuat += item.qty;
+            }
+        });
+        
+        inventoryMap.set(id, tongNhap - tongXuat);
+    });
+    
+    return inventoryMap;
+}
+
+/* ======= Helpers Khác ======= */
 
 function getCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; } }
 function saveCart(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); renderCartUI(); }
@@ -283,164 +327,198 @@ function formatVND(n){ return Number(n).toLocaleString('vi-VN') + '₫'; }
 function e(s){ return String(s||'').replace(/[&<>"]+/g,''); }
 
 /* ======= Render cart (mobile-friendly) ======= */
+/* ======= Render cart (mobile-friendly) - ĐÃ SỬA LỖI KIỂM TRA TỒN KHO KHI BẤM + ======= */
 function renderCartUI(){
-  const cart = getCart();
-  const cartList = document.getElementById('cartList');
-  const empty = document.getElementById('cartEmptyNotice');
-  const totalWrap = document.getElementById('totalWrap');
-  const totalPrice = document.getElementById('totalPrice');
+    const cart = getCart();
+    const cartList = document.getElementById('cartList');
+    const empty = document.getElementById('cartEmptyNotice');
+    const totalWrap = document.getElementById('totalWrap');
+    const totalPrice = document.getElementById('totalPrice');
 
-  cartList.innerHTML='';
-  if(!cart || cart.length === 0){ empty.classList.remove('hidden'); if(totalWrap) totalWrap.style.display='none'; if(totalPrice) totalPrice.textContent='0₫'; return; }
+    // Tính toán tồn kho một lần khi render
+    const inventory = calculateAllInventory(); 
 
-  empty.classList.add('hidden');
-  cart.forEach((it, idx)=>{
-    const div = document.createElement('div'); div.className='cart-item';
-    div.innerHTML = `<div class="meta"><div style="font-weight:700">${e(it.name)}</div><div class="muted" style="font-size:13px;margin-top:6px">Mã: ${e(it.id||'')}</div></div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="price">${formatVND(it.price * it.qty)}</div>
-      <div style="display:flex;gap:6px;align-items:center"><div class="qty"><button data-action="dec">−</button><div class="count">${it.qty}</div><button data-action="inc">+</button></div><button class="remove-btn">Xóa</button></div></div>`;
-    cartList.appendChild(div);
+    cartList.innerHTML='';
+    if(!cart || cart.length === 0){ empty.classList.remove('hidden'); if(totalWrap) totalWrap.style.display='none'; if(totalPrice) totalPrice.textContent='0₫'; return; }
 
-    // bind
-    div.querySelector('[data-action="dec"]').addEventListener('click', ()=>{ if(it.qty>1){ it.qty--; cart[idx]=it; saveCart(cart);} else if(confirm('Giảm sẽ xóa sản phẩm. Xóa?')){ cart.splice(idx,1); saveCart(cart);} });
-    div.querySelector('[data-action="inc"]').addEventListener('click', ()=>{ it.qty++; cart[idx]=it; saveCart(cart); });
-    div.querySelector('.remove-btn').addEventListener('click', ()=>{ if(confirm('Xóa sản phẩm?')){ cart.splice(idx,1); saveCart(cart); } });
-  });
+    empty.classList.add('hidden');
+    cart.forEach((it, idx)=>{
+        const div = document.createElement('div'); div.className='cart-item';
+        div.innerHTML = `<div class="meta"><div style="font-weight:700">${e(it.name)}</div><div class="muted" style="font-size:13px;margin-top:6px">Mã: ${e(it.id||'')}</div></div>
+             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="price">${formatVND(it.price * it.qty)}</div>
+             <div style="display:flex;gap:6px;align-items:center"><div class="qty"><button data-action="dec">−</button><div class="count">${it.qty}</div><button data-action="inc">+</button></div><button class="remove-btn">Xóa</button></div></div>`;
+        cartList.appendChild(div);
 
-  const total = sumCart(cart);
-  if(totalPrice) totalPrice.textContent = formatVND(total);
-  if(totalWrap) totalWrap.style.display='flex';
+        // bind
+        div.querySelector('[data-action="dec"]').addEventListener('click', ()=>{ if(it.qty>1){ it.qty--; cart[idx]=it; saveCart(cart);} else if(confirm('Giảm sẽ xóa sản phẩm. Xóa?')){ cart.splice(idx,1); saveCart(cart);} });
+        
+        // === LOGIC MỚI: KIỂM TRA TỒN KHO TRƯỚC KHI TĂNG ===
+        div.querySelector('[data-action="inc"]').addEventListener('click', ()=>{ 
+            const stock = inventory.get(it.id) || 0;
+            const newQty = it.qty + 1;
+            
+            if (newQty > stock) {
+                alert(`Lỗi: Số lượng tối đa có thể mua cho sản phẩm "${it.name}" là ${stock}.`);
+            } else {
+                it.qty = newQty; 
+                cart[idx] = it; 
+                saveCart(cart); // Lưu và render lại UI
+            }
+        });
+        // === KẾT THÚC LOGIC MỚI ===
+        
+        div.querySelector('.remove-btn').addEventListener('click', ()=>{ if(confirm('Xóa sản phẩm?')){ cart.splice(idx,1); saveCart(cart); } });
+    });
+
+    const total = sumCart(cart);
+    if(totalPrice) totalPrice.textContent = formatVND(total);
+    if(totalWrap) totalWrap.style.display='flex';
 }
 
 /* fill user info if present */
 function prefill(){ if(userData){ const nm = (userData.firstname||'') + (userData.lastname?(' '+userData.lastname):''); if(nm.trim()) document.getElementById('name').value = nm; if(userData.number) document.getElementById('phone').value = userData.number; } }
 
-/* payment UI toggles
-NOTE: we DO NOT auto-show bank form when selecting 'bank'.
-   We only show bank info in confirmation after pressing Đặt hàng for 'bank'.
-*/
+/* payment UI toggles */
 const radios = document.querySelectorAll('input[name="payment"]');
 let selectedPayment = document.querySelector('input[name="payment"]:checked').value;
 radios.forEach(r=>r.addEventListener('change', ()=>{ selectedPayment = document.querySelector('input[name="payment"]:checked').value; }));
 
-/* show order summary + place order flow
-   Branch based on paymentMethod:
-   - online => show QR image + instructions, button "Đã quét & Hoàn tất"
-   - bank => show bank details + button "Tôi đã chuyển khoản & Hoàn tất"
-   - cod => show normal summary with confirm button
-*/
+/* show order summary + place order flow */
 function showOrderSummary(order){
-  const target = document.getElementById('mobileOrderArea'); target.innerHTML = '';
-  const s = document.createElement('div'); s.className='card';
+    const target = document.getElementById('mobileOrderArea'); target.innerHTML = '';
+    const s = document.createElement('div'); s.className='card';
 
-  if(order.paymentMethod === 'online'){
-    s.innerHTML = `<div style="font-weight:800">Thanh toán bằng QR - Đơn #${order.id}</div>
-      <div style="margin-top:8px">Tổng cần thanh toán: <strong style="color:crimson">${formatVND(order.total)}</strong></div>
-      <div style="margin-top:8px">Vui lòng quét mã QR dưới đây bằng ứng dụng ngân hàng hoặc ví để thanh toán.</div>
-      <img src="images/qr.jpg" alt="Mã QR Thanh toán" class="qr-img">
-      <div style="margin-top:8px;text-align:center;display:flex;gap:8px;justify-content:center">
-        <button id="qrDoneBtn" class="btn">Đã quét & Hoàn tất</button>
-        <button id="qrCancelBtn" class="btn ghost">Hủy</button>
-      </div>
-      <div class="note" style="margin-top:8px">Lưu ý: Sau khi quét và chuyển thành công, nhấn "Đã quét & Hoàn tất" để lưu đơn và xóa giỏ hàng.</div>`;
-    target.appendChild(s);
+    if(order.paymentMethod === 'online'){
+        s.innerHTML = `<div style="font-weight:800">Thanh toán bằng QR - Đơn #${order.id}</div>
+              <div style="margin-top:8px">Tổng cần thanh toán: <strong style="color:crimson">${formatVND(order.total)}</strong></div>
+              <div style="margin-top:8px">Vui lòng quét mã QR dưới đây bằng ứng dụng ngân hàng hoặc ví để thanh toán.</div>
+              <img src="images/qr.jpg" alt="Mã QR Thanh toán" class="qr-img">
+              <div style="margin-top:8px;text-align:center;display:flex;gap:8px;justify-content:center">
+                <button id="qrDoneBtn" class="btn">Đã quét & Hoàn tất</button>
+                <button id="qrCancelBtn" class="btn ghost">Hủy</button>
+              </div>
+              <div class="note" style="margin-top:8px">Lưu ý: Sau khi quét và chuyển thành công, nhấn "Đã quét & Hoàn tất" để lưu đơn và xóa giỏ hàng.</div>`;
+        target.appendChild(s);
 
-    document.getElementById('qrDoneBtn').addEventListener('click', ()=>{ completeOrder(order); });
-    document.getElementById('qrCancelBtn').addEventListener('click', ()=>{ target.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); });
-    s.scrollIntoView({behavior:'smooth'});
-    return;
-  }
+        document.getElementById('qrDoneBtn').addEventListener('click', ()=>{ completeOrder(order); });
+        document.getElementById('qrCancelBtn').addEventListener('click', ()=>{ target.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); });
+        s.scrollIntoView({behavior:'smooth'});
+        return;
+    }
 
-  if(order.paymentMethod === 'bank'){
-    // Show bank instructions + optional field to paste transfer ref (we will copy from formTransferRef if user added)
-    const bankInfo = `<div style="font-weight:700">Thông tin chuyển khoản</div>
-      <div class="note" style="margin-top:8px">Ngân hàng: <strong>Vietcombank</strong><br>Chủ TK: <strong>WATCHTIME JSC</strong><br>Số TK: <strong>0123456789</strong></div>
-      <div style="margin-top:8px">
-        <label for="confirmTransferRef">Ghi chú / Mã giao dịch (nếu đã chuyển)</label>
-        <input id="confirmTransferRef" placeholder="Nhập mã giao dịch (nếu có)">
-      </div>`;
-    s.innerHTML = `<div style="font-weight:800">Chuyển khoản - Xác nhận đơn #${order.id}</div>
+    if(order.paymentMethod === 'bank'){
+        const bankInfo = `<div style="font-weight:700">Thông tin chuyển khoản</div>
+              <div class="note" style="margin-top:8px">Ngân hàng: <strong>Vietcombank</strong><br>Chủ TK: <strong>WATCHTIME JSC</strong><br>Số TK: <strong>0123456789</strong></div>
+              <div style="margin-top:8px">
+                <label for="confirmTransferRef">Ghi chú / Mã giao dịch (nếu đã chuyển)</label>
+                <input id="confirmTransferRef" placeholder="Nhập mã giao dịch (nếu có)">
+              </div>`;
+        s.innerHTML = `<div style="font-weight:800">Chuyển khoản - Xác nhận đơn #${order.id}</div>
 <div style="margin-top:8px"><strong>Người nhận:</strong> ${e(order.customer.name)} — ${e(order.customer.phone)}</div>
-      <div style="margin-top:6px"><strong>Địa chỉ:</strong> ${e(order.customer.address)}</div>
-      <div style="margin-top:8px"><strong>Sản phẩm:</strong><ul style="margin:6px 0 0 16px"></ul></div>
-      ${bankInfo}
-      <div style="text-align:right;margin-top:8px;font-weight:800">Tổng: <span style="color:crimson">${formatVND(order.total)}</span></div>
-      <div style="margin-top:12px;display:flex;gap:8px"><button id="bankDoneBtn" class="btn">Tôi đã chuyển khoản & Hoàn tất</button><button id="bankCancelBtn" class="btn ghost">Hủy</button></div>
-      <div class="note" style="margin-top:8px">Vui lòng chuyển đúng số tiền và ghi rõ mã đơn để chúng tôi đối soát.</div>`;
-    const ul = (new DOMParser()).parseFromString('<div>'+s.innerHTML+'</div>','text/html').body.querySelector('ul'); // placeholder to fill below
+              <div style="margin-top:6px"><strong>Địa chỉ:</strong> ${e(order.customer.address)}</div>
+              <div style="margin-top:8px"><strong>Sản phẩm:</strong><ul style="margin:6px 0 0 16px"></ul></div>
+              ${bankInfo}
+              <div style="text-align:right;margin-top:8px;font-weight:800">Tổng: <span style="color:crimson">${formatVND(order.total)}</span></div>
+              <div style="margin-top:12px;display:flex;gap:8px"><button id="bankDoneBtn" class="btn">Tôi đã chuyển khoản & Hoàn tất</button><button id="bankCancelBtn" class="btn ghost">Hủy</button></div>
+              <div class="note" style="margin-top:8px">Vui lòng chuyển đúng số tiền và ghi rõ mã đơn để chúng tôi đối soát.</div>`;
+        const ul = (new DOMParser()).parseFromString('<div>'+s.innerHTML+'</div>','text/html').body.querySelector('ul'); 
+        target.appendChild(s);
+        const ulNode = s.querySelector('ul');
+        order.items.forEach(it=>{ const li = document.createElement('li'); li.textContent = `${it.name} x ${it.qty} — ${formatVND(it.price * it.qty)}`; ulNode.appendChild(li); });
+
+        document.getElementById('bankDoneBtn').addEventListener('click', ()=>{ 
+            const ref = document.getElementById('confirmTransferRef').value.trim();
+            if(ref) order.transferRef = ref;
+            completeOrder(order); 
+        });
+        document.getElementById('bankCancelBtn').addEventListener('click', ()=>{ target.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); });
+        s.scrollIntoView({behavior:'smooth'});
+        return;
+    }
+
+    // COD or fallback: previous confirmation UI
+    s.innerHTML = `<div style="font-weight:800">Xác nhận đơn hàng #${order.id}</div>
+        <div style="margin-top:8px"><strong>Người nhận:</strong> ${e(order.customer.name)} — ${e(order.customer.phone)}</div>
+        <div style="margin-top:6px"><strong>Địa chỉ:</strong> ${e(order.customer.address)}</div>
+        <div style="margin-top:8px"><strong>Sản phẩm:</strong><ul style="margin:6px 0 0 16px"></ul></div>
+        <div style="text-align:right;margin-top:8px;font-weight:800">Tổng: <span style="color:crimson">${formatVND(order.total)}</span></div>
+        <div style="margin-top:12px"><button id="confirmBtn" class="btn">Hoàn tất & Lưu đơn hàng</button></div>`;
+    const ul2 = s.querySelector('ul'); order.items.forEach(it=>{ const li = document.createElement('li'); li.textContent = `${it.name} x ${it.qty} — ${formatVND(it.price * it.qty)}`; ul2.appendChild(li); });
     target.appendChild(s);
-    // fill items in the UL inside card
-    const ulNode = s.querySelector('ul');
-    order.items.forEach(it=>{ const li = document.createElement('li'); li.textContent = `${it.name} x ${it.qty} — ${formatVND(it.price * it.qty)}`; ulNode.appendChild(li); });
-
-    document.getElementById('bankDoneBtn').addEventListener('click', ()=>{ 
-      // Optionally copy transfer ref
-      const ref = document.getElementById('confirmTransferRef').value.trim();
-      if(ref) order.transferRef = ref;
-      completeOrder(order); 
-    });
-    document.getElementById('bankCancelBtn').addEventListener('click', ()=>{ target.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); });
+    document.getElementById('confirmBtn').addEventListener('click', ()=>{ completeOrder(order); });
     s.scrollIntoView({behavior:'smooth'});
-    return;
-  }
-
-  // COD or fallback: previous confirmation UI
-  s.innerHTML = `<div style="font-weight:800">Xác nhận đơn hàng #${order.id}</div>
-    <div style="margin-top:8px"><strong>Người nhận:</strong> ${e(order.customer.name)} — ${e(order.customer.phone)}</div>
-    <div style="margin-top:6px"><strong>Địa chỉ:</strong> ${e(order.customer.address)}</div>
-    <div style="margin-top:8px"><strong>Sản phẩm:</strong><ul style="margin:6px 0 0 16px"></ul></div>
-    <div style="text-align:right;margin-top:8px;font-weight:800">Tổng: <span style="color:crimson">${formatVND(order.total)}</span></div>
-    <div style="margin-top:12px"><button id="confirmBtn" class="btn">Hoàn tất & Lưu đơn hàng</button></div>`;
-  const ul2 = s.querySelector('ul'); order.items.forEach(it=>{ const li = document.createElement('li'); li.textContent = `${it.name} x ${it.qty} — ${formatVND(it.price * it.qty)}`; ul2.appendChild(li); });
-  target.appendChild(s);
-  document.getElementById('confirmBtn').addEventListener('click', ()=>{ completeOrder(order); });
-  s.scrollIntoView({behavior:'smooth'});
 }
 
 /* completeOrder: save to localStorage + clear cart + UI */
 function completeOrder(order){
-let allOrders = []; try{ allOrders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || []; }catch(e){ allOrders = []; }
-  allOrders.push(order); localStorage.setItem(ORDERS_KEY, JSON.stringify(allOrders));
-  localStorage.removeItem(CART_KEY);
-  renderCartUI();
-  // hide form, show success
-  document.getElementById('checkoutForm').classList.add('hidden');
-  const mobileArea = document.getElementById('mobileOrderArea'); mobileArea.innerHTML = `<div class="card"><div style="font-weight:800;color:green">Cảm ơn! Đã ghi nhận đơn #${order.id}</div><div style="margin-top:10px;display:flex;gap:8px"><a href="index.html" class="btn secondary">Về trang chủ</a><a href="lichsu.html" class="btn ghost">Lịch sử đơn hàng</a></div></div>`;
+    let allOrders = []; try{ allOrders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || []; }catch(e){ allOrders = []; }
+    allOrders.push(order); localStorage.setItem(ORDERS_KEY, JSON.stringify(allOrders));
+    localStorage.removeItem(CART_KEY);
+    renderCartUI();
+    // hide form, show success
+    document.getElementById('checkoutForm').classList.add('hidden');
+    const mobileArea = document.getElementById('mobileOrderArea'); mobileArea.innerHTML = `<div class="card"><div style="font-weight:800;color:green">Cảm ơn! Đã ghi nhận đơn #${order.id}</div><div style="margin-top:10px;display:flex;gap:8px"><a href="index.html" class="btn secondary">Về trang chủ</a><a href="lichsu.html" class="btn ghost">Lịch sử đơn hàng</a></div></div>`;
 }
 
-/* build order object from form */
+/* build order object from form (ĐÃ THÊM KIỂM TRA TỒN KHO) */
 function buildOrder(){
-  const cart = getCart(); if(!cart || cart.length===0){ alert('Giỏ hàng rỗng'); return null; }
-  const name = document.getElementById('name').value.trim(); const phone = document.getElementById('phone').value.trim(); let address = document.getElementById('address').value.trim();
-  if(!address && userData && userData.address) address = userData.address;
-  if(!name || !phone || !address){ alert('Vui lòng nhập đầy đủ Họ tên, SĐT và Địa chỉ.'); return null; }
-  const pm = document.querySelector('input[name="payment"]:checked').value;
-  return {
-    id: 'ORD' + Date.now(), userEmail: currentUser ? currentUser.email : 'guest',
-    customer: { name, phone, address }, items: cart.map(i=>({...i})), total: sumCart(cart), paymentMethod: pm, status: 'Mới đặt', orderDate: new Date().toISOString()
-  };
+    const cart = getCart(); 
+    if(!cart || cart.length===0){ alert('Giỏ hàng rỗng'); return null; }
+    
+    // === KIỂM TRA TỒN KHO TRƯỚC KHI TẠO ĐƠN HÀNG ===
+    const inventory = calculateAllInventory(); 
+    let isInventoryValid = true;
+    let insufficientItemName = '';
+    
+    // Duyệt qua giỏ hàng để kiểm tra
+    for (const item of cart) {
+        const stock = inventory.get(item.id) || 0;
+        
+        if (item.qty > stock) {
+            isInventoryValid = false;
+            insufficientItemName = item.name;
+            break; 
+        }
+    }
+    
+    if (!isInventoryValid) {
+        // Thông báo lỗi và chặn tạo đơn hàng
+        alert(`Sản phẩm "${insufficientItemName}" hiện không đủ số lượng tồn kho (${inventory.get(cart.find(i => i.name === insufficientItemName).id)}). Vui lòng điều chỉnh giỏ hàng.`);
+        return null;
+    }
+    // === KẾT THÚC KIỂM TRA TỒN KHO ===
+
+    const name = document.getElementById('name').value.trim(); const phone = document.getElementById('phone').value.trim(); let address = document.getElementById('address').value.trim();
+    if(!address && userData && userData.address) address = userData.address;
+    if(!name || !phone || !address){ alert('Vui lòng nhập đầy đủ Họ tên, SĐT và Địa chỉ.'); return null; }
+    const pm = document.querySelector('input[name="payment"]:checked').value;
+    
+    return {
+      id: 'ORD' + Date.now(), userEmail: currentUser ? currentUser.email : 'guest',
+      customer: { name, phone, address }, items: cart.map(i=>({...i})), total: sumCart(cart), paymentMethod: pm, status: 'Mới đặt', orderDate: new Date().toISOString()
+    };
 }
 
 /* UI bindings */
 document.addEventListener('DOMContentLoaded', ()=>{
-  renderCartUI(); prefill();
+    renderCartUI(); prefill();
 
-  // Desktop checkout
-  document.getElementById('checkoutBtnDesktop')?.addEventListener('click', ()=>{
-    const o = buildOrder(); if(!o) return;
-    // If payment is bank and you want to auto-show bank info in the form area for reference, you can uncomment:
-    // document.getElementById('formBankArea').classList.toggle('hidden', o.paymentMethod !== 'bank');
-    showOrderSummary(o);
-  });
+    // Desktop checkout
+    document.getElementById('checkoutBtnDesktop')?.addEventListener('click', ()=>{
+        const o = buildOrder(); if(!o) return;
+        showOrderSummary(o);
+    });
 
-  // Mobile checkout button in form
-  document.getElementById('placeOrderBtnMobile')?.addEventListener('click', ()=>{
-    const o = buildOrder(); if(!o) return;
-    showOrderSummary(o);
-  });
-
-  // optional: if you want to preview bank info in the page whenever needed, you can toggle this manually
+    // Mobile checkout button in form
+    document.getElementById('placeOrderBtnMobile')?.addEventListener('click', ()=>{
+        const o = buildOrder(); if(!o) return;
+        showOrderSummary(o);
+    });
 });
 </script>
+
+</body>
+</html>
+
 </body>
 </html>
