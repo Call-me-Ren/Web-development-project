@@ -337,7 +337,7 @@ function showOrderSummary(order){
     s.innerHTML = `<div style="font-weight:800">Thanh toán bằng QR - Đơn #${order.id}</div>
       <div style="margin-top:8px">Tổng cần thanh toán: <strong style="color:crimson">${formatVND(order.total)}</strong></div>
       <div style="margin-top:8px">Vui lòng quét mã QR dưới đây bằng ứng dụng ngân hàng hoặc ví để thanh toán.</div>
-      <img src="/images/qr.jpg" alt="Mã QR Thanh toán" class="qr-img">
+      <img src="images/qr.jpg" alt="Mã QR Thanh toán" class="qr-img">
       <div style="margin-top:8px;text-align:center;display:flex;gap:8px;justify-content:center">
         <button id="qrDoneBtn" class="btn">Đã quét & Hoàn tất</button>
         <button id="qrCancelBtn" class="btn ghost">Hủy</button>
