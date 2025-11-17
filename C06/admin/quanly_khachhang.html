@@ -25,13 +25,33 @@
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4b5563; }
         .form-group input { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; }
         .btn-submit { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 700; color: #ffffff; background-color: #16a34a; border: none; border-radius: 6px; cursor: pointer; }
+        
+        /* CSS cho lựa chọn loại tài khoản */
+        .form-group.account-type-group {
+            grid-column: 1 / -1; /* Chiếm toàn bộ chiều rộng */
+        }
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .radio-group label {
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+        }
+        .radio-group input[type="radio"] {
+            width: auto;
+            margin-right: 5px;
+        }
+
         /* Responsive cho form thêm */
         @media (max-width: 768px) {
             .form-grid { grid-template-columns: 1fr; }
+            .form-group.account-type-group { grid-column: 1; }
         }
         
         /* TỐI ƯU HÓA: Buộc các cột nội dung hiển thị trên một dòng */
-        /* Chỉ giữ lại Tên tài khoản và Trạng thái cần nowrap */
         .admin-table td:nth-child(1), /* Tên tài khoản */
         .admin-table td:nth-child(3) { /* Trạng thái */
             white-space: nowrap;
@@ -85,6 +105,17 @@
             
             <form id="add-user-form" class="admin-form">
                 <h3 class="text-xl font-bold mb-4">Thêm tài khoản mới</h3>
+                <div class="form-group account-type-group">
+                    <label>Loại tài khoản</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="account-type" value="user" checked> Tài khoản thường
+                        </label>
+                        <label>
+                            <input type="radio" name="account-type" value="admin"> Tài khoản Admin
+                        </label>
+                    </div>
+                </div>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="new-user-email">Tên tài khoản</label>
@@ -160,7 +191,7 @@
                 if (e.target.classList.contains('btn-doi-mk')) {
                     const key = e.target.dataset.key;
                     // Lấy Tên tài khoản từ cột đầu tiên của hàng
-                    const username = e.target.closest('tr').querySelector('td:nth-child(1)').textContent.trim();
+                    const username = e.target.closest('tr').querySelector('td:nth-child(1)').textContent.trim().replace('ADMIN', '').trim();
                     
                     // Điền thông tin vào modal
                     userKeyInput.value = key;

@@ -32,27 +32,54 @@
         document.getElementById("form-admin-login").addEventListener("submit", function(e) {
             e.preventDefault();
             
-            const user = document.getElementById("admin-user").value;
-            const pass = document.getElementById("admin-pass").value;
+            const username = document.getElementById("admin-user").value.trim();
+            const pass = document.getElementById("admin-pass").value.trim();
             const errorMsg = document.getElementById("error-message");
 
-            // --- TÀI KHOẢN ADMIN (Hard-code) ---
-            // ĐÃ CẬP NHẬT TỪ: admin/123456
-            const ADMIN_USER = "quanly1";
-            const ADMIN_PASS = "abcd1234";
+            errorMsg.classList.add("hidden");
 
-            if (user === ADMIN_USER && pass === ADMIN_PASS) {
+            if (!username || !pass) {
+                 errorMsg.textContent = "Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu!";
+                 errorMsg.classList.remove("hidden");
+                 return;
+            }
+            
+            // --- LOGIC MỚI: TÌM KIẾM TÀI KHOẢN ADMIN TRONG LOCALSTORAGE ---
+            
+            // 1. Xác định các key có thể là Admin (username hoặc username_admin)
+            const possibleKeys = [username, `${username}_admin`, 'quanly1_user']; 
+            
+            let storedUserData = null;
+            let foundKey = null;
+
+            // 2. Lặp qua các key và tìm tài khoản khớp
+            for (const key of possibleKeys) {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const user = JSON.parse(data);
+                        // 3. Kiểm tra mật khẩu và cờ isAdmin
+                        if (user.password === pass && user.isAdmin === true) {
+                            storedUserData = user;
+                            foundKey = key;
+                            break;
+                        }
+                    } catch (e) {
+                        console.error(`Lỗi parse dữ liệu cho key ${key}:`, e);
+                    }
+                }
+            }
+
+            if (storedUserData) {
                 // Đăng nhập thành công
-                // Lưu trạng thái đăng nhập admin vào sessionStorage
                 sessionStorage.setItem("isAdminLoggedIn", "true");
                 
-                // Chuyển hướng tới trang dashboard
-                alert("Đăng nhập admin thành công!");
+                alert("Đăng nhập Admin thành công!");
                 window.location.href = "dashboard.html"; 
                 
             } else {
                 // Đăng nhập thất bại
-                errorMsg.textContent = "Sai tên đăng nhập hoặc mật khẩu!";
+                errorMsg.textContent = "Sai Tên đăng nhập hoặc Mật khẩu, hoặc Tài khoản không phải Admin!";
                 errorMsg.classList.remove("hidden");
             }
         });

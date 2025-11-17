@@ -160,12 +160,12 @@ function saveToStorage(key, data) {
 (function initializeQuanLyUser() {
     const defaultUsers = [
         // Tài khoản Quản lý (key được gán cứng để dễ phân biệt)
-        { key: 'quanly1_user', username: 'quanly1', password: 'abcd1234', firstname: 'Quản', lastname: 'Lý', isLocked: false, number: '0123456789', address: 'Hà Nội' },
+        { key: 'quanly1_user', username: 'quanly1', password: 'abcd1234', firstname: 'Quản', lastname: 'Lý', isLocked: false, number: '0123456789', address: 'Hà Nội', isAdmin: true },
         
         // TÀI KHOẢN MẪU MỚI (Khóa/Không khóa)
-        { key: 'khachhang1', username: 'khachhang1', password: '123456', firstname: 'Khách', lastname: 'Hàng 1', isLocked: false, number: 'Chưa có', address: 'Chưa có' },
-        { key: 'khachhang2', username: 'khachhang2', password: '123456', firstname: 'Khách', lastname: 'Hàng 2 (Khóa)', isLocked: true, number: 'Chưa có', address: 'Chưa có' },
-        { key: 'khachhang3', username: 'khachhang3', password: '123456', firstname: 'Khách', lastname: 'Hàng 3', isLocked: true, number: 'Chưa có', address: 'Chưa có' }
+        { key: 'khachhang1', username: 'khachhang1', password: '123456', firstname: 'Khách', lastname: 'Hàng 1', isLocked: false, number: 'Chưa có', address: 'Chưa có', isAdmin: false },
+        { key: 'khachhang2', username: 'khachhang2', password: '123456', firstname: 'Khách', lastname: 'Hàng 2 (Khóa)', isLocked: true, number: 'Chưa có', address: 'Chưa có', isAdmin: false },
+        { key: 'khachhang3', username: 'khachhang3', password: '123456', firstname: 'Khách', lastname: 'Hàng 3', isLocked: false, number: 'Chưa có', address: 'Chưa có', isAdmin: false }
     ];
 
     defaultUsers.forEach(user => {
@@ -178,9 +178,10 @@ function saveToStorage(key, data) {
                 isLocked: user.isLocked,
                 number: user.number,
                 address: user.address,
-                email: user.username.includes('@') ? user.username : undefined 
+                email: user.username.includes('@') ? user.username : undefined,
+                isAdmin: user.isAdmin // Thêm cờ isAdmin
             };
-            const storageKey = user.key === 'quanly1_user' ? 'quanly1_user' : user.username; 
+            const storageKey = user.key; 
             localStorage.setItem(storageKey, JSON.stringify(userObj));
             console.log(`Đã thêm tài khoản mẫu: ${user.username}`);
         }
@@ -203,7 +204,9 @@ function loadUserTable() {
                 const user = JSON.parse(localStorage.getItem(key));
                 if (user.password) {
                     const username = user.username || key; 
-                    users.push({ ...user, username: username, storageKey: key, password: user.password });
+                    // Kiểm tra nếu key kết thúc bằng '_admin' HOẶC key là 'quanly1_user'
+                    const isAdmin = user.isAdmin || key.endsWith('_admin') || key === 'quanly1_user';
+                    users.push({ ...user, username: username, storageKey: key, password: user.password, isAdmin: isAdmin });
                 }
             } catch (e) { console.warn(`Không thể parse user data cho key: ${key}`); }
         }
@@ -219,8 +222,9 @@ function loadUserTable() {
         const isLocked = user.isLocked || false;
         
         // KIỂM TRA VÀ THÊM NHÃN ADMIN
-        const isAdminAccount = user.storageKey === 'quanly1_user';
-        const usernameDisplay = isAdminAccount ? `${user.username} <span style="background:#dc2626; color:white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 5px;">ADMIN</span>` : user.username;
+        const isAdminAccount = user.isAdmin || user.storageKey === 'quanly1_user' || user.storageKey.endsWith('_admin');
+        const adminLabel = isAdminAccount ? ` <span style="background:#dc2626; color:white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 5px;">ADMIN</span>` : '';
+        const usernameDisplay = user.username + adminLabel;
 
 
         // CHỈ TẠO 4 CỘT: Tên tài khoản, Mật khẩu, Trạng thái, Hành động
@@ -268,7 +272,7 @@ function toggleUserLock(key) {
 }
 
 /**
- * THAY ĐỔI: Logic cho form Thêm tài khoản (Không dùng email)
+ * CẬP NHẬT: Logic cho form Thêm tài khoản (Phân loại Admin/User)
  */
 function attachAddUserFormEvent() {
     const form = document.getElementById("add-user-form");
@@ -279,37 +283,42 @@ function attachAddUserFormEvent() {
         
         const username = document.getElementById("new-user-email").value.trim();
         const password = document.getElementById("new-user-pass").value.trim();
+        const accountType = document.querySelector('input[name="account-type"]:checked').value; // 'user' hoặc 'admin'
         
-        // Thêm kiểm tra: không được chứa ký tự '@'
+        // Kiểm tra cơ bản
         if (username.includes('@')) {
             alert("Tên tài khoản không được chứa ký tự '@'!");
             return;
         }
 
-        // Tạo key mới trong localStorage
-        const storageKey = username; 
+        // ĐỊNH NGHĨA KEY VÀ KIỂM TRA TỒN TẠI
+        let storageKey = username;
         
+        if (accountType === 'admin') {
+            // LƯU Ý: Giữ lại key quanly1_user cho tài khoản Admin mặc định để phục vụ Admin Login hard-code
+            storageKey = username === 'quanly1' ? 'quanly1_user' : `${username}_admin`;
+        }
+
         if (localStorage.getItem(storageKey)) {
-            alert(`Tài khoản ${username} đã tồn tại! Vui lòng sử dụng tên khác.`);
-            return;
+             alert(`Tài khoản '${username}' đã tồn tại! Vui lòng sử dụng tên khác.`);
+             return;
         }
         
-        // Tạo đối tượng user mới với thông tin cơ bản
-        // Cấu trúc này phải khớp với cấu trúc mà dangnhap.js mong đợi
+        // TẠO OBJECT USER MỚI
         const newUser = {
-            username: username, // Lưu tên đăng nhập
+            username: username, 
             password: password,
-            firstname: "Người dùng", 
-            lastname: "mới",
-            number: "Chưa có",
-            address: "Chưa có",
-            isLocked: false 
+            firstname: accountType === 'admin' ? 'Quản' : 'Người dùng',
+            lastname: accountType === 'admin' ? 'Lý' : 'mới',
+            number: accountType === 'admin' ? 'Chưa có' : 'Chưa có', // Giữ nguyên
+            address: accountType === 'admin' ? 'Chưa có' : 'Chưa có', // Giữ nguyên
+            isLocked: false,
+            // Đánh dấu cờ Admin cho tất cả các tài khoản Admin mới
+            isAdmin: accountType === 'admin'
         };
         
-        // Lưu vào LocalStorage với key là username
         localStorage.setItem(storageKey, JSON.stringify(newUser));
-        
-        alert(`Đã thêm tài khoản mới thành công!`);
+        alert(`Đã thêm tài khoản ${accountType} thành công:\nTK: ${username}\nMK: ${password}`);
         
         form.reset();
         loadUserTable();
@@ -458,7 +467,7 @@ function attachProductActionButtons() {
             document.getElementById("product-image").value = product.image;
             document.getElementById("product-desc-short").value = product.description_short || '';
             document.getElementById("product-desc-long").value = product.description_long || '';
-            document.getElementById("btn-cancel-product-edit").classList.remove("hidden");
+            document.getElementById("btn-cancel-product-edit").classList.add("hidden");
             window.scrollTo(0, 0); 
         });
     });
@@ -696,7 +705,7 @@ function attachImportActionButtons() {
             renderImportItemsList();
             
             // Hiện nút "Hủy sửa"
-            document.getElementById("btn-cancel-import-edit").classList.remove("hidden");
+            document.getElementById("btn-cancel-import-edit").classList.add("hidden");
             document.querySelector("#import-form .btn-submit").textContent = "Lưu thay đổi";
 
             window.scrollTo(0, 0); // Cuộn lên đầu
