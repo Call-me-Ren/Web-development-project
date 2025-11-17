@@ -1,37 +1,35 @@
 $(document).ready(function () {
-    // ================== TẠO TÀI KHOẢN MẶC ĐỊNH CHO LẦN ĐẦU CHẠY ==================
-    const defaultUsername = "user";
+    // ================== TẠO TÀI KHOẢN MẶC ĐỊNH ==================
+    const defaultUsername = "khachhang1";
+    const defaultPassword = "123456";
+
     if (!localStorage.getItem(defaultUsername)) {
         const defaultUser = {
-            username: defaultUsername, 
-            password: "123456", 
+            username: defaultUsername,
+            password: defaultPassword,
             firstname: "User",
             lastname: "Test",
             number: "0901234567",
             address: "123 Nguyễn Trãi, Quận 1, TP.HCM"
         };
         localStorage.setItem(defaultUsername, JSON.stringify(defaultUser));
-        console.log(`Tài khoản mẫu '${defaultUsername}' (pass: 123456) đã được tạo.`);
+        console.log(`Tài khoản mẫu '${defaultUsername}' (pass: ${defaultPassword}) đã được tạo.`);
     }
-    // LƯU Ý: Tài khoản Admin (quanly1_user) được khởi tạo trong admin.js
 
-    // ================== Ẩn/hiện mật khẩu ==================
+    // ================== ẨN/HIỆN MẬT KHẨU ==================
     $("#eye").click(function () {
         $(this).toggleClass("open");
         $(this).children("i").toggleClass("fa-eye-slash fa-eye");
-
         let input = $(this).prev();
         input.attr("type", $(this).hasClass("open") ? "text" : "password");
     });
 
-    // ================== Xử lý đăng nhập ==================
+    // ================== ĐĂNG NHẬP ==================
     $("#form-login").submit(function (e) {
         e.preventDefault();
 
-        // Lấy tên đăng nhập và mật khẩu
-        const username = $(this).find("input:eq(0)").val().trim(); 
+        const username = $(this).find("input:eq(0)").val().trim();
         const password = $(this).find("input:eq(1)").val().trim();
-        const storageKey = username.includes('@') ? username : username; // Key lưu trữ là username
 
         $(".error-message").remove();
 
@@ -42,45 +40,20 @@ $(document).ready(function () {
             return;
         }
 
-        const userData = localStorage.getItem(storageKey);
-        // THỬ TÌM VỚI KEY ADMIN NẾU KHÔNG TÌM THẤY VỚI USERNAME
-        const adminKey = username === 'quanly1' ? 'quanly1_user' : null;
-        const finalKey = userData ? storageKey : adminKey;
-        
-        const finalUserData = localStorage.getItem(finalKey);
-
-        if (!finalUserData) {
+        const userData = localStorage.getItem(username);
+        if (!userData) {
             $("#form-login").prepend(
                 '<p class="error-message">Tài khoản không tồn tại! Vui lòng đăng ký trước.</p>'
             );
             return;
         }
 
-        const user = JSON.parse(finalUserData);
-        
-        // KIỂM TRA KHÓA TÀI KHOẢN (BƯỚC SỬA)
-        if (user.isLocked === true) {
-             $("#form-login").prepend(
-                '<p class="error-message">Tài khoản này đã bị khóa. Vui lòng liên hệ Admin để mở khóa!</p>'
-            );
-            return;
-        }
-        
-        // KIỂM TRA PHÂN QUYỀN ĐĂNG NHẬP NGƯỜI DÙNG: CHẶN ADMIN
-        // Admin chỉ log được ở /admin/index.html (quanly1_user là key của Admin)
-        if (finalKey === 'quanly1_user' || user.isAdmin === true) {
-             $("#form-login").prepend(
-                '<p class="error-message">Tài khoản này chỉ dùng để quản trị (Admin)!</p>'
-            );
-            return;
-        }
+        const user = JSON.parse(userData);
 
         if (password === user.password) {
             localStorage.setItem("currentUser", JSON.stringify(user));
             localStorage.setItem("isLoggedIn", "true");
-            
-            window.location.href = "index.html"; // Chuyển hướng đến index.html
-            return;
+            window.location.href = "index.html";
         } else {
             $("#form-login").prepend(
                 '<p class="error-message">Sai mật khẩu! Vui lòng thử lại.</p>'
@@ -88,7 +61,7 @@ $(document).ready(function () {
         }
     });
 
-    // ================== Quên mật khẩu ==================
+    // ================== QUÊN MẬT KHẨU ==================
     $("#form-reset").submit(function (e) {
         e.preventDefault();
 
@@ -111,10 +84,8 @@ $(document).ready(function () {
             );
             return;
         }
-        
-        const storageKey = username;
 
-        const userData = localStorage.getItem(storageKey);
+        const userData = localStorage.getItem(username);
         if (!userData) {
             $("#form-reset").prepend(
                 '<p class="error-message">Tài khoản không tồn tại!</p>'
@@ -124,9 +95,9 @@ $(document).ready(function () {
 
         const user = JSON.parse(userData);
         user.password = newPassword;
-        localStorage.setItem(storageKey, JSON.stringify(user));
+        localStorage.setItem(username, JSON.stringify(user));
 
         alert("Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.");
-        window.location.href = "dangnhap.html"; // Trở lại trang đăng nhập
+        window.location.href = "dangnhap.html";
     });
 });
