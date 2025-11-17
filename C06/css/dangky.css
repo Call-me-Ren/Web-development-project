@@ -2,249 +2,235 @@
 
 /* RESET CƠ BẢN */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
 }
 
 /* NỀN */
 body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: #f0f2f5;
-  padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #f0f2f5;
+    padding: 20px;
 }
 
 /* KHUNG NGOÀI */
 .container {
-  width: 400px;
-  max-width: 100%;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  padding-bottom: 15px;
+    width: 400px;
+    max-width: 100%;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    padding-bottom: 15px;
 }
 
 /* TIÊU ĐỀ */
 h1 {
-  text-align: center;
-  font-size: 1.6em;
-  color: #333;
-  margin: 20px 0 10px 0;
+    text-align: center;
+    font-size: 1.6em;
+    color: #333;
+    margin: 20px 0 10px 0;
 }
 
 /* FORM */
 .form-register {
-  padding: 20px;
-  text-align: left;
+    padding: 20px;
+    text-align: left;
 }
 
-/* HỌ & TÊN */
+/* NHÓM INPUT CHUNG (Bao gồm label và input) */
+.input-group {
+    margin-top: 15px; /* Tạo khoảng cách giữa các trường */
+    position: relative; /* Dùng cho icon mắt */
+}
+
+/* LABEL: Nhãn nằm trên ô input */
+.input-group label {
+    display: block;
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+
+/* HỌ & TÊN (2 cột) */
 .full-name {
-  display: flex;
-  justify-content: space-between;
-  gap: 4%;
+    display: flex;
+    gap: 4%;
+    margin-top: 0; /* Bỏ margin-top của .full-name vì đã dùng .input-group */
 }
 
-.full-name input {
-  width: 100%;
-  border: 1px solid #ccd0d5;
-  border-radius: 5px;
-  padding: 10px;
-  font-size: 14px;
+/* Đảm bảo input trong .full-name vẫn là 100% của nhóm nhỏ */
+.full-name .input-group {
+    flex: 1;
+    margin-top: 0;
 }
 
 /* INPUT CHUNG */
-.email,
-.password,
-.password-confirm,
-.number,
-.road {
-  margin-top: 10px;
-  position: relative;
-}
-
-.email input,
-.password input,
-.password-confirm input,
-.number input,
-.road input {
-  width: 100%;
-  border: 1px solid #ccd0d5;
-  border-radius: 5px;
-  padding: 10px;
-  transition: 0.3s;
-  font-size: 14px;
+.form-register input[type="text"],
+.form-register input[type="tel"],
+.form-register input[type="password"] {
+    width: 100%;
+    border: 1px solid #ccd0d5;
+    border-radius: 5px;
+    padding: 10px;
+    transition: 0.3s;
+    font-size: 14px;
 }
 
 /* NÚT CON MẮT */
 .eye {
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: #777;
-  font-size: 16px;
+    position: absolute;
+    /* Căn chỉnh lại vị trí của icon mắt do có label ở trên */
+    top: 50%; 
+    right: 12px;
+    transform: translateY(calc(-50% + 15px)); /* Điều chỉnh xuống dưới label */
+    cursor: pointer;
+    color: #777;
+    font-size: 16px;
 }
 
 .eye:hover {
-  color: #42b72a;
+    color: #42b72a;
 }
 
 /* HIỆU ỨNG FOCUS */
-input:focus,
-select:focus {
-  border-color: #42b72a;
-  outline: none;
-  box-shadow: 0 0 4px rgba(66, 183, 42, 0.3);
-}
-
-/* NGÀY SINH */
-.birthday {
-  margin-top: 15px;
-}
-
-.font-sub {
-  font-size: 0.9em;
-  color: #555;
-  margin-bottom: 5px;
-}
-
-.c-birthday {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: nowrap; /* luôn trên 1 dòng */
-}
-
-.c-birthday div {
-  flex: 1;
-}
-
-.c-birthday select {
-  width: 100%;
-  border: 1px solid #ccd0d5;
-  border-radius: 5px;
-  padding: 10px;
-  font-size: 14px;
+input:focus {
+    border-color: #42b72a;
+    outline: none;
+    box-shadow: 0 0 4px rgba(66, 183, 42, 0.3);
 }
 
 /* GIỚI TÍNH */
 .sex {
-  margin-top: 15px;
+    margin-top: 15px;
+}
+
+.font-sub {
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 5px;
+    font-weight: 500;
 }
 
 .f-sex {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-top: 5px;
-  flex-wrap: nowrap; /* ép nằm 1 dòng */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+    flex-wrap: nowrap;
 }
 
 .f-sex div {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #ccd0d5;
-  border-radius: 5px;
-  padding: 8px 0;
-  cursor: pointer;
-  transition: 0.3s;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccd0d5;
+    border-radius: 5px;
+    padding: 8px 0;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 14px; /* Điều chỉnh font size cho nội dung bên trong */
 }
 
 .f-sex div:hover {
-  background-color: #f0f2f5;
+    background-color: #f0f2f5;
 }
 
 .f-sex label {
-  margin-left: 6px;
-  cursor: pointer;
+    margin-left: 6px;
+    cursor: pointer;
 }
 
 /* NÚT ĐĂNG KÝ */
 .btn-register {
-  margin-top: 20px;
-  text-align: center;
+    margin-top: 25px;
+    text-align: center;
 }
 
 .btn-register button {
-  width: 100%;
-  padding: 10px;
-  background-color: #42b72a;
-  color: #fff;
-  font-size: 1em;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
+    width: 100%;
+    padding: 10px;
+    background-color: #42b72a;
+    color: #fff;
+    font-size: 1em;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
 .btn-register button:hover {
-  background-color: #36a420;
+    background-color: #36a420;
 }
 
 /* LINK DƯỚI CÙNG */
 .form-register p {
-  font-size: 14px;
+    font-size: 14px;
+    margin-top: 15px; /* Thêm margin-top cho p cuối cùng */
 }
 
 .form-register a {
-  color: #42b72a;
-  text-decoration: none;
-  font-weight: 500;
+    color: #42b72a;
+    text-decoration: none;
+    font-weight: 500;
 }
 
 .form-register a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 /* ===== RESPONSIVE CHO MOBILE ===== */
 @media (max-width: 480px) {
-  body {
-    padding: 10px;
-  }
+    body {
+        padding: 10px;
+    }
 
-  .container {
-    width: 100%;
-    border-radius: 8px;
-  }
+    .container {
+        width: 100%;
+        border-radius: 8px;
+    }
 
-  .form-register {
-    padding: 15px;
-  }
+    .form-register {
+        padding: 15px;
+    }
 
-  h1 {
-    font-size: 1.3em;
-  }
+    h1 {
+        font-size: 1.3em;
+    }
 
-  /* Họ và tên xuống hàng */
-  .full-name {
-    flex-direction: column;
-    gap: 10px;
-  }
+    /* Họ và tên xuống hàng */
+    .full-name {
+        flex-direction: column;
+        gap: 10px;
+    }
 
-  /* Ngày sinh và giới tính vẫn 1 dòng */
-  .c-birthday,
-  .f-sex {
-    flex-wrap: nowrap;
-  }
+    /* Đảm bảo icon mắt vẫn căn giữa */
+    .eye {
+        transform: translateY(calc(-50% + 15px)); 
+    }
 
-  input,
-  select {
-    font-size: 13px;
-    padding: 9px;
-  }
+    /* Giới tính vẫn 1 dòng */
+    .f-sex {
+        flex-wrap: nowrap;
+    }
 
-  .btn-register button {
-    font-size: 14px;
-    padding: 10px;
-  }
+    input,
+    select {
+        font-size: 13px;
+        padding: 9px;
+    }
+
+    .btn-register button {
+        font-size: 14px;
+        padding: 10px;
+    }
 }
