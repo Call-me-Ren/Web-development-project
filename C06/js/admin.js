@@ -156,22 +156,38 @@ function saveToStorage(key, data) {
   PHẦN 1: QUẢN LÝ NGƯỜI DÙNG (THAY CHO QUẢN LÝ KHÁCH HÀNG)
 ================================================================
 */
-// THÊM: Tự động thêm tài khoản quanly1 vào danh sách user (Key: quanly1_user)
+// THÊM: Tự động thêm tài khoản quanly1 và các tài khoản mẫu vào danh sách user
 (function initializeQuanLyUser() {
-    const adminUserKey = 'quanly1_user'; 
-    if (!localStorage.getItem(adminUserKey)) {
-        const defaultUser = {
-            username: 'quanly1',
-            password: 'abcd1234',
-            firstname: 'Quản',
-            lastname: 'Lý',
-            number: '0123456789',
-            address: 'Hồ Chí Minh',
-            isLocked: false 
-        };
-        localStorage.setItem(adminUserKey, JSON.stringify(defaultUser));
-        console.log("Đã thêm tài khoản 'quanly1' vào danh sách người dùng.");
-    }
+    const defaultUsers = [
+        // Tài khoản Quản lý (đã yêu cầu trước)
+        { key: 'quanly1_user', username: 'quanly1', password: 'abcd1234', firstname: 'Quản', lastname: 'Lý', isLocked: false, number: '0123456789', address: 'Hà Nội' },
+        
+        // TÀI KHOẢN MẪU MỚI (Khóa/Không khóa)
+        { key: 'khachhang1', username: 'khachhang1', password: '123456', firstname: 'Khách', lastname: 'Hàng 1', isLocked: false, number: 'Chưa có', address: 'Chưa có' },
+        { key: 'khachhang2', username: 'khachhang2', password: '123456', firstname: 'Khách', lastname: 'Hàng 2 (Khóa)', isLocked: true, number: 'Chưa có', address: 'Chưa có' },
+        { key: 'khachhang3', username: 'khachhang3', password: '123456', firstname: 'Khách', lastname: 'Hàng 3', isLocked: true, number: 'Chưa có', address: 'Chưa có' }
+    ];
+
+    defaultUsers.forEach(user => {
+        if (!localStorage.getItem(user.key)) {
+            const userObj = {
+                username: user.username,
+                password: user.password,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                isLocked: user.isLocked,
+                number: user.number,
+                address: user.address,
+                // Giữ lại email nếu đây là tài khoản được tạo từ form đăng ký email cũ (nếu có)
+                email: user.username.includes('@') ? user.username : undefined 
+            };
+            // Lưu với key chuẩn, trừ tài khoản quanly1_user
+            const storageKey = user.key === 'quanly1_user' ? 'quanly1_user' : user.username; 
+            localStorage.setItem(storageKey, JSON.stringify(userObj));
+            console.log(`Đã thêm tài khoản mẫu: ${user.username}`);
+        }
+    });
+
 })();
 
 function loadUserTable() {
@@ -180,36 +196,32 @@ function loadUserTable() {
     tableBody.innerHTML = ""; 
     let users = [];
     
-    // Logic tìm kiếm user được thay đổi: tìm tất cả các key chứa 'password'
+    // Logic tìm kiếm user: tìm tất cả các key chứa 'password'
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        // Loại bỏ các key không phải user data (như 'currentUser', 'watchtime_products', etc.)
-        if (localStorage.getItem(key).includes('password')) { 
+        // Lấy tất cả các object có trường 'password' (để lọc user)
+        if (localStorage.getItem(key) && localStorage.getItem(key).includes('password')) { 
             try {
                 const user = JSON.parse(localStorage.getItem(key));
-                // CHỈ LẤY USER THỰC SỰ (có password và không phải cờ tạm)
                 if (user.password) {
-                     // Nếu user được tạo bằng email (trang đăng ký cũ), key sẽ là email, gán lại username = key
-                     // Nếu user là quanly1_user, key là quanly1_user, username là quanly1
                     const username = user.username || key; 
-                    users.push({ ...user, username: username, storageKey: key });
+                    users.push({ ...user, username: username, storageKey: key, password: user.password });
                 }
             } catch (e) { console.warn(`Không thể parse user data cho key: ${key}`); }
         }
     }
     
-    // Lọc bỏ tài khoản Admin (quanly1) cứng đã thêm ở trên để tránh nhầm lẫn với tài khoản hệ thống nếu có
-    // Giữ lại nếu username không chứa '@' hoặc nếu là tài khoản quanly1 được thêm ở trên
-    // users = users.filter(u => u.username !== 'quanly1'); 
+    // Lọc bỏ tài khoản Admin hard-code (nếu nó được lưu với key 'admin') để tránh trùng lặp hiển thị
+    users = users.filter(u => u.storageKey !== 'admin'); 
 
-    if (users.length === 0) { tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Không tìm thấy người dùng nào.</td></tr>'; return; }
+    if (users.length === 0) { tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Không tìm thấy người dùng nào.</td></tr>'; return; }
     
     users.forEach(user => {
         const tr = document.createElement("tr");
         const isLocked = user.isLocked || false;
         
-        // Dùng user.storageKey để reset/khóa, vì đó là key thật trong localStorage
-        tr.innerHTML = `<td>${user.username}</td><td>${user.firstname || ''} ${user.lastname || ''}</td><td>${user.number || 'Chưa có'}</td><td>${user.address || 'Chưa có'}</td><td style="color: ${isLocked ? 'red' : 'green'}; font-weight: bold;">${isLocked ? 'Đã khóa' : 'Hoạt động'}</td><td><button class="btn-action btn-doi-mk" data-key="${user.storageKey}">Đổi Mật khẩu</button><button class="btn-action btn-toggle-lock" data-key="${user.storageKey}">${isLocked ? 'Mở khóa' : 'Khoá'}</button></td>`;
+        // CHỈ TẠO 4 CỘT: Tên tài khoản, Mật khẩu, Trạng thái, Hành động
+        tr.innerHTML = `<td>${user.username}</td><td>${user.password}</td><td style="color: ${isLocked ? 'red' : 'green'}; font-weight: bold;">${isLocked ? 'Đã khóa' : 'Hoạt động'}</td><td><button class="btn-action btn-doi-mk" data-key="${user.storageKey}">Khởi tạo Mật khẩu</button><button class="btn-action btn-toggle-lock" data-key="${user.storageKey}">${isLocked ? 'Mở khóa' : 'Khoá'}</button></td>`;
         tableBody.appendChild(tr);
     });
     attachTableActions();
@@ -217,12 +229,8 @@ function loadUserTable() {
 function attachTableActions() {
     // SỬA CHỮA: Cập nhật class CSS cho nút Reset
     document.querySelectorAll(".btn-doi-mk").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const key = btn.dataset.key;
-            if (confirm(`Bạn có chắc muốn đổi mật khẩu cho tài khoản này?\nMật khẩu mới sẽ là '123456'.`)) {
-                resetUserPassword(key, '123456');
-            }
-        });
+        // Nút Đổi Mật khẩu giờ được xử lý trong HTML (attachResetPasswordModalEvents)
+        // Hành động ở đây chỉ là để ngăn lỗi nếu có
     });
     document.querySelectorAll(".btn-toggle-lock").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -234,13 +242,21 @@ function attachTableActions() {
         });
     });
 }
-// Các hàm này dùng key (storageKey) thay vì email
-function resetUserPassword(key, newPassword) {
+// Hàm này là hàm được gọi từ logic Modal trong HTML
+window.updateUserPassword = function(key, newPassword) {
     try {
         const userData = JSON.parse(localStorage.getItem(key));
-        if (userData) { userData.password = newPassword; localStorage.setItem(key, JSON.stringify(userData)); alert(`Đã đổi mật khẩu thành '123456'.`); loadUserTable(); }
-    } catch (e) { alert("Có lỗi xảy ra khi đổi mật khẩu."); }
-}
+        if (userData) { 
+            userData.password = newPassword; 
+            localStorage.setItem(key, JSON.stringify(userData)); 
+            alert(`Đã khởi tạo mật khẩu thành công! Mật khẩu mới là: ${newPassword}`); 
+            loadUserTable(); 
+        }
+    } catch (e) { 
+        alert("Có lỗi xảy ra khi khởi tạo mật khẩu."); 
+    }
+};
+
 function toggleUserLock(key) {
      try {
         const userData = JSON.parse(localStorage.getItem(key));
@@ -276,11 +292,12 @@ function attachAddUserFormEvent() {
         }
         
         // Tạo đối tượng user mới với thông tin cơ bản
+        // Cấu trúc này phải khớp với cấu trúc mà dangnhap.js mong đợi
         const newUser = {
             username: username, // Lưu tên đăng nhập
             password: password,
-            firstname: "Chưa", 
-            lastname: "có",
+            firstname: "Người dùng", 
+            lastname: "mới",
             number: "Chưa có",
             address: "Chưa có",
             isLocked: false 
@@ -289,7 +306,7 @@ function attachAddUserFormEvent() {
         // Lưu vào LocalStorage với key là username
         localStorage.setItem(storageKey, JSON.stringify(newUser));
         
-        alert(`Đã thêm tài khoản mới:\nTên TK: ${username}\nMK: ${password}`);
+        alert(`Đã thêm tài khoản mới thành công!`);
         
         form.reset();
         loadUserTable();
@@ -1013,10 +1030,10 @@ function loadAndAttachProfitForm() {
         const inputs = listContainer.querySelectorAll("input[type='number']");
         
         inputs.forEach(input => {
-            const catId = input.dataset.id;
-            const newMargin = parseFloat(input.value);
+            catId = input.dataset.id;
+            newMargin = parseFloat(input.value);
             
-            const index = categories.findIndex(c => c.id === catId);
+            index = categories.findIndex(c => c.id === catId);
             if (index !== -1 && !isNaN(newMargin)) {
                 categories[index].margin = newMargin;
             }

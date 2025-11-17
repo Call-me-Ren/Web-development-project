@@ -5,6 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Admin WatchTime</title>
     <link rel="stylesheet" href="../css/admin.css">
+    <style>
+        /* CSS BỔ SUNG ĐỂ LÀM ĐẸP TRANG DASHBOARD */
+        .dashboard-content {
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .welcome-block {
+            background-color: #e0f2fe; /* Light blue background */
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #007bff;
+        }
+
+        .welcome-block p {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #007bff;
+        }
+
+        .admin-info-box {
+            background-color: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .admin-info-box strong {
+            color: #16a34a; /* Green for key info */
+            font-weight: 700;
+        }
+
+        .admin-info-box .warning {
+            color: #dc2626; /* Red for security warning */
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: block;
+        }
+        
+        .cta-action {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #4b5563;
+        }
+    </style>
 </head>
 <body>
     <div class="admin-layout">
@@ -13,7 +62,7 @@
             <a href="#" id="admin-close-btn" class="admin-close-btn">&times;</a>
             <nav class="admin-nav">
                 <a href="dashboard.html" class="active">Bảng điều khiển</a>
-                <a href="quanly_khachhang.html">Quản lý Khách hàng</a>
+                <a href="quanly_khachhang.html">Quản lý Người dùng</a>
                 <a href="quanly_loaisp.html">Quản lý Loại Sản phẩm</a>
                 <a href="quanly_sanpham.html">Quản lý Sản phẩm</a>
                 <a href="quanly_nhaphang.html">Quản lý Nhập hàng</a>
@@ -29,8 +78,19 @@
             <button id="admin-menu-btn" class="admin-menu-btn">☰</button>
             <h2>Bảng điều khiển</h2>
             <div class="dashboard-content">
-                <p>Chào mừng bạn đến với trang quản trị WatchTime.</p>
-                <p>Vui lòng chọn một chức năng từ menu bên trái để bắt đầu.</p>
+                
+                <div class="welcome-block">
+                    <p class="text-xl font-bold">Chào mừng, <span id="admin-username" class="text-indigo-600">Admin</span>!</p>
+                </div>
+
+                <div class="admin-info-box">
+                    <p>Thông tin đăng nhập của tài khoản quản trị </p>
+                    <p class="mb-2">Tên đăng nhập: <strong id="admin-info-user"></strong></p>
+                    <p>Mật khẩu: <strong id="admin-info-pass"></strong></p>
+                </div>
+                
+                <p class="cta-action">Vui lòng chọn một chức năng từ menu bên trái để bắt đầu quản trị.</p>
+                
             </div>
         </main>
     </div>
@@ -41,6 +101,15 @@
             checkAdminLogin();
             attachLogoutEvent();
             attachMobileMenuEvents();
+            
+            // THÔNG TIN ADMIN HARD-CODE
+            const ADMIN_USER = "quanly1"; 
+            const ADMIN_PASS = "abcd1234";
+
+            // Hiển thị thông tin
+            document.getElementById("admin-username").textContent = ADMIN_USER;
+            document.getElementById("admin-info-user").textContent = ADMIN_USER;
+            document.getElementById("admin-info-pass").textContent = ADMIN_PASS;
         });
     </script>
 </body>
