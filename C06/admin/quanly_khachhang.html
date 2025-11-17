@@ -13,7 +13,7 @@
         .admin-table tr:hover { background-color: #fdfdfd; }
         .btn-action { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.8rem; margin-right: 5px; }
         /* Nút hành động */
-        .btn-doi-mk { background-color: #3b82f6; color: white; }
+        .btn-doi-mk { background-color: #3b82f6; color: white; } /* Giữ class cũ, đổi tên hiển thị */
         .btn-doi-mk:hover { background-color: #2563eb; }
         .btn-toggle-lock { background-color: #ef4444; color: white; }
         .btn-toggle-lock:hover { background-color: #dc2626; }
@@ -31,15 +31,33 @@
         }
         
         /* TỐI ƯU HÓA: Buộc các cột nội dung hiển thị trên một dòng */
+        /* Chỉ giữ lại Tên tài khoản và Trạng thái cần nowrap */
         .admin-table td:nth-child(1), /* Tên tài khoản */
-        .admin-table td:nth-child(2), /* Họ tên */
-        .admin-table td:nth-child(3), /* Số điện thoại */
-        .admin-table td:nth-child(4), /* Địa chỉ */
-        .admin-table td:nth-child(5) { /* Trạng thái */
+        .admin-table td:nth-child(3) { /* Trạng thái */
             white-space: nowrap;
         }
-        /* Cột hành động vẫn giữ nguyên để các nút nằm cạnh nhau */
 
+        /* --- CSS cho Modal --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -88,21 +106,36 @@
                     <thead>
                         <tr>
                             <th>Tên tài khoản</th>
-                            <th>Họ tên</th>
-                            <th>Số điện thoại</th>
-                            <th>Địa chỉ</th>
+                            <th>Mật khẩu</th>
                             <th>Trạng thái</th>
-                            <th>HÀNH ĐỘNG (THAY ĐỔI MẬT KHẨU / KHOÁ)</th>
+                            <th>HÀNH ĐỘNG (KHỞI TẠO MẬT KHẨU / KHOÁ)</th>
                         </tr>
                     </thead>
                     <tbody id="user-table-body">
-                        <tr><td colspan="6" style="text-align: center;">Đang tải dữ liệu...</td></tr>
+                        <tr><td colspan="4" style="text-align: center;">Đang tải dữ liệu...</td></tr>
                     </tbody>
                 </table>
             </div>
         </main>
     </div>
 
+    <div id="reset-password-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">Khởi tạo Mật khẩu mới</h3>
+            <input type="hidden" id="modal-user-key">
+            <p class="mb-3 text-sm text-gray-600">Bạn đang khởi tạo mật khẩu cho tài khoản: <strong id="modal-username-display"></strong></p>
+            
+            <div class="form-group">
+                <label for="new-password-input">Mật khẩu mới</label>
+                <input type="text" id="new-password-input" placeholder="Nhập mật khẩu mới" required>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" id="confirm-reset-btn" class="btn-doi-mk" style="margin-right: 0;">Xác nhận Khởi tạo</button>
+                <button type="button" id="cancel-reset-btn" class="btn-cancel">Hủy</button>
+            </div>
+        </div>
+    </div>
     <script src="../js/admin.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -111,7 +144,61 @@
             loadUserTable();
             attachAddUserFormEvent();
             attachMobileMenuEvents();
+            attachResetPasswordModalEvents(); // Gắn sự kiện cho Modal
         });
+        
+        // Cần thêm hàm này để xử lý logic Modal trong HTML
+        function attachResetPasswordModalEvents() {
+            const modal = document.getElementById('reset-password-modal');
+            const confirmBtn = document.getElementById('confirm-reset-btn');
+            const cancelBtn = document.getElementById('cancel-reset-btn');
+            const newPassInput = document.getElementById('new-password-input');
+            const userKeyInput = document.getElementById('modal-user-key');
+
+            // 1. Gắn sự kiện mở modal vào các nút 'Đổi Mật khẩu'
+            document.querySelector('#user-table-body').addEventListener('click', (e) => {
+                if (e.target.classList.contains('btn-doi-mk')) {
+                    const key = e.target.dataset.key;
+                    // Lấy Tên tài khoản từ cột đầu tiên của hàng
+                    const username = e.target.closest('tr').querySelector('td:nth-child(1)').textContent.trim();
+                    
+                    // Điền thông tin vào modal
+                    userKeyInput.value = key;
+                    document.getElementById('modal-username-display').textContent = username;
+                    newPassInput.value = ''; // Xóa mật khẩu cũ
+                    modal.style.display = 'flex';
+                }
+            });
+
+            // 2. Nút Hủy
+            cancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+            
+            // 3. Nút Xác nhận Đổi
+            confirmBtn.addEventListener('click', () => {
+                const key = userKeyInput.value;
+                const newPassword = newPassInput.value.trim();
+
+                if (!newPassword) {
+                    alert('Vui lòng nhập mật khẩu mới!');
+                    return;
+                }
+
+                // Gọi hàm cập nhật mật khẩu trong admin.js
+                window.updateUserPassword(key, newPassword); 
+
+                // Đóng modal
+                modal.style.display = 'none';
+            });
+            
+            // Đóng modal khi click ra ngoài
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
     </script>
 </body>
 </html>
