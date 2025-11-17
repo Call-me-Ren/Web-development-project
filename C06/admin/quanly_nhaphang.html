@@ -6,36 +6,103 @@
     <title>Quản lý Nhập hàng - Admin WatchTime</title>
     <link rel="stylesheet" href="../css/admin.css">
     <style>
-        .admin-table { width: 100%; border-collapse: collapse; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; margin-bottom: 2rem; }
-        .admin-table th, .admin-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
-        .admin-table th { background-color: #f7fafc; font-weight: 600; color: #4a5568; text-transform: uppercase; font-size: 0.85rem; }
-        .admin-table td .details ul { margin: 5px 0 0 15px; list-style-type: disc; color: #4b5563; }
-        .btn-action { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.8rem; margin-right: 5px; }
-        .btn-complete { background-color: #16a34a; color: white; }
-        .btn-complete:disabled { background-color: #9ca3af; }
-        .btn-edit { background-color: #3b82f6; color: white; } /* Nút Sửa */
-        .btn-edit:disabled { background-color: #9ca3af; }
+        /* CSS cho Form */
         .admin-form { background-color: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
-        
-        /* CẬP NHẬT: Sửa lại grid cho form nhập */
-        .form-grid-nhap { display: grid; grid-template-columns: 2fr 1fr 1fr 100px; gap: 1rem; align-items: flex-end; }
-
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4b5563; }
         .form-group input, .form-group select { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; }
-        .btn-submit, .btn-add-item { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 700; color: #ffffff; background-color: #1877f2; border: none; border-radius: 6px; cursor: pointer; }
-        .btn-add-item { background-color: #3b82f6; }
-        .btn-cancel { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 700; color: #333; background-color: #e5e7eb; border: none; border-radius: 6px; cursor: pointer; margin-left: 10px; } /* Nút Hủy */
         
-        #import-items-list li { padding: 8px; background-color: #f3f4f6; border-radius: 4px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
-        #import-items-list li button { background-color: #ef4444; color: white; border: none; border-radius: 4px; padding: 2px 6px; font-size: 0.8rem; }
-    
-        /* CSS cho Lọc (giống trang đơn hàng) */
-        .filter-bar { display: flex; flex-wrap: wrap; gap: 1rem; background-color: #fff; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .filter-bar .form-group { flex: 1 1 200px; margin-bottom: 0; }
-        .filter-bar label { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: block; }
-        .filter-bar input, .filter-bar select { width: 100%; padding: 0.6rem; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; }
-        .filter-bar button { padding: 0.6rem 1rem; background-color: #1877f2; color: white; border: none; border-radius: 6px; cursor: pointer; align-self: flex-end; height: 38px; }
+        /* Form nhập hàng chi tiết */
+        .form-grid-nhap { 
+            display: grid; 
+            grid-template-columns: 1.5fr 1fr 1fr 1fr 100px; /* Mã, Tên, Giá, SL, Nút */
+            gap: 1rem; 
+            align-items: flex-end; 
+            margin-bottom: 1rem;
+        }
+        .btn-add-item { 
+            padding: 0.75rem 1rem; 
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            color: #ffffff; 
+            background-color: #3b82f6; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        /* Danh sách sản phẩm nhập */
+        #import-items-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        #import-items-list li { 
+            padding: 10px; 
+            background-color: #f7f9fb; 
+            border-radius: 4px; 
+            margin-bottom: 5px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 0.9rem;
+            border: 1px solid #eef1f5;
+        }
+        #import-items-list li button { 
+            background-color: #ef4444; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            padding: 4px 8px; 
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* Responsive cho form nhập hàng */
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-grid-nhap { grid-template-columns: 1fr; gap: 0.5rem; }
+        }
+
+        /* CSS cho Bảng Phiếu nhập */
+        .status-Moi { background-color: #fef3c7; color: #d97706; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+        .status-HoanThanh { background-color: #d1fae5; color: #059669; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+        .btn-edit-import { background-color: #3b82f6; color: white; }
+        .btn-edit-import:hover { background-color: #2563eb; }
+        .btn-complete-import { background-color: #10b981; color: white; }
+        .btn-complete-import:hover { background-color: #059669; }
+        .btn-complete-import:disabled { background-color: #9ca3af; cursor: not-allowed; }
+
+        /* Modal cho sửa phiếu nhập */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-item-list { border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; max-height: 200px; overflow-y: auto; }
+        .modal-item-list div { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f7fafc; }
+        .modal-item-list div:last-child { border-bottom: none; }
+        .modal-item-list input { width: 80px; text-align: right; margin-left: 10px; padding: 4px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -46,13 +113,7 @@
             <nav class="admin-nav">
                 <a href="dashboard.html">Bảng điều khiển</a>
                 <a href="quanly_khachhang.html">Quản lý Người dùng</a>
-                <a href="quanly_loaisp.html">Quản lý danh mục sản phẩm</a>
-                <a href="quanly_sanpham.html">Quản lý Sản phẩm</a>
                 <a href="quanly_nhaphang.html" class="active">Quản lý Nhập hàng</a>
-                <a href="quanly_giaban.html">Quản lý Giá bán</a>
-                <a href="quanly_donhang.html">Quản lý Đơn hàng</a>
-                <a href="quanly_tonkho.html">Quản lý Tồn kho</a>
-                
                 <a href="#" id="admin-logout-btn" class="logout">Đăng xuất</a>
             </nav>
         </aside>
@@ -61,55 +122,66 @@
             <button id="admin-menu-btn" class="admin-menu-btn">☰</button>
             <h2>Quản lý Nhập hàng</h2>
             
-            <form id="import-form" class="admin-form">
-                <h3 id="import-form-title" class="text-xl font-bold mb-4">Tạo phiếu nhập hàng mới</h3>
-                <input type="hidden" id="editing-import-id">
+            <form id="add-import-form" class="admin-form">
+                <h3 class="text-xl font-bold mb-4">Lập phiếu nhập hàng</h3>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="import-note">Ghi chú phiếu nhập</label>
+                        <input type="text" id="import-note" placeholder="Nhà cung cấp/Lý do nhập" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="import-date">Ngày nhập</label>
+                        <input type="date" id="import-date" required>
+                    </div>
+                </div>
 
+                <h4 class="text-lg font-semibold mt-4 mb-3 border-b pb-2">Thông tin sản phẩm nhập</h4>
+                
                 <div class="form-grid-nhap">
                     <div class="form-group">
-                        <label for="import-product">Chọn sản phẩm</label>
-                        <select id="import-product">
-                            <option value="">-- Tải danh sách sản phẩm --</option>
-                        </select>
+                        <label for="product-select">Chọn sản phẩm (Mã/Tên)</label>
+                        <select id="product-select" required>
+                            <option value="">-- Chọn sản phẩm --</option>
+                            </select>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="import-price">Giá nhập (VNĐ)</label>
+                        <input type="number" id="import-price" min="1000" placeholder="Giá nhập mỗi đơn vị" required>
+                    </div>
+
                     <div class="form-group">
                         <label for="import-qty">Số lượng</label>
-                        <input type="number" id="import-qty" min="1" value="1">
+                        <input type="number" id="import-qty" min="1" placeholder="Số lượng nhập" required>
                     </div>
+                    
                     <div class="form-group">
-                        <label for="import-cost-price">Giá nhập (VNĐ)</label>
-                        <input type="number" id="import-cost-price" min="0" placeholder="Giá vốn">
+                        <label for="import-lot">Lô hàng</label>
+                        <input type="text" id="import-lot" placeholder="Lô A/B/C (tùy chọn)">
                     </div>
-                    <button type="button" id="btn-add-item" class="btn-add-item">Thêm</button>
+
+                    <div class="form-group" style="align-self: flex-end; margin-bottom: 0;">
+                        <button type="button" id="btn-add-product" class="btn-add-item">Thêm vào phiếu</button>
+                    </div>
                 </div>
                 
-                <h4 class="text-lg font-semibold mt-4">Sản phẩm trong phiếu nhập:</h4>
-                <ul id="import-items-list" class="my-4">
-                    </ul>
+                <h4 class="text-md font-semibold mt-4 mb-2">Danh sách nhập (<span id="total-items-qty">0</span> sản phẩm)</h4>
+                <ul id="import-items-list">
+                    <li id="empty-list-notice" style="text-align: center; color: #9ca3af; background: transparent; border: none;">Chưa có sản phẩm nào được thêm.</li>
+                </ul>
 
-                <button type="submit" class="btn-submit">Lưu Phiếu Nhập</button>
-                <button type="button" id="btn-cancel-import-edit" class="btn-cancel hidden">Hủy sửa</button>
+                <button type="submit" id="btn-create-import" class="btn-submit mt-6" style="width: 100%;">Tạo phiếu nhập mới</button>
             </form>
 
-            <h3 class="text-xl font-bold mt-8 mb-4">Danh mục phiếu nhập hàng</h3>
-            <div class="filter-bar">
-                <div class="form-group">
-                    <label for="filter-date-start">Từ ngày</label>
-                    <input type="date" id="filter-date-start">
+            <h3 class="text-xl font-bold mt-8 mb-4">Danh sách Phiếu nhập</h3>
+            
+            <div class="admin-form">
+                <label for="search-import-id" class="block text-md font-bold mb-2">Tìm kiếm Phiếu nhập</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="search-import-id" placeholder="Nhập ID Phiếu nhập (VD: IMP_1700...)" style="flex-grow: 1;">
+                    <button type="button" id="btn-search-import" class="btn-edit-import">Tìm kiếm</button>
                 </div>
-                <div class="form-group">
-                    <label for="filter-date-end">Đến ngày</label>
-                    <input type="date" id="filter-date-end">
-                </div>
-                <div class="form-group">
-                    <label for="filter-status">Trạng thái</label>
-                    <select id="filter-status">
-                        <option value="">Tất cả</option>
-                        <option value="Mới tạo">Mới tạo</option>
-                        <option value="Đã hoàn thành">Đã hoàn thành</option>
-                    </select>
-                </div>
-                <button id="filter-btn">Lọc</button>
             </div>
 
             <div class="table-container">
@@ -117,30 +189,421 @@
                     <thead>
                         <tr>
                             <th>Mã Phiếu</th>
-                            <th>Ngày tạo</th>
-                            <th>Chi tiết</th>
+                            <th>Ngày nhập</th>
+                            <th>Tổng SP</th>
+                            <th>Ghi chú</th>
                             <th>Trạng thái</th>
-                            <th>Hành động</th>
+                            <th>HÀNH ĐỘNG</th>
                         </tr>
                     </thead>
                     <tbody id="import-table-body">
-                        </tbody>
+                        <tr><td colspan="6" style="text-align: center;">Đang tải dữ liệu...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </main>
     </div>
 
+    <div id="edit-import-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">Sửa Phiếu nhập: <span id="modal-import-id"></span></h3>
+            
+            <div class="form-group">
+                <label>Ngày nhập</label>
+                <input type="date" id="modal-import-date">
+            </div>
+            
+            <div class="form-group">
+                <label>Ghi chú</label>
+                <input type="text" id="modal-import-note">
+            </div>
+
+            <h4 class="text-md font-semibold mt-4 mb-2">Chi tiết sản phẩm nhập (Sửa Giá và Số lượng)</h4>
+            <div class="modal-item-list" id="modal-item-list">
+                </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" id="modal-save-btn" class="btn-submit" style="background-color: #16a34a;">Lưu thay đổi</button>
+                <button type="button" id="modal-cancel-btn" class="btn-cancel">Hủy</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/admin.js"></script>
     <script>
+        // Data tạm thời cho sản phẩm đang được thêm vào phiếu nhập
+        let currentImportItems = []; 
+        let allProductsInSystem = []; // Lưu trữ dữ liệu từ products.js
+
         document.addEventListener("DOMContentLoaded", () => {
             checkAdminLogin();
             attachLogoutEvent();
-            loadProductsIntoSelect('import-product');
-            loadImportTable(); // Tải tất cả lúc ban đầu
-            attachImportFormEvents();
-            attachImportFilterEvents(); // Gắn sự kiện cho nút lọc mới
             attachMobileMenuEvents();
+            
+            // 1. Tải danh sách sản phẩm để chọn
+            allProductsInSystem = loadProductsForImport();
+            populateProductSelect(allProductsInSystem);
+            
+            // 2. Gắn sự kiện cho Form và Bảng
+            attachAddItemToFormEvent();
+            attachCreateImportFormEvent();
+            loadImportTable();
+            attachEditImportModalEvents();
+            attachSearchImportEvent();
         });
+        
+        // ======================================================
+        // CÁC HÀM RIÊNG CỦA TRANG QUẢN LÝ NHẬP HÀNG
+        // ======================================================
+
+        function loadProductsForImport() {
+            // Lấy dữ liệu sản phẩm từ localStorage (được tạo ở products.js)
+            const PRODUCTS_KEY = 'watchtime_products';
+            try {
+                const data = localStorage.getItem(PRODUCTS_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                console.error("Lỗi khi tải dữ liệu sản phẩm:", e);
+                return [];
+            }
+        }
+
+        function populateProductSelect(products) {
+            const select = document.getElementById('product-select');
+            if (!select) return;
+
+            products.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = `[${p.id}] ${p.name}`;
+                option.dataset.price = p.price; // Lưu giá bán để tiện tham khảo
+                select.appendChild(option);
+            });
+        }
+        
+        function renderImportItemsList() {
+            const list = document.getElementById('import-items-list');
+            const totalQtyEl = document.getElementById('total-items-qty');
+            if (!list) return;
+
+            list.innerHTML = '';
+            let totalQty = 0;
+
+            if (currentImportItems.length === 0) {
+                 list.innerHTML = `<li id="empty-list-notice" style="text-align: center; color: #9ca3af; background: transparent; border: none;">Chưa có sản phẩm nào được thêm.</li>`;
+            } else {
+                 currentImportItems.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>
+                            <strong>${item.name}</strong> 
+                            <span style="color: #64748b;">(Mã: ${item.productId}, Lô: ${item.lot || 'Không'})</span> 
+                            <br>
+                            Giá nhập: ${formatVND(item.importPrice)} | SL: ${item.qty}
+                        </span>
+                        <button type="button" data-index="${index}">Xóa</button>
+                    `;
+                    li.querySelector('button').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        currentImportItems.splice(index, 1);
+                        renderImportItemsList();
+                    });
+                    list.appendChild(li);
+                    totalQty += item.qty;
+                });
+            }
+            if(totalQtyEl) totalQtyEl.textContent = totalQty;
+        }
+
+        function attachAddItemToFormEvent() {
+            const btn = document.getElementById('btn-add-product');
+            if (!btn) return;
+
+            btn.addEventListener('click', () => {
+                const select = document.getElementById('product-select');
+                const priceInput = document.getElementById('import-price');
+                const qtyInput = document.getElementById('import-qty');
+                const lotInput = document.getElementById('import-lot');
+                
+                if (!select.value || !priceInput.value || !qtyInput.value) {
+                    alert('Vui lòng chọn sản phẩm và nhập đầy đủ Giá nhập, Số lượng.');
+                    return;
+                }
+                
+                const productId = select.value;
+                const selectedOption = select.options[select.selectedIndex];
+                const productName = selectedOption.textContent.split('] ')[1].trim(); 
+                const importPrice = parseFloat(priceInput.value);
+                const qty = parseInt(qtyInput.value);
+                const lot = lotInput.value.trim();
+
+                if (importPrice <= 0 || qty <= 0) {
+                     alert('Giá nhập và Số lượng phải lớn hơn 0.');
+                     return;
+                }
+
+                currentImportItems.push({
+                    productId,
+                    name: productName,
+                    importPrice,
+                    qty,
+                    lot,
+                    timestamp: Date.now() 
+                });
+                
+                // Reset form chi tiết
+                select.value = "";
+                priceInput.value = "";
+                qtyInput.value = "";
+                lotInput.value = "";
+
+                renderImportItemsList();
+            });
+        }
+        
+        function attachCreateImportFormEvent() {
+            const form = document.getElementById('add-import-form');
+            if (!form) return;
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const note = document.getElementById('import-note').value.trim();
+                const date = document.getElementById('import-date').value.trim();
+
+                if (currentImportItems.length === 0) {
+                    alert('Vui lòng thêm ít nhất một sản phẩm vào phiếu nhập.');
+                    return;
+                }
+                
+                // Tạo ID Phiếu nhập
+                const importId = 'IMP_' + Date.now();
+
+                const newImport = {
+                    id: importId,
+                    note: note,
+                    importDate: date,
+                    creationDate: new Date().toISOString(),
+                    items: currentImportItems,
+                    totalQuantity: currentImportItems.reduce((sum, item) => sum + item.qty, 0),
+                    status: 'Mới tạo' // Trạng thái ban đầu
+                };
+
+                // Lưu vào LocalStorage (sử dụng hàm từ admin.js)
+                const allImports = getFromStorage(IMPORTS_KEY, []);
+                allImports.push(newImport);
+                saveToStorage(IMPORTS_KEY, allImports); 
+                
+                alert(`Đã tạo phiếu nhập ${importId} thành công! Vui lòng hoàn thành để cập nhật tồn kho.`);
+                
+                // Reset giao diện
+                currentImportItems = [];
+                form.reset();
+                renderImportItemsList();
+                loadImportTable();
+            });
+        }
+        
+        function loadImportTable() {
+            const tableBody = document.getElementById("import-table-body");
+            if (!tableBody) return; 
+            tableBody.innerHTML = ""; 
+            
+            const allImports = getFromStorage(IMPORTS_KEY, []);
+
+            if (allImports.length === 0) { 
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Không tìm thấy phiếu nhập nào.</td></tr>'; 
+                return; 
+            }
+            
+            allImports.sort((a, b) => new Date(b.creationDate) - new Date(a.creationDate));
+
+            allImports.forEach(imp => {
+                const tr = document.createElement("tr");
+                const isCompleted = imp.status === 'Đã hoàn thành';
+                
+                const statusClass = isCompleted ? 'status-HoanThanh' : 'status-Moi';
+                
+                tr.innerHTML = `
+                    <td>${imp.id}</td>
+                    <td>${imp.importDate}</td>
+                    <td>${imp.totalQuantity}</td>
+                    <td>${imp.note}</td>
+                    <td><span class="${statusClass}">${imp.status}</span></td>
+                    <td>
+                        <button class="btn-action btn-edit-import" data-id="${imp.id}" ${isCompleted ? 'disabled' : ''}>${isCompleted ? 'Đã sửa' : 'Sửa'}</button>
+                        <button class="btn-action btn-complete-import" data-id="${imp.id}" ${isCompleted ? 'disabled' : ''}>Hoàn thành</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+            attachImportTableActions();
+        }
+        
+        function attachSearchImportEvent() {
+            const searchInput = document.getElementById('search-import-id');
+            const searchBtn = document.getElementById('btn-search-import');
+            const tableBody = document.getElementById("import-table-body");
+            if (!searchBtn || !searchInput || !tableBody) return;
+
+            searchBtn.addEventListener('click', () => {
+                const searchTerm = searchInput.value.trim().toUpperCase();
+                const allImports = getFromStorage(IMPORTS_KEY, []);
+                
+                if (!searchTerm) {
+                    loadImportTable(); // Hiển thị lại toàn bộ nếu trống
+                    return;
+                }
+
+                const result = allImports.filter(imp => imp.id.includes(searchTerm));
+
+                tableBody.innerHTML = '';
+                if (result.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Không tìm thấy phiếu nhập nào khớp với ID.</td></tr>'; 
+                } else {
+                    result.forEach(imp => {
+                         const tr = document.createElement("tr");
+                         const isCompleted = imp.status === 'Đã hoàn thành';
+                         const statusClass = isCompleted ? 'status-HoanThanh' : 'status-Moi';
+                         tr.innerHTML = `
+                            <td>${imp.id}</td>
+                            <td>${imp.importDate}</td>
+                            <td>${imp.totalQuantity}</td>
+                            <td>${imp.note}</td>
+                            <td><span class="${statusClass}">${imp.status}</span></td>
+                            <td>
+                                <button class="btn-action btn-edit-import" data-id="${imp.id}" ${isCompleted ? 'disabled' : ''}>${isCompleted ? 'Đã sửa' : 'Sửa'}</button>
+                                <button class="btn-action btn-complete-import" data-id="${imp.id}" ${isCompleted ? 'disabled' : ''}>Hoàn thành</button>
+                            </td>
+                         `;
+                         tableBody.appendChild(tr);
+                    });
+                    attachImportTableActions();
+                }
+            });
+        }
+        
+        function attachImportTableActions() {
+            document.querySelectorAll(".btn-edit-import").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = btn.dataset.id;
+                    openEditImportModal(id);
+                });
+            });
+            
+            document.querySelectorAll(".btn-complete-import").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = btn.dataset.id;
+                    if (confirm(`Bạn có chắc muốn HOÀN THÀNH phiếu nhập ${id}? Hành động này không thể hoàn tác.`)) {
+                        // Gọi hàm hoàn thành từ admin.js
+                        window.completeImport(id);
+                        loadImportTable(); // Cập nhật bảng
+                    }
+                });
+            });
+        }
+
+        // --- Logic Modal Sửa Phiếu Nhập ---
+        function openEditImportModal(importId) {
+            const modal = document.getElementById('edit-import-modal');
+            const importObj = getFromStorage(IMPORTS_KEY, []).find(imp => imp.id === importId);
+
+            if (!importObj) {
+                alert("Không tìm thấy phiếu nhập.");
+                return;
+            }
+
+            if (importObj.status === 'Đã hoàn thành') {
+                 alert("Phiếu nhập đã hoàn thành, không thể sửa đổi!");
+                 return;
+            }
+
+            // Gán data cho Modal
+            document.getElementById('modal-import-id').textContent = importId;
+            document.getElementById('modal-import-date').value = importObj.importDate;
+            document.getElementById('modal-import-note').value = importObj.note;
+            modal.dataset.editingId = importId; // Lưu ID đang sửa
+
+            // Render chi tiết sản phẩm
+            renderModalItems(importObj.items);
+            
+            modal.style.display = 'flex';
+        }
+        
+        function renderModalItems(items) {
+            const itemList = document.getElementById('modal-item-list');
+            itemList.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <span style="flex: 1 1 50%; white-space: nowrap;">${item.name} (${item.productId})</span>
+                    <span style="flex: 1 1 25%; text-align: right;">Giá nhập: <input type="number" data-field="price" value="${item.importPrice}" data-index="${index}" min="1000"></span>
+                    <span style="flex: 1 1 25%; text-align: right;">SL: <input type="number" data-field="qty" value="${item.qty}" data-index="${index}" min="1"></span>
+                `;
+                itemList.appendChild(div);
+            });
+        }
+        
+        function attachEditImportModalEvents() {
+            const modal = document.getElementById('edit-import-modal');
+            const saveBtn = document.getElementById('modal-save-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+
+            cancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            saveBtn.addEventListener('click', () => {
+                const importId = modal.dataset.editingId;
+                const newDate = document.getElementById('modal-import-date').value;
+                const newNote = document.getElementById('modal-import-note').value.trim();
+                const itemList = document.getElementById('modal-item-list');
+                
+                let newItems = [];
+                let hasError = false;
+
+                // Lấy dữ liệu mới từ các input trong modal
+                itemList.querySelectorAll('div').forEach(itemDiv => {
+                    const priceInput = itemDiv.querySelector('input[data-field="price"]');
+                    const qtyInput = itemDiv.querySelector('input[data-field="qty"]');
+                    const index = parseInt(priceInput.dataset.index);
+                    
+                    const originalItem = getFromStorage(IMPORTS_KEY, []).find(imp => imp.id === importId).items[index];
+                    
+                    const newPrice = parseFloat(priceInput.value);
+                    const newQty = parseInt(qtyInput.value);
+
+                    if (newPrice <= 0 || newQty <= 0) {
+                        hasError = true;
+                    }
+
+                    newItems.push({
+                        ...originalItem,
+                        importPrice: newPrice,
+                        qty: newQty
+                    });
+                });
+
+                if (hasError) {
+                     alert("Giá nhập và Số lượng phải là số dương!");
+                     return;
+                }
+                
+                // Gọi hàm cập nhật từ admin.js
+                window.updateImport(importId, newDate, newNote, newItems);
+                
+                modal.style.display = 'none';
+                loadImportTable(); // Cập nhật lại bảng
+            });
+            
+             // Đóng modal khi click ra ngoài
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
     </script>
 </body>
 </html>

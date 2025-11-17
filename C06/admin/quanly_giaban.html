@@ -6,40 +6,32 @@
     <title>Quản lý Giá bán - Admin WatchTime</title>
     <link rel="stylesheet" href="../css/admin.css">
     <style>
-        .admin-table { width: 100%; border-collapse: collapse; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; margin-bottom: 2rem; }
+        .admin-table { width: 100%; border-collapse: collapse; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
         .admin-table th, .admin-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
         .admin-table th { background-color: #f7fafc; font-weight: 600; color: #4a5568; text-transform: uppercase; font-size: 0.85rem; }
-        .admin-form { background-color: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .admin-table tr:hover { background-color: #fdfdfd; }
+        .admin-table td:nth-child(4) { width: 150px; } /* Cột % Lợi nhuận */
+        .admin-table td input[type="number"] { width: 80px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; text-align: right; margin-right: 5px; }
+        .admin-table td .btn-save-price { background-color: #10b981; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; border: none; font-weight: 600; font-size: 0.8rem; }
+        .admin-table td .btn-save-price:hover { background-color: #059669; }
         
-        /* CẬP NHẬT: CSS cho form lợi nhuận */
-        .form-group-inline {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .form-group-inline label {
-            font-weight: 600;
-            color: #4b5563;
-            flex: 1;
-        }
-        .form-group-inline input {
-            width: 120px; /* Độ rộng cố định cho input */
-            padding: 0.5rem 0.75rem;
-            font-size: 1rem;
-            border: 1px solid #dddfe2;
-            border-radius: 6px;
-            box-sizing: border-box;
-            text-align: right;
-        }
+        .admin-table td .text-cost { color: #dc2626; font-weight: bold; }
+        .admin-table td .text-profit-pct { color: #16a34a; font-weight: bold; }
+        .admin-table td .text-sale-price { color: #3b82f6; font-weight: bold; }
+        .admin-table td .text-error { color: #ef4444; font-size: 0.8rem; }
 
-        .btn-submit { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 700; color: #ffffff; background-color: #16a34a; border: none; border-radius: 6px; cursor: pointer; }
-        .text-cost { color: #b91c1c; font-weight: 500; }
-        .text-profit { color: #16a34a; font-weight: 500; }
-        .text-final-price { color: #1d4ed8; font-weight: bold; }
+        .search-bar { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            padding: 1.5rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .search-bar input { flex-grow: 1; padding: 10px; border: 1px solid #dddfe2; border-radius: 6px; }
+        .search-bar button { background-color: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        
     </style>
 </head>
 <body>
@@ -50,13 +42,8 @@
             <nav class="admin-nav">
                 <a href="dashboard.html">Bảng điều khiển</a>
                 <a href="quanly_khachhang.html">Quản lý Người dùng</a>
-                <a href="quanly_loaisp.html">Quản lý danh mục sản phẩm</a>
-                <a href="quanly_sanpham.html">Quản lý Sản phẩm</a>
                 <a href="quanly_nhaphang.html">Quản lý Nhập hàng</a>
                 <a href="quanly_giaban.html" class="active">Quản lý Giá bán</a>
-                <a href="quanly_donhang.html">Quản lý Đơn hàng</a>
-                <a href="quanly_tonkho.html">Quản lý Tồn kho</a>
-                
                 <a href="#" id="admin-logout-btn" class="logout">Đăng xuất</a>
             </nav>
         </aside>
@@ -64,33 +51,29 @@
         <main class="admin-main">
             <button id="admin-menu-btn" class="admin-menu-btn">☰</button>
             <h2>Quản lý Giá bán</h2>
-
-            <form id="profit-form" class="admin-form">
-                <h3 class="text-xl font-bold mb-4">Cài đặt Tỉ lệ Lợi nhuận (Theo Loại SP)</h3>
-                
-                <div id="category-profit-list" class="mb-4">
-                    <p>Đang tải danh sách loại sản phẩm...</p>
-                </div>
-                
-                <p class="text-sm text-gray-500 mt-1 mb-4">Giá Bán (đề xuất) = Giá Vốn * (1 + % Lợi nhuận / 100).<br>Nếu loại SP không có % lợi nhuận, hệ thống sẽ dùng 50% làm mặc định.</p>
-                
-                <button type="submit" class="btn-submit">Lưu Cài đặt</button>
-            </form>
             
-            <h3 class="text-xl font-bold mt-8 mb-4">Tra cứu Giá vốn & Giá bán</h3>
+            <p class="mb-4 text-gray-600">Sửa **Tỉ lệ Lợi nhuận (%)** và lưu. Giá bán sẽ được tính lại tự động dựa trên Giá vốn nhập hàng gần nhất.</p>
+
+            <div class="search-bar">
+                <input type="text" id="price-search-input" placeholder="Tìm kiếm sản phẩm theo tên hoặc mã hàng...">
+                <button id="btn-search-price">Tra cứu</button>
+            </div>
+
             <div class="table-container">
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Sản phẩm</th>
-                            <th>Giá Vốn (cuối)</th>
-                            <th>% Lợi nhuận (đang áp dụng)</th>
-                            <th>Giá Bán (đề xuất)</th>
-                            <th>Giá Bán (hiện tại)</th>
+                            <th>Mã hàng</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Giá vốn gần nhất</th>
+                            <th>Tỉ lệ Lợi nhuận (%)</th>
+                            <th>Giá bán (VNĐ)</th>
+                            <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody id="price-table-body">
-                        </tbody>
+                        <tr><td colspan="6" style="text-align: center;">Đang tải dữ liệu...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </main>
@@ -98,14 +81,198 @@
 
     <script src="../js/admin.js"></script>
     <script>
+        // Lưu trữ danh sách sản phẩm đã tính toán
+        let calculatedProducts = []; 
+
         document.addEventListener("DOMContentLoaded", () => {
             checkAdminLogin();
             attachLogoutEvent();
-            loadPriceTable();
-            // CẬP NHẬT: Đổi tên hàm
-            loadAndAttachProfitForm(); 
             attachMobileMenuEvents();
+            
+            loadPriceTable();
+            attachPriceTableEvents();
+            attachPriceSearchEvent();
         });
+        
+        // ======================================================
+        // CÁC HÀM RIÊNG CỦA TRANG QUẢN LÝ GIÁ BÁN
+        // ======================================================
+
+        /**
+         * Hàm tải dữ liệu (sản phẩm, giá vốn, margin) và tính toán giá bán
+         */
+        function calculateProductPrices(products) {
+            // Lấy tất cả phiếu nhập đã hoàn thành
+            const allImports = getFromStorage(IMPORTS_KEY, []).filter(i => i.status === 'Đã hoàn thành'); 
+
+            return products.map(prod => {
+                const id = prod.id;
+                
+                // 1. Tìm Giá vốn gần nhất (Giá nhập)
+                let lastImportPrice = 0;
+                let latestTimestamp = 0;
+
+                allImports.forEach(imp => {
+                    imp.items.forEach(item => {
+                        if (item.productId === id) {
+                            if (item.timestamp > latestTimestamp) {
+                                latestTimestamp = item.timestamp;
+                                lastImportPrice = item.importPrice;
+                            }
+                        }
+                    });
+                });
+                
+                // Mặc định margin là 50% nếu chưa có, hoặc sử dụng margin đã lưu (nếu có)
+                const marginPct = prod.margin || 50; 
+                
+                // 2. Tính toán Giá bán cuối cùng
+                let finalSalePrice = 0;
+                if (lastImportPrice > 0) {
+                    // Giá bán = Giá vốn * (1 + % Margin)
+                    finalSalePrice = Math.ceil(lastImportPrice * (1 + (marginPct / 100)) / 1000) * 1000;
+                } else {
+                    // Nếu không có giá vốn (chưa nhập hàng), sử dụng giá bán cũ (từ products.js)
+                    finalSalePrice = prod.price || 0;
+                }
+                
+                return {
+                    ...prod,
+                    costPrice: lastImportPrice, 
+                    margin: marginPct,
+                    salePrice: finalSalePrice,
+                    status: lastImportPrice > 0 ? 'Có giá vốn' : 'Chưa nhập hàng'
+                };
+            });
+        }
+
+        function loadPriceTable(searchTerm = "") {
+            const tableBody = document.getElementById("price-table-body");
+            if (!tableBody) return; 
+
+            // 1. Lấy danh sách sản phẩm (sử dụng hàm từ admin.js để đảm bảo đồng bộ)
+            const allProducts = getFromStorage(PRODUCTS_KEY, []);
+            
+            // 2. Tính toán giá vốn, margin, giá bán
+            calculatedProducts = calculateProductPrices(allProducts);
+            
+            // 3. Lọc theo tìm kiếm
+            let displayProducts = calculatedProducts;
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                displayProducts = calculatedProducts.filter(p => 
+                    p.id.toLowerCase().includes(term) || p.name.toLowerCase().includes(term)
+                );
+            }
+
+            if (displayProducts.length === 0) { 
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Không tìm thấy sản phẩm nào ${searchTerm ? 'khớp với tìm kiếm' : ''}.</td></tr>`; 
+                return; 
+            }
+            
+            tableBody.innerHTML = "";
+            displayProducts.forEach(prod => {
+                const tr = document.createElement("tr");
+                
+                // Định dạng giá vốn
+                const costPriceDisplay = prod.costPrice > 0 
+                    ? `<span class="text-cost">${formatVND(prod.costPrice)}</span>`
+                    : `<span class="text-error">Chưa có</span>`;
+
+                // Định dạng giá bán
+                const salePriceDisplay = prod.costPrice > 0 
+                    ? `<span class="text-sale-price">${formatVND(prod.salePrice)}</span>`
+                    : `<span class="text-warning">${formatVND(prod.price)} (Giá mặc định)</span>`;
+
+
+                tr.innerHTML = `
+                    <td>${prod.id}</td>
+                    <td>${prod.name}</td>
+                    <td>${costPriceDisplay}</td>
+                    <td>
+                        <input type="number" data-id="${prod.id}" class="input-margin" value="${prod.margin}" min="0" max="1000"> %
+                    </td>
+                    <td id="sale-price-${prod.id}">${salePriceDisplay}</td>
+                    <td>
+                        <button class="btn-action btn-save-price" data-id="${prod.id}">Lưu</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+        
+        function attachPriceSearchEvent() {
+            const searchInput = document.getElementById('price-search-input');
+            const searchBtn = document.getElementById('btn-search-price');
+            
+            if (searchBtn) {
+                searchBtn.addEventListener('click', () => {
+                    loadPriceTable(searchInput.value.trim());
+                });
+            }
+            if (searchInput) {
+                 searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        loadPriceTable(searchInput.value.trim());
+                    }
+                });
+            }
+        }
+
+        function attachPriceTableEvents() {
+            const tableBody = document.getElementById("price-table-body");
+            if (!tableBody) return;
+
+            // Sự kiện thay đổi Margin (Tính toán lại Giá bán ngay lập tức)
+            tableBody.addEventListener('input', (e) => {
+                if (e.target.classList.contains('input-margin')) {
+                    const productId = e.target.dataset.id;
+                    const newMargin = parseFloat(e.target.value);
+
+                    // Tìm sản phẩm đang được chỉnh sửa
+                    const product = calculatedProducts.find(p => p.id === productId);
+                    
+                    if (!product || isNaN(newMargin) || newMargin < 0) return;
+                    
+                    // Tính lại giá bán
+                    let newSalePrice = 0;
+                    if (product.costPrice > 0) {
+                        newSalePrice = Math.ceil(product.costPrice * (1 + (newMargin / 100)) / 1000) * 1000;
+                    } else {
+                        // Nếu không có giá vốn, không tính lại, chỉ hiển thị cảnh báo
+                         newSalePrice = product.price; 
+                    }
+                    
+                    // Cập nhật hiển thị Giá bán
+                    const salePriceEl = document.getElementById(`sale-price-${productId}`);
+                    if (salePriceEl) {
+                        if (product.costPrice > 0) {
+                             salePriceEl.innerHTML = `<span class="text-sale-price">${formatVND(newSalePrice)}</span>`;
+                        } else {
+                            salePriceEl.innerHTML = `<span class="text-warning">${formatVND(newSalePrice)} (Giá mặc định)</span>`;
+                        }
+                    }
+                }
+            });
+
+            // Sự kiện Lưu Margin
+            tableBody.addEventListener('click', (e) => {
+                if (e.target.classList.contains('btn-save-price')) {
+                    const productId = e.target.dataset.id;
+                    const marginInput = tableBody.querySelector(`.input-margin[data-id="${productId}"]`);
+                    const newMargin = parseFloat(marginInput.value);
+
+                    if (isNaN(newMargin) || newMargin < 0 || newMargin > 1000) {
+                        alert("Tỉ lệ lợi nhuận không hợp lệ (0% - 1000%).");
+                        return;
+                    }
+                    
+                    // Gọi hàm lưu từ admin.js
+                    window.updateProductMarginAndPrice(productId, newMargin);
+                    loadPriceTable(document.getElementById('price-search-input').value.trim()); // Load lại bảng để cập nhật Giá bán chính thức
+                }
+            });
+        }
     </script>
 </body>
 </html>
