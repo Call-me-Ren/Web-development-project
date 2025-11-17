@@ -263,6 +263,7 @@
         // Cập nhật biến userData và localStorage
         userData = newUserData;
         localStorage.setItem(userData.email, JSON.stringify(userData));
+        localStorage.setItem("currentUser", JSON.stringify(newUserData));
         
         // Cập nhật giao diện
         renderUserInfo();
