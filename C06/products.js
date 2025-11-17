@@ -304,6 +304,29 @@ function initProducts() {
             const parsed = JSON.parse(stored);
             // Trả về dữ liệu nếu tồn tại và hợp lệ (có ít nhất 1 sản phẩm)
             if (Array.isArray(parsed) && parsed.length > 0) {
+                
+                // === BỔ SUNG: KIỂM TRA TÍNH NHẤT QUÁN CỦA CÁC TRƯỜNG ===
+                // Nếu data có sẵn nhưng thiếu trường, dùng default data để bổ sung
+                const hasMissingField = parsed.some(p => typeof p.margin === 'undefined' || typeof p.status === 'undefined' || typeof p.unit === 'undefined' || typeof p.specs === 'undefined');
+                
+                if(hasMissingField) {
+                    console.warn("Dữ liệu sản phẩm cũ thiếu trường (margin/status/unit/specs). Đang trộn/cập nhật data.");
+                    const mergedData = parsed.map(p => {
+                        const defaultP = defaultData.find(d => d.id === p.id);
+                        return {
+                            ...p,
+                            // Bổ sung các trường cần thiết nếu bị thiếu
+                            margin: p.margin || (defaultP ? defaultP.margin : 50),
+                            status: p.status || (defaultP ? defaultP.status : 'selling'),
+                            unit: p.unit || (defaultP ? defaultP.unit : 'Chiếc'),
+                            specs: p.specs || (defaultP ? defaultP.specs : [])
+                        };
+                    });
+                    // Lưu lại bản đã bổ sung
+                    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(mergedData));
+                    return mergedData;
+                }
+                
                 return parsed;
             }
         } catch (e) {

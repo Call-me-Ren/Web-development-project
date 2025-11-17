@@ -12,11 +12,17 @@ function attachMobileMenuEvents() {
             main.classList.add("dimmed"); // Thêm hiệu ứng mờ cho nội dung
         });
 
-        // Đóng sidebar (bằng nút X)
+        // Đóng sidebar (bằng nút X hoặc click vào khu vực dimmed)
         closeBtn.addEventListener("click", (e) => {
             e.preventDefault();
             sidebar.classList.remove("show");
             main.classList.remove("dimmed");
+        });
+        main.addEventListener("click", () => {
+            if (sidebar.classList.contains("show")) {
+                sidebar.classList.remove("show");
+                main.classList.remove("dimmed");
+            }
         });
     }
 }
@@ -25,21 +31,20 @@ function attachMobileMenuEvents() {
 
 // js/admin.js
 
-/* --- CẤU HÌNH KEYS (CHỈ GIỮ KEY LIÊN QUAN ĐẾN USER) --- */
-const PRODUCTS_KEY = 'watchtime_products'; // Key sản phẩm gốc
+/* --- CẤU HÌNH KEYS --- */
+const PRODUCTS_KEY = 'watchtime_products'; 
 const ORDERS_KEY = 'allOrders'; 
 const IMPORTS_KEY = 'watchtime_imports'; 
-const CATEGORY_KEY = 'watchtime_categories'; // Bổ sung key Category
+const CATEGORY_KEY = 'watchtime_categories'; 
 
 
 /* --- HÀM CHUNG --- */
 function checkAdminLogin() {
     const isAdminLoggedIn = sessionStorage.getItem("isAdminLoggedIn");
     if (isAdminLoggedIn !== "true") {
-        alert("Bạn phải đăng nhập với tư cách Admin để truy cập trang này!");
+        // alert("Bạn phải đăng nhập với tư cách Admin để truy cập trang này!");
         window.location.href = "index.html";
     }
-    // BƯỚC MỚI: Thêm lắng nghe storage để buộc logout khi bị khóa
     checkAndEnforceAdminLogout();
 }
 function attachLogoutEvent() {
@@ -49,13 +54,12 @@ function attachLogoutEvent() {
             e.preventDefault();
             if (confirm("Bạn có chắc muốn đăng xuất?")) {
                 sessionStorage.removeItem("isAdminLoggedIn");
-                sessionStorage.removeItem("admin_session_key"); // Xóa key session Admin
+                sessionStorage.removeItem("admin_session_key"); 
                 window.location.href = "index.html";
             }
         });
     }
 }
-// Giữ các hàm định dạng chung nếu cần
 function formatVND(n) { return Number(n).toLocaleString('vi-VN') + '₫'; }
 function formatDate(isoString) {
     if (!isoString) return 'Không rõ';
@@ -67,8 +71,7 @@ function formatDate(isoString) {
 function getFromStorage(key, defaultValue = []) {
     try {
         const data = localStorage.getItem(key);
-        if (data === null) {
-            // Loại bỏ tất cả logic khởi tạo mặc định cho các file khác
+        if (data === null || data === undefined) {
             saveToStorage(key, defaultValue);
             return defaultValue;
         }
@@ -81,11 +84,8 @@ function getFromStorage(key, defaultValue = []) {
 function saveToStorage(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
     
-    // BỔ SUNG: Nếu lưu PRODUCTS_KEY hoặc CATEGORY_KEY hoặc ORDERS_KEY
-    // ta cần kích hoạt lại lắng nghe để client cập nhật giao diện
-    if (key === PRODUCTS_KEY || key === CATEGORY_KEY || key === ORDERS_KEY) {
-        // Cần kích hoạt sự kiện 'storage' ở các tab khác
-        // Bằng cách đơn giản nhất là ghi đè lại chính key đó (dù giá trị đã giống)
+    // Kích hoạt sự kiện 'storage' ở các tab khác
+    if (key === PRODUCTS_KEY || key === CATEGORY_KEY || key === ORDERS_KEY || key === IMPORTS_KEY) {
         localStorage.setItem(key, JSON.stringify(data));
     }
 }
@@ -95,7 +95,7 @@ function checkAndEnforceAdminLogout() {
     const adminKey = 'quanly1_user'; 
     const adminData = getFromStorage(adminKey, null);
     
-    if (adminData && adminData.isLocked === true) {
+    if (adminData && adminData.isLocked === true && sessionStorage.getItem("isAdminLoggedIn") === "true") {
         sessionStorage.removeItem("isAdminLoggedIn");
         sessionStorage.removeItem("admin_session_key");
         alert("Tài khoản quản trị đã bị khóa! Buộc đăng xuất.");
@@ -103,40 +103,63 @@ function checkAndEnforceAdminLogout() {
     }
 }
 
+/* ================================================================
+  PHẦN 0: KHỞI TẠO DỮ LIỆU MẶC ĐỊNH CHO ADMIN (QUAN TRỌNG)
+================================================================
+*/
+(function initializeDefaultAdminData() {
+    // Khởi tạo tài khoản Admin/User
+    const defaultUsers = [
+        { key: 'quanly1_user', username: 'quanly1', password: 'abcd1234', firstname: 'Quản', lastname: 'Lý', isLocked: false, isAdmin: true },
+        // User 1 (Hoạt động)
+        { key: 'khachhang1', username: 'khachhang1', password: '123456', firstname: 'Khách', lastname: 'Hàng 1', isLocked: false, isAdmin: false },
+        // User 2 (Hoạt động)
+        { key: 'khachhang2', username: 'khachhang2', password: '123456', firstname: 'Khách', lastname: 'Hàng 2', isLocked: false, isAdmin: false },
+        // User 3 (Đã khóa)
+        { key: 'khachhang3', username: 'khachhang3', password: '123456', firstname: 'Khách', lastname: 'Hàng 3', isLocked: true, isAdmin: false },
+        // User 4 (Hoạt động)
+        { key: 'khachhang4', username: 'khachhang4', password: '123456', firstname: 'Khách', lastname: 'Hàng 4', isLocked: false, isAdmin: false },
+    ];
+    defaultUsers.forEach(user => {
+        if (!localStorage.getItem(user.key)) {
+            // SỬA: Đảm bảo có đủ trường cho việc hiển thị thông tin cá nhân và kiểm tra đăng nhập
+            localStorage.setItem(user.key, JSON.stringify({...user, email: user.username, number: '0123456789', address: '123 Nguyễn Trãi, TP.HCM', gender: 'Nam'}));
+        }
+    });
+
+    // Khởi tạo Category mặc định (Nếu file products.js/categories.js chưa chạy)
+    if (!localStorage.getItem(CATEGORY_KEY) || getFromStorage(CATEGORY_KEY, []).length === 0) {
+        const categories = [
+            { id: 'nam', name: 'Đồng hồ Nam', margin: 50 }, 
+            { id: 'nu', name: 'Đồng hồ Nữ', margin: 55 }, 
+            { id: 'doi', name: 'Đồng hồ Đôi', margin: 50 }
+        ];
+        saveToStorage(CATEGORY_KEY, categories);
+    }
+    
+    // Khởi tạo Đơn hàng mẫu (Vì products.js không làm)
+    if (!localStorage.getItem(ORDERS_KEY) || getFromStorage(ORDERS_KEY, []).length === 0) {
+        const mockOrder = {
+            id: 'ORD_1700000001',
+            userEmail: 'khachhang1',
+            customer: { name: 'Khách Hàng 1', phone: '0123456789', address: '123 Nguyễn Trãi, TP.HCM' },
+            // Dùng ID sản phẩm có tồn kho mẫu (sp_ben10)
+            items: [
+                { id: 'sp_ben10', name: 'BEN 10 OMNITRIX', price: 999999999, qty: 1 },
+            ],
+            total: 999999999,
+            status: 'Mới đặt', 
+            createdAt: new Date('2025-01-15').toISOString()
+        };
+        saveToStorage(ORDERS_KEY, [mockOrder]);
+    }
+})();
+
 
 /* ================================================================
   PHẦN 1: QUẢN LÝ NGƯỜI DÙNG (GIỮ LẠI TOÀN BỘ LOGIC)
 ================================================================
 */
-(function initializeQuanLyUser() {
-    const defaultUsers = [
-        { key: 'quanly1_user', username: 'quanly1', password: 'abcd1234', firstname: 'Quản', lastname: 'Lý', isLocked: false, number: '0123456789', address: 'Hà Nội', isAdmin: true },
-        { key: 'khachhang1', username: 'khachhang1', password: '123456', firstname: 'Khách', lastname: 'Hàng 1', isLocked: false, number: 'Chưa có', address: 'Chưa có', isAdmin: false },
-        { key: 'khachhang2', username: 'khachhang2', password: '123456', firstname: 'Khách', lastname: 'Hàng 2 (Khóa)', isLocked: true, number: 'Chưa có', address: 'Chưa có', isAdmin: false },
-        { key: 'khachhang3', username: 'khachhang3', password: '123456', firstname: 'Khách', lastname: 'Hàng 3', isLocked: false, number: 'Chưa có', address: 'Chưa có', isAdmin: false }
-    ];
-
-    defaultUsers.forEach(user => {
-        if (!localStorage.getItem(user.key)) {
-            const userObj = {
-                username: user.username,
-                password: user.password,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                isLocked: user.isLocked,
-                number: user.number,
-                address: user.address,
-                email: user.username.includes('@') ? user.username : undefined,
-                isAdmin: user.isAdmin
-            };
-            const storageKey = user.key; 
-            localStorage.setItem(storageKey, JSON.stringify(userObj));
-            console.log(`Đã thêm tài khoản mẫu: ${user.username}`);
-        }
-    });
-
-})();
-
 function loadUserTable() {
     const tableBody = document.getElementById("user-table-body");
     if (!tableBody) return; 
@@ -145,19 +168,21 @@ function loadUserTable() {
     
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (localStorage.getItem(key) && localStorage.getItem(key).includes('password')) { 
+        // Chỉ quét các key có vẻ là tài khoản user
+        if (localStorage.getItem(key) && localStorage.getItem(key).includes('password') && localStorage.getItem(key).includes('username')) { 
             try {
                 const user = JSON.parse(localStorage.getItem(key));
                 if (user.password) {
                     const username = user.username || key; 
-                    const isAdmin = user.isAdmin || key.endsWith('_admin') || key === 'quanly1_user';
+                    const isAdmin = user.isAdmin || key === 'quanly1_user' || key.endsWith('_admin');
                     users.push({ ...user, username: username, storageKey: key, password: user.password, isAdmin: isAdmin });
                 }
             } catch (e) { console.warn(`Không thể parse user data cho key: ${key}`); }
         }
     }
     
-    users = users.filter(u => u.storageKey !== 'admin'); 
+    // SỬA: Loại bỏ các key không phải là user chính thức
+    users = users.filter(u => u.storageKey !== 'admin' && u.storageKey !== 'currentUser' && u.storageKey !== 'isLoggedIn'); 
 
     if (users.length === 0) { tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Không tìm thấy người dùng nào.</td></tr>'; return; }
     
@@ -238,8 +263,8 @@ function attachAddUserFormEvent() {
         const password = document.getElementById("new-user-pass").value.trim();
         const accountType = document.querySelector('input[name="account-type"]:checked').value;
         
-        if (username.includes('@')) {
-            alert("Tên tài khoản không được chứa ký tự '@'!");
+        if (username.includes('@') || username.includes(' ')) {
+            alert("Tên tài khoản không được chứa ký tự '@' hoặc khoảng trắng!");
             return;
         }
 
@@ -257,10 +282,13 @@ function attachAddUserFormEvent() {
         const newUser = {
             username: username, 
             password: password,
+            // SỬA: Đảm bảo có trường email để khớp với logic check user
+            email: username, 
             firstname: accountType === 'admin' ? 'Quản' : 'Người dùng',
             lastname: accountType === 'admin' ? 'Lý' : 'mới',
             number: 'Chưa có', 
             address: 'Chưa có', 
+            gender: 'Chưa rõ',
             isLocked: false,
             isAdmin: accountType === 'admin'
         };
@@ -301,7 +329,7 @@ window.updateImport = function(importId, newDate, newNote, newItems) {
 };
 
 /**
- * Hoàn thành Phiếu nhập (Chỉ trạng thái và KICK LẮNG NGHE cho Client)
+ * Hoàn thành Phiếu nhập
  */
 window.completeImport = function(importId) {
     const allImports = getFromStorage(IMPORTS_KEY, []);
@@ -320,19 +348,14 @@ window.completeImport = function(importId) {
     allImports[index].status = 'Đã hoàn thành';
     saveToStorage(IMPORTS_KEY, allImports);
     
-    // YÊU CẦU: Cập nhật tồn kho (được xử lý gián tiếp)
-    // Client-side (Giaodien.js) có listener cho IMPORTS_KEY, khi key này thay đổi 
-    // thì hàm calculateAllInventory và runFullProductUpdate sẽ tự động chạy
-    // để tính lại tồn kho (Nhập - Xuất) và cập nhật lưới sản phẩm.
-    
-    // KICK: Gửi tín hiệu thay đổi IMPORTS_KEY (thay đổi giá trị)
+    // KICK: Gửi tín hiệu thay đổi IMPORTS_KEY 
     localStorage.setItem(IMPORTS_KEY, JSON.stringify(allImports));
     
     alert(`Đã hoàn thành phiếu nhập ${importId}! Tồn kho đã được cập nhật.`);
 };
 
 /* ================================================================
-  PHẦN 3: QUẢN LÝ GIÁ BÁN (LOGIC MỚI)
+  PHẦN 3: QUẢN LÝ GIÁ BÁN
 ================================================================
 */
 
@@ -348,17 +371,9 @@ window.updateProductMarginAndPrice = function(productId, newMargin) {
         return;
     }
     
-    // Lấy thông tin giá vốn và tính lại Giá bán
-    // Logic tính giá vốn/giá bán nên được đặt trong hàm calculateProductPrices ở file quanly_giaban.html
-    // Tuy nhiên, ta cần lưu margin vào đây để giá bán được tính lại chính xác.
-
     allProducts[index].margin = newMargin;
 
-    // --- Tính lại giá bán (Tạm thời) ---
-    // Vì không có hàm tính giá vốn ở đây, ta chỉ cập nhật margin và kích hoạt lắng nghe
-    // (Lắng nghe của Giaodien.js sẽ tính lại Giá bán chính xác)
-    
-    // Để Giá bán được hiển thị đúng trong Bảng giá, ta buộc phải tính lại nó ở đây:
+    // --- Tính lại giá bán (để lưu vào products.js) ---
     const allImports = getFromStorage(IMPORTS_KEY, []).filter(i => i.status === 'Đã hoàn thành'); 
     
     let lastImportPrice = 0;
@@ -376,7 +391,7 @@ window.updateProductMarginAndPrice = function(productId, newMargin) {
 
     let newSalePrice = 0;
     if (lastImportPrice > 0) {
-        // Giá bán = Giá vốn * (1 + % Margin)
+        // Giá bán = Giá vốn * (1 + % Margin), làm tròn lên hàng nghìn
         newSalePrice = Math.ceil(lastImportPrice * (1 + (newMargin / 100)) / 1000) * 1000;
     } else {
         // Nếu chưa có giá vốn, dùng giá bán mặc định của sản phẩm
@@ -395,7 +410,7 @@ window.updateProductMarginAndPrice = function(productId, newMargin) {
 };
 
 /* ================================================================
-  PHẦN 4: QUẢN LÝ ĐƠN HÀNG (LOGIC MỚI)
+  PHẦN 4: QUẢN LÝ ĐƠN HÀNG
 ================================================================
 */
 
@@ -424,9 +439,9 @@ window.updateOrderStatus = function(orderId, newStatus) {
     
     // Nếu chuyển sang trạng thái "Đã giao", cần kích hoạt cập nhật tồn kho ở Client
     if (newStatus === 'Đã giao') {
-        // KICK: Gửi tín hiệu thay đổi ORDERS_KEY để Giaodien.js tự động cập nhật tồn kho
+        // KICK: Gửi tín hiệu thay đổi ORDERS_KEY 
         localStorage.setItem(ORDERS_KEY, JSON.stringify(allOrders));
     }
     
     // Lưu ý: Cập nhật lại giao diện bảng sẽ được thực hiện ở file HTML gọi hàm này.
-};a
+};

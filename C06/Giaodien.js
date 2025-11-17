@@ -52,7 +52,6 @@ function createProductCard(product) {
         opacityClass = "grayscale opacity-80"; // Giữ lại hiệu ứng mờ
         
         // KHÔNG GÁN pointer-events-none cho thẻ <a> nữa!
-        // Giữ linkClasses rỗng hoặc thêm class phù hợp.
         linkClasses = ''; 
     }
 
@@ -298,8 +297,6 @@ function attachClickEventToGrid(gridElement) {
         }
     });
 }
-// Cần sửa lại hàm initializeAddToCart cũ để nó dùng logic chung này, 
-// hoặc đơn giản là trong initializeAddToCart cũ, gọi attachClickEventToGrid(document.getElementById("product-grid"));
 
 /**
  * Gắn sự kiện cho Tìm kiếm (ĐÃ SỬA: ĐỒNG BỘ HEADER VÀ BODY VÀ GỌI HÀM LỌC CHO BODY)
@@ -307,17 +304,34 @@ function attachClickEventToGrid(gridElement) {
 function initializeSearch() {
     const headerSearch = document.getElementById('search');      // Input trên Header
     const bodySearch = document.getElementById('search-input');  // Input bộ lọc giữa trang (chỉ có ở sanpham.html)
+    
+    // Tìm thẻ <a> chứa icon search trên Header (chỉ có ở index/about/contact)
+    const headerSearchIcon = document.querySelector('header nav .search a i[data-lucide="search"]')?.closest('a');
+
+    // Nút tìm kiếm trên Header (icon) - KHẮC PHỤC LỖI
+    if (headerSearchIcon) {
+        headerSearchIcon.addEventListener('click', (e) => {
+            // Nếu không ở trang sản phẩm, chặn mặc định và chuyển hướng kèm tham số
+             if (!bodySearch) {
+                e.preventDefault();
+                const searchTerm = headerSearch ? headerSearch.value.trim() : "";
+                window.location.href = `sanpham.html?search=${searchTerm}`; 
+             }
+             // Nếu đang ở trang sản phẩm, click vào icon sẽ kích hoạt lọc
+             else {
+                 e.preventDefault(); // Chặn hành vi mặc định của thẻ <a>
+                 applyFiltersAndSearch();
+             }
+        });
+    }
 
     if (headerSearch) {
         // Sự kiện 1: Khi gõ chữ vào header
         headerSearch.addEventListener('input', (e) => {
             const val = e.target.value;
 
-            // 1. Nếu đang ở trang sản phẩm (có ô tìm kiếm body), copy giá trị xuống dưới
             if (bodySearch) {
                 bodySearch.value = val;
-                
-                // 2. Gọi hàm lọc ngay lập tức
                 if (typeof applyFiltersAndSearch === "function") {
                     applyFiltersAndSearch();
                 }
@@ -328,33 +342,29 @@ function initializeSearch() {
         headerSearch.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                // Nếu đang ở trang khác, chuyển hướng sang trang sản phẩm
                 if (!bodySearch) {
-                    // SỬA LỖI: Chuyển hướng sang trang sản phẩm với tham số tìm kiếm
+                    // Chuyển hướng sang trang sản phẩm
                     window.location.href = `sanpham.html?search=${headerSearch.value.trim()}`; 
                 } else {
-                    // Nếu đang ở trang sản phẩm, focus xuống ô search dưới
                     bodySearch.focus();
                 }
             }
         });
     }
     
-    // === BỔ SUNG QUAN TRỌNG: Gắn sự kiện cho ô search thân trang (bodySearch) ===
+    // Gắn sự kiện cho ô search thân trang (bodySearch)
     if (bodySearch) {
         bodySearch.addEventListener('input', (e) => {
-            // Đồng bộ: Copy giá trị lên header
             if(headerSearch) {
                 headerSearch.value = e.target.value;
             }
-            // Gọi hàm lọc ngay lập tức khi gõ vào ô search thân trang
             if (typeof applyFiltersAndSearch === "function") {
                 applyFiltersAndSearch();
             }
         });
         
         // Bổ sung: Gắn sự kiện cho nút tìm kiếm trên thân trang (nếu có)
-        const searchBtn = document.querySelector('.search button[data-lucide="search"]')?.closest('a');
+        const searchBtn = document.querySelector('#search-input')?.closest('.relative')?.querySelector('i[data-lucide="search"]')?.closest('span');
         if(searchBtn) {
             searchBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -819,8 +829,6 @@ function scrollToProductTop() {
 
     if (targetElement) {
         // 2. Lấy chiều cao của header (nếu có)
-        // Chúng ta giả định header của bạn là <header>
-        // Nếu nó là một ID khác (ví dụ: #main-nav), hãy thay 'header' bên dưới
         const header = document.querySelector('header'); 
         const headerHeight = header ? header.offsetHeight : 0;
 
@@ -884,9 +892,8 @@ function initializeLoginUI() {
             // 3. Hiển thị tên chào mừng (LOGIC ĐÃ SỬA TẠI ĐÂY)
             let displayName = "Khách hàng";
             if (currentUser.lastname && currentUser.firstname) {
-                // Hiển thị Họ trước, Tên sau (Ví dụ: Nguyễn Văn A)
-                // Giả định: currentUser.firstname = Họ, currentUser.lastname = Tên
-                displayName = `${currentUser.firstname} ${currentUser.lastname}`; 
+                // KHẮC PHỤC LỖI: Hiển thị Tên trước, Họ sau (Ví dụ: A Nguyễn Văn)
+                displayName = `${currentUser.lastname} ${currentUser.firstname}`; 
             } else if (currentUser.lastname) {
                 displayName = currentUser.lastname; // Nếu chỉ có Tên
             } else if (currentUser.firstname) {
@@ -990,11 +997,7 @@ function initializeMobileMenu() {
 
     // Đóng menu khi nhấp vào một link
     mobileMenu.querySelectorAll("a").forEach(link => {
-        // Không đóng menu nếu là link đăng xuất/thông tin (vì chúng không cuộn trang)
-        if(link.getAttribute('href') === '#' || link.getAttribute('href') === 'xuathongtin.html' || link.getAttribute('href') === 'lichsu.html') {
-            return;
-        }
-        
+        // KHẮC PHỤC LỖI: Xóa điều kiện chặn, đảm bảo menu luôn đóng sau khi click vào bất kỳ link nào
         link.addEventListener("click", () => {
             mobileMenu.classList.add("hidden");
         });
