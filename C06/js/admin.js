@@ -353,7 +353,7 @@ function attachAddUserFormEvent() {
 
 
 /* ================================================================
-  PHẦN 2: QUẢN LÝ LOẠI SẢN PHẨM (Cập nhật)
+  PHẦN 2: Quản lý danh mục sản phẩm  (Cập nhật)
 ================================================================
 */
 function getCategories() { return getFromStorage(CATEGORY_KEY); }
