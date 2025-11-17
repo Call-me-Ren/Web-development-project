@@ -26,6 +26,7 @@ function createProductCard(product) {
     let overlayHtml = '';
     let opacityClass = '';
     let clickEventClass = ''; 
+    let linkClasses = ''; // Thêm biến mới cho class của thẻ <a>
 
     if (stock > 0) {
         // CÒN HÀNG
@@ -44,6 +45,8 @@ function createProductCard(product) {
                 <a href="chitiet.html?id=${product.id}" class="block w-full bg-white text-indigo-600 text-center py-3 font-bold shadow-lg rounded-lg hover:bg-gray-50">Xem chi tiết</a>
             </div>`;
             
+        linkClasses = 'hover:text-indigo-600 transition-colors'; // Cho phép hover khi còn hàng
+
     } else {
         // HẾT HÀNG
         actionHtml = `
@@ -58,15 +61,18 @@ function createProductCard(product) {
                 <span class="bg-gray-800 text-white font-bold px-4 py-2 rounded shadow-xl transform -rotate-12 uppercase tracking-wider text-sm">Hết hàng</span>
             </div>`;
         
-        opacityClass = "grayscale opacity-80 cursor-not-allowed";
-        clickEventClass = "pointer-events-none"; 
+        opacityClass = "grayscale opacity-80"; // Giữ lại hiệu ứng mờ
+        
+        // KHÔNG GÁN pointer-events-none cho thẻ <a> nữa!
+        // Giữ linkClasses rỗng hoặc thêm class phù hợp.
+        linkClasses = ''; 
     }
 
     return `
     <div class="product-card bg-white border border-gray-100 rounded-xl hover:shadow-xl transition-all duration-300 flex flex-col h-full group relative overflow-hidden" data-category="${product.category}" data-id="${product.id}">
         
         <div class="relative h-64 overflow-hidden bg-gray-50 ${opacityClass}">
-            <a href="chitiet.html?id=${product.id}" class="block h-full ${clickEventClass}">
+            <a href="chitiet.html?id=${product.id}" class="block h-full"> 
                 <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
             </a>
             ${overlayHtml}
@@ -74,8 +80,8 @@ function createProductCard(product) {
         
         <div class="p-4 flex flex-col flex-grow">
             <div class="text-xs text-gray-400 mb-1 uppercase tracking-wider font-semibold">${product.category}</div>
-            <h3 class="text-base font-bold text-gray-900 mb-2 line-clamp-1 hover:text-indigo-600 transition-colors">
-                <a href="chitiet.html?id=${product.id}" class="${clickEventClass}">${product.name}</a>
+            <h3 class="text-base font-bold text-gray-900 mb-2 line-clamp-1 ${linkClasses}">
+                <a href="chitiet.html?id=${product.id}">${product.name}</a> 
             </h3>
             
             ${description}
