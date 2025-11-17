@@ -159,12 +159,12 @@ function saveToStorage(key, data) {
 // THÊM: Tự động thêm tài khoản quanly1 và các tài khoản mẫu vào danh sách user
 (function initializeQuanLyUser() {
     const defaultUsers = [
-        // Tài khoản Quản lý (key được gán cứng để dễ phân biệt)
+        // Tài khoản Quản lý GỐC (key được gán cứng để dễ phân biệt)
         { key: 'quanly1_user', username: 'quanly1', password: 'abcd1234', firstname: 'Quản', lastname: 'Lý', isLocked: false, number: '0123456789', address: 'Hà Nội', isAdmin: true },
         
         // TÀI KHOẢN MẪU MỚI (Khóa/Không khóa)
         { key: 'khachhang1', username: 'khachhang1', password: '123456', firstname: 'Khách', lastname: 'Hàng 1', isLocked: false, number: 'Chưa có', address: 'Chưa có', isAdmin: false },
-        { key: 'khachhang2', username: 'khachhang2', password: '123456', firstname: 'Khách', lastname: 'Hàng 2 (Khóa)', isLocked: true, number: 'Chưa có', address: 'Chưa có', isAdmin: false },
+        { key: 'khachhang2', username: 'khachhang2', password: '123456', firstname: 'Khách', lastname: 'Hàng 2 ', isLocked: true, number: 'Chưa có', address: 'Chưa có', isAdmin: false },
         { key: 'khachhang3', username: 'khachhang3', password: '123456', firstname: 'Khách', lastname: 'Hàng 3', isLocked: true, number: 'Chưa có', address: 'Chưa có', isAdmin: false }
     ];
 
@@ -204,7 +204,6 @@ function loadUserTable() {
                 const user = JSON.parse(localStorage.getItem(key));
                 if (user.password) {
                     const username = user.username || key; 
-                    // Kiểm tra nếu key kết thúc bằng '_admin' HOẶC key là 'quanly1_user'
                     const isAdmin = user.isAdmin || key.endsWith('_admin') || key === 'quanly1_user';
                     users.push({ ...user, username: username, storageKey: key, password: user.password, isAdmin: isAdmin });
                 }
@@ -265,9 +264,37 @@ window.updateUserPassword = function(key, newPassword) {
 };
 
 function toggleUserLock(key) {
+     // BƯỚC SỬA: CHẶN KHÓA TÀI KHOẢN GỐC QUANLY1
+     if (key === 'quanly1_user') {
+        alert("Không thể khóa tài khoản Admin gốc (quanly1)!");
+        return;
+     }
+
      try {
         const userData = JSON.parse(localStorage.getItem(key));
-        if (userData) { userData.isLocked = !userData.isLocked; localStorage.setItem(key, JSON.stringify(userData)); alert(`Đã ${userData.isLocked ? 'khoá' : 'mở khoá'} tài khoản.`); loadUserTable(); }
+        if (userData) { 
+            const newLockedState = !userData.isLocked;
+            userData.isLocked = newLockedState; 
+            localStorage.setItem(key, JSON.stringify(userData)); 
+            
+            // BƯỚC SỬA: XÓA PHIÊN KHI BỊ KHÓA (Gửi tín hiệu qua localStorage)
+            if (newLockedState) {
+                // Sử dụng một cờ tạm để báo hiệu cho các tab khác
+                localStorage.setItem('session_lock_signal', key + Date.now()); 
+                // Tự động log out Admin nếu Admin đang khóa chính mình (trừ quanly1_user)
+                if (key === sessionStorage.getItem('admin_session_key')) {
+                    sessionStorage.removeItem('isAdminLoggedIn');
+                    alert(`Tài khoản Admin của bạn (${userData.username}) vừa bị khóa! Đang kết thúc phiên.`);
+                    window.location.href = "index.html";
+                }
+                
+                alert(`Đã khóa tài khoản '${userData.username}'. Phiên đăng nhập sẽ bị kết thúc.`); 
+            } else {
+                 alert(`Đã mở khóa tài khoản '${userData.username}'.`); 
+            }
+            
+            loadUserTable(); 
+        }
     } catch (e) { alert("Có lỗi xảy ra."); }
 }
 
@@ -295,7 +322,6 @@ function attachAddUserFormEvent() {
         let storageKey = username;
         
         if (accountType === 'admin') {
-            // LƯU Ý: Giữ lại key quanly1_user cho tài khoản Admin mặc định để phục vụ Admin Login hard-code
             storageKey = username === 'quanly1' ? 'quanly1_user' : `${username}_admin`;
         }
 
@@ -352,7 +378,7 @@ function attachCategoryActionButtons() {
             document.getElementById("category-name").value = btn.dataset.name;
             document.getElementById("category-key").value = btn.dataset.id;
             document.getElementById("category-key").readOnly = true; 
-            document.getElementById("btn-cancel-edit").classList.remove("hidden");
+            document.getElementById("btn-cancel-edit").classList.add("hidden");
             window.scrollTo(0, 0); 
         });
     });

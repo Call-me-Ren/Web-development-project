@@ -58,9 +58,17 @@ $(document).ready(function () {
 
         const user = JSON.parse(finalUserData);
         
+        // KIỂM TRA KHÓA TÀI KHOẢN (BƯỚC SỬA)
+        if (user.isLocked === true) {
+             $("#form-login").prepend(
+                '<p class="error-message">Tài khoản này đã bị khóa. Vui lòng liên hệ Admin để mở khóa!</p>'
+            );
+            return;
+        }
+        
         // KIỂM TRA PHÂN QUYỀN ĐĂNG NHẬP NGƯỜI DÙNG: CHẶN ADMIN
         // Admin chỉ log được ở /admin/index.html (quanly1_user là key của Admin)
-        if (finalKey === 'quanly1_user') {
+        if (finalKey === 'quanly1_user' || user.isAdmin === true) {
              $("#form-login").prepend(
                 '<p class="error-message">Tài khoản này chỉ dùng để quản trị (Admin)!</p>'
             );

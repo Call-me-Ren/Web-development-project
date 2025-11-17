@@ -44,13 +44,13 @@
                  return;
             }
             
-            // --- LOGIC MỚI: TÌM KIẾM TÀI KHOẢN ADMIN TRONG LOCALSTORAGE ---
+            // --- LOGIC: TÌM KIẾM TÀI KHOẢN ADMIN TRONG LOCALSTORAGE ---
             
-            // 1. Xác định các key có thể là Admin (username hoặc username_admin)
+            // 1. Xác định các key có thể là Admin
+            // (username, username_admin, hoặc quanly1_user)
             const possibleKeys = [username, `${username}_admin`, 'quanly1_user']; 
             
             let storedUserData = null;
-            let foundKey = null;
 
             // 2. Lặp qua các key và tìm tài khoản khớp
             for (const key of possibleKeys) {
@@ -58,10 +58,10 @@
                 if (data) {
                     try {
                         const user = JSON.parse(data);
-                        // 3. Kiểm tra mật khẩu và cờ isAdmin
+                        
+                        // 3. Kiểm tra Mật khẩu và cờ isAdmin
                         if (user.password === pass && user.isAdmin === true) {
                             storedUserData = user;
-                            foundKey = key;
                             break;
                         }
                     } catch (e) {
@@ -71,6 +71,13 @@
             }
 
             if (storedUserData) {
+                // BƯỚC SỬA: KIỂM TRA TÌNH TRẠNG KHÓA
+                if (storedUserData.isLocked === true) {
+                    errorMsg.textContent = "Tài khoản Admin này đã bị khóa!";
+                    errorMsg.classList.remove("hidden");
+                    return;
+                }
+                
                 // Đăng nhập thành công
                 sessionStorage.setItem("isAdminLoggedIn", "true");
                 
