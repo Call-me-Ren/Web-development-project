@@ -11,9 +11,27 @@ const defaultData = [
         price: 999999999,
         image: "images/ben10.webp",
         category: "nam",
-        description_short: "Chỉ dành cho người được chọn...",
-        // Chiếc đồng hồ huyền thoại, khóa mở sức mạnh 10 siêu anh hùng.
-        description_long: "Chiếc đồng hồ Omnitrix huyền thoại, phiên bản giới hạn. Không chỉ hiển thị thời gian, đây là chìa khóa mở ra sức mạnh của 10 siêu anh hùng ngoài hành tinh. Chỉ dành cho Người Được Chọn hoặc bất kỳ ai sẵn sàng chi trả con số 'khủng' này để sở hữu món bảo vật vô giá."
+        description_short: "Chỉ dành cho người được chọn.",
+        description_long: "Đây là chiếc đồng hồ viễn tưởng huyền thoại, Omnitrix, đến từ series hoạt hình Ben 10. Đây là vật phẩm sưu tầm tối thượng cho fan Ben 10.",
+        // ✨ THUỘC TÍNH MỚI CHO TRÌNH BÀY ĐẸP
+        specs: [
+            { 
+                label: "Thiết kế", 
+                value: "Thiết kế hầm hố với vỏ ngoài màu xanh lá phát quang và các chi tiết cơ khí màu trắng/xám kim loại. Mặt đồng hồ có biểu tượng đồng hồ cát đặc trưng." 
+            },
+            { 
+                label: "Tính năng", 
+                value: "Mô phỏng được các chức năng cốt lõi của Omnitrix, bao gồm: ánh sáng xanh lá, âm thanh, và cơ chế bật nắp." 
+            },
+            { 
+                label: "Chất liệu", 
+                value: "Nhựa tổng hợp cao cấp, các chi tiết làm từ kim loại nhẹ (cho phiên bản cao cấp)." 
+            },
+            { 
+                label: "Mục đích", 
+                value: "Sưu tầm, cosplay, và trang trí." 
+            }
+        ]
     },
     {
         id: "sp_conan",
@@ -21,9 +39,26 @@ const defaultData = [
         price: 67000000,
         image: "images/conan.jpg",
         category: "nu",
-        description_short: "Trang bị cơ bản của thám tử.",
-        // Mô phỏng hoàn hảo, tích hợp kim gây mê và độ chính xác Thụy Sỹ.
-        description_long: "Phiên bản mô phỏng hoàn hảo chiếc đồng hồ đeo tay của Thám tử lừng danh Conan. Thiết kế thể thao, mặt kính chống lóa, và đặc biệt tích hợp Kim gây mê siêu nhỏ (tính năng chỉ có trong truyện!) giúp bạn luôn chủ động trong mọi tình huống. Độ chính xác chuẩn Thụy Sỹ."
+        description_short: "Trang bị biểu tượng của thám tử.",
+        description_long: "Đây là trang bị cơ bản, mang tính biểu tượng của thám tử lừng danh Conan - chiếc Đồng hồ Gây Mê. Là vật phẩm sưu tầm cao cấp, dành riêng cho fan hâm mộ.",
+        specs: [
+            { 
+                label: "Thiết kế", 
+                value: "Đồng hồ điện tử cổ điển, vỏ kim loại màu bạc. Mặt đồng hồ đơn giản, có nắp bật." 
+            },
+            { 
+                label: "Tính năng", 
+                value: "Đặc trưng là cơ chế bật lên để mô phỏng chức năng ngắm và bắn kim gây mê (có thể có cơ chế bật kim, phát ra ánh sáng đỏ mô phỏng tia laser). Chức năng xem giờ cơ bản." 
+            },
+            { 
+                label: "Chất liệu", 
+                value: "Vỏ và dây kim loại (thép không gỉ) tạo cảm giác chắc chắn." 
+            },
+            { 
+                label: "Mục đích", 
+                value: "Sưu tầm, trưng bày." 
+            }
+        ]
     },
     {
         id: "sp_doraemon",
@@ -31,9 +66,26 @@ const defaultData = [
         price: 8500000,
         image: "images/doraemon.jpg",
         category: "nam",
-        description_short: "Chất lượng Nhật Bản.",
-        // Lấy cảm hứng từ bảo bối của Doraemon, bền bỉ và độc đáo.
-        description_long: "Được lấy cảm hứng từ Bảo bối của Doraemon, chiếc đồng hồ này cho phép bạn 'kiểm soát' thời gian (trên mặt số). Thiết kế cơ học tinh xảo, chất liệu thép không gỉ, đạt tiêu chuẩn chất lượng Nhật Bản, đảm bảo bền bỉ 'cùng với thời gian', xứng đáng là món đồ sưu tầm độc đáo."
+        description_short: "Bảo bối thần kỳ của Doraemon.",
+        description_long: "Time stop watch là bảo bối thần kỳ nổi tiếng của Doraemon. Sản phẩm được mô tả là có 'chất lượng Nhật Bản, bền bỉ với thời gian.'",
+        specs: [
+            { 
+                label: "Thiết kế", 
+                value: "Hình dáng của một chiếc đồng hồ bấm giờ (stop watch) cổ điển, màu đỏ và vàng nổi bật. Mặt số có kim chỉ tốc độ/trạng thái ngưng đọng thời gian." 
+            },
+            { 
+                label: "Tính năng", 
+                value: "Dùng như một chiếc đồng hồ bấm giờ thông thường hoặc là vật trang trí có ánh sáng và âm thanh mô phỏng chức năng ngưng đọng thời gian." 
+            },
+            { 
+                label: "Chất liệu", 
+                value: "Vỏ kim loại nhẹ, bền bỉ, được hoàn thiện bằng lớp sơn bóng." 
+            },
+            { 
+                label: "Bộ máy", 
+                value: "Cơ chế Quartz hoặc cơ khí đơn giản (tùy phiên bản mô phỏng)." 
+            }
+        ]
     },
     {
         id: "sp_oip",
@@ -41,9 +93,30 @@ const defaultData = [
         price: 4200000,
         image: "images/oip.webp",
         category: "doi",
-        description_short: "Thiết kế hầm hố.",
-        // Mạnh mẽ, chống va đập tuyệt đối, phong cách Gumball vui vẻ.
-        description_long: "Mẫu đồng hồ OIP với thiết kế hầm hố, mạnh mẽ, dành cho những cặp đôi cá tính, yêu thích phiêu lưu. Vỏ bảo vệ chuyên dụng cung cấp khả năng chống va đập tuyệt đối và chống nước vượt trội. Lấy cảm hứng từ The Amazing World of Gumball, mang lại phong cách vui vẻ, nổi bật."
+        description_short: "Nhân vật biểu tượng Gumball.",
+        description_long: "Đồng hồ OIP là phiên bản sưu tầm độc đáo, tái hiện hình ảnh nhân vật đồng hồ đáng yêu và hài hước từ bộ phim hoạt hình The Amazing World of Gumball.",
+        specs: [
+            { 
+                label: "Thiết kế", 
+                value: "Hình dáng mặt tròn, màu cam rực rỡ, tay và chân tạo hình sống động, mang đậm phong cách hoạt hình." 
+            },
+            { 
+                label: "Chất liệu Vỏ", 
+                value: "Nhựa ABS cao cấp, được thiết kế hầm hố, chống va đập tuyệt đối, bền màu." 
+            },
+            { 
+                label: "Kích thước", 
+                value: "Đường kính mặt khoảng 10cm. Kích thước tổng thể phù hợp để đặt trên bàn học, kệ sách hoặc bàn làm việc." 
+            },
+            { 
+                label: "Bộ máy", 
+                value: "Quartz (Pin) đơn giản, đảm bảo hiển thị giờ, phút, giây cơ bản." 
+            },
+            { 
+                label: "Mục đích", 
+                value: "Sưu tầm, trang trí." 
+            }
+        ]
     },
     {
         id: "sp_timecity",
@@ -51,9 +124,34 @@ const defaultData = [
         price: 696500000,
         image: "images/time_city.webp",
         category: "doi",
-        description_short: "Chỉ dành cho giới thượng lưu.",
-        // Vàng 18K và kim cương, khẳng định vị thế giới thượng lưu.
-        description_long: "Tuyệt phẩm chế tác Time City, biểu tượng của sự xa hoa và đẳng cấp. Vỏ và dây đeo được làm từ vàng trắng 18K và nạm kín kim cương tự nhiên chất lượng cao. Chiếc đồng hồ này không chỉ xem giờ mà còn là lời khẳng định vị thế giới thượng lưu của người sở hữu. Phiên bản cặp đôi độc quyền."
+        description_short: "Dòng Luxe Diamond giới thượng lưu.",
+        description_long: "Đồng hồ Time City Luxe Diamond là một tuyệt tác chế tác, thể hiện đẳng cấp vượt trội và sự xa hoa tinh tế, chỉ dành cho giới thượng lưu.",
+        specs: [
+            { 
+                label: "Thiết kế", 
+                value: "Mặt đồng hồ nổi bật với vòng tròn kim cương được sắp xếp tỉ mỉ, tạo hiệu ứng thị giác lấp lánh như xoáy nước ánh kim cương." 
+            },
+            { 
+                label: "Chất liệu Đính kết", 
+                value: "Kim cương tự nhiên (Full Diamond) được đính kết thủ công trên toàn bộ vỏ." 
+            },
+            { 
+                label: "Vỏ (Case)", 
+                value: "Chế tác từ kim loại quý (Vàng trắng hoặc Thép không gỉ cao cấp) được đánh bóng." 
+            },
+            { 
+                label: "Dây đeo (Strap)", 
+                value: "Dây cao su tự nhiên màu đen tuyền, tạo độ tương phản sang trọng với kim cương và mang lại sự thoải mái khi đeo." 
+            },
+            { 
+                label: "Bộ máy (Movement)", 
+                value: "Swiss Quartz hoặc Automatic cao cấp, đảm bảo độ chính xác tuyệt đối." 
+            },
+            { 
+                label: "Kính", 
+                value: "Kính Sapphire nguyên khối, chống trầy xước." 
+            }
+        ]
     },
     {
         id: "sp_casio_001",
@@ -62,8 +160,25 @@ const defaultData = [
         image: "images/ảnh đồng hồ nam 1.jpg",
         category: "nam",
         description_short: "Thiết kế bát giác mạnh mẽ.",
-        // Casioak bát giác, Carbon Core Guard, bền bỉ và mỏng nhẹ.
-        description_long: "Mẫu G-Shock GA-2100 được mệnh danh là 'Casioak' với thiết kế bát giác độc đáo và độ mỏng kỷ lục trong dòng G-Shock. Được trang bị cấu trúc Carbon Core Guard, chiếc đồng hồ này cực kỳ bền bỉ nhưng vẫn rất nhẹ, là lựa chọn hoàn hảo cho phong cách năng động, hiện đại."
+        description_long: "Mẫu G-Shock GA-2100 được mệnh danh là 'Casioak' với thiết kế bát giác độc đáo và độ mỏng kỷ lục trong dòng G-Shock. Được trang bị cấu trúc Carbon Core Guard, chiếc đồng hồ này cực kỳ bền bỉ nhưng vẫn rất nhẹ.",
+        specs: [
+            { 
+                label: "Thiết kế", 
+                value: "Thiết kế bát giác mạnh mẽ (Casioak), màu đen mờ (matte black) toàn bộ." 
+            },
+            { 
+                label: "Bộ máy", 
+                value: "Khả năng cao là máy Quartz Chronograph. Chức năng bấm giờ thể thao (Chronograph)." 
+            },
+            { 
+                label: "Chất liệu", 
+                value: "Vỏ thép không gỉ được phủ lớp PVD đen, kính khoáng cường lực." 
+            },
+            { 
+                label: "Khả năng chống nước", 
+                value: "Theo mặt đồng hồ, có in 100 METERS (tương đương 10 ATM), có thể dùng khi bơi lội nông." 
+            }
+        ]
     },
     {
         id: "sp_daniel_001",
@@ -72,8 +187,25 @@ const defaultData = [
         image: "images/ảnh đồng hồ nam 2.jpg",
         category: "nu",
         description_short: "Tinh tế và thanh lịch.",
-        // Tối giản Bắc Âu, dây lưới sang trọng, phụ kiện không thể thiếu.
-        description_long: "Đồng hồ DW Petite mang đến vẻ đẹp tối giản, tinh tế và thanh lịch chuẩn phong cách Bắc Âu. Mặt đồng hồ nhỏ nhắn, kết hợp với dây lưới (mesh) bằng thép không gỉ sang trọng, ôm tay. Dễ dàng kết hợp với mọi trang phục, là phụ kiện không thể thiếu của phái nữ hiện đại."
+        description_long: "Đồng hồ DW Petite mang đến vẻ đẹp tối giản, tinh tế và thanh lịch chuẩn phong cách Bắc Âu. Mặt đồng hồ nhỏ nhắn, kết hợp với dây lưới (mesh) bằng thép không gỉ sang trọng.",
+        specs: [
+            { 
+                label: "Thiết kế", 
+                value: "Mặt số và dây đeo thép không gỉ nguyên khối được mạ PVD màu đen. Các chi tiết kim và cọc số màu vàng kim nổi bật." 
+            },
+            { 
+                label: "Chức năng", 
+                value: "Là đồng hồ Chronograph (bấm giờ thể thao) với ba mặt số phụ (sub-dials) và ô lịch ngày nằm ở vị trí 3 giờ." 
+            },
+            { 
+                label: "Bộ máy", 
+                value: "Quartz (Pin) đảm bảo độ chính xác cao." 
+            },
+            { 
+                label: "Chất liệu", 
+                value: "Vỏ và dây thép không gỉ, mặt kính khoáng cứng chịu lực tốt." 
+            }
+        ]
     },
     {
         id: "sp_seiko_001",
@@ -82,8 +214,25 @@ const defaultData = [
         image: "images/ảnh đồng hồ nam 3.jpg",
         category: "nam",
         description_short: "Cỗ máy cơ tự động bền bỉ.",
-        // Seiko 5 huyền thoại, máy Automatic, chống nước 100m.
-        description_long: "Dòng Seiko 5 Sports huyền thoại với lịch sử gần 60 năm, nổi tiếng về độ bền và tin cậy. Sở hữu bộ máy cơ Automatic (tự động lên dây) mạnh mẽ, mặt kính Hardlex chống trầy và khả năng chống nước 100m. Hoàn hảo cho người yêu thích đồng hồ cơ và phong cách thể thao, phiêu lưu."
+        description_long: "Dòng Seiko 5 Sports huyền thoại với lịch sử gần 60 năm, nổi tiếng về độ bền và tin cậy. Hoàn hảo cho người yêu thích đồng hồ cơ và phong cách thể thao, phiêu lưu.",
+        specs: [
+            { 
+                label: "Thiết kế", 
+                value: "Mang phong cách quân đội (military) và thể thao mạnh mẽ, với thiết kế vỏ lớn, màu đen mờ (matte black) toàn bộ. Mặt số có kết cấu sần, cọc số lớn dễ đọc." 
+            },
+            { 
+                label: "Bộ máy", 
+                value: "Sở hữu bộ máy cơ Automatic (tự động lên dây) mạnh mẽ." 
+            },
+            { 
+                label: "Tính năng", 
+                value: "Chức năng bấm giờ thể thao (Chronograph) và ô hiển thị lịch ngày tại vị trí 4 giờ. Khả năng chống nước 100m." 
+            },
+            { 
+                label: "Chất liệu", 
+                value: "Vỏ thép không gỉ được phủ lớp PVD đen, kính khoáng cường lực." 
+            }
+        ]
     },
     {
         id: "sp_citizen_001",
@@ -92,8 +241,25 @@ const defaultData = [
         image: "images/xanhhong.jpg",
         category: "doi",
         description_short: "Đồng hồ cặp năng lượng ánh sáng.",
-        // Công nghệ Eco-Drive không cần pin, biểu tượng tình yêu bền vững.
-        description_long: "Bộ đôi đồng hồ Citizen sử dụng công nghệ Eco-Drive độc quyền, hấp thụ mọi nguồn ánh sáng để tạo năng lượng, vĩnh viễn không cần thay pin. Thiết kế thanh lịch, mặt số màu xanh/hồng lãng mạn, là món quà ý nghĩa thể hiện sự bền vững và trọn vẹn trong tình yêu đôi lứa."
+        description_long: "Bộ đôi đồng hồ Citizen sử dụng công nghệ Eco-Drive độc quyền, hấp thụ mọi nguồn ánh sáng để tạo năng lượng, vĩnh viễn không cần thay pin. Là món quà ý nghĩa thể hiện sự bền vững và trọn vẹn trong tình yêu đôi lứa.",
+        specs: [
+            { 
+                label: "Thiết kế", 
+                value: "Thiết kế cổ điển, vỏ và dây đeo làm từ thép không gỉ sáng bóng. Phiên bản Nam: Mặt số màu xanh dương đậm. Phiên bản Nữ: Mặt số màu hồng phấn, dịu dàng." 
+            },
+            { 
+                label: "Mặt số", 
+                value: "Cọc số đơn giản và có một viên đá đính ở vị trí 12 giờ, tạo điểm nhấn sang trọng." 
+            },
+            { 
+                label: "Bộ máy", 
+                value: "Công nghệ Eco-Drive, sử dụng pin sạc bằng năng lượng ánh sáng." 
+            },
+            { 
+                label: "Khả năng chống nước", 
+                value: "Chống nước sinh hoạt cơ bản." 
+            }
+        ]
     },
     {
         id: "sp_tissot_001",
@@ -101,9 +267,30 @@ const defaultData = [
         price: 14500000,
         image: "images/nhatban.jpg",
         category: "nu",
-        description_short: "Vẻ đẹp Thụy Sỹ cổ điển.",
-        // Tissot Thụy Sỹ, máy Automatic, mặt Guilloché, quý phái vượt thời gian.
-        description_long: "Mẫu Tissot Le Locle nữ, mang đậm phong cách cổ điển, được đặt theo tên quê hương của Tissot tại Thụy Sỹ. Bộ máy cơ Automatic chất lượng cao, mặt số chạm khắc họa tiết Guilloché tinh xảo và cọc số La Mã sang trọng. Chiếc đồng hồ này là biểu tượng của sự quý phái và thẩm mỹ vượt thời gian."
+        description_short: "Họa tiết hoa anh đào tinh xảo.",
+        description_long: "Mẫu đồng hồ này mang vẻ đẹp lãng mạn và thời trang với họa tiết hoa anh đào tinh xảo in trên mặt số. Phù hợp với những người phụ nữ yêu thích sự tinh tế, nữ tính và muốn một món phụ kiện nhẹ nhàng mang hơi hướng Á Đông.",
+        specs: [
+            { 
+                label: "Thiết kế", 
+                value: "Vỏ tròn mỏng, dây đeo lưới (mesh) màu kim loại súng (Gunmetal) thời trang, ôm sát cổ tay." 
+            },
+            { 
+                label: "Mặt số", 
+                value: "Màu xám than chì (hoặc nâu xám) tối giản, nổi bật là họa tiết hoa anh đào (floral) được chạm khắc hoặc in mờ với màu vàng hồng (rose gold)." 
+            },
+            { 
+                label: "Cọc số", 
+                value: "Sử dụng cọc chấm tròn tối giản, không gây rối mắt, làm nổi bật họa tiết hoa." 
+            },
+            { 
+                label: "Bộ máy", 
+                value: "Quartz (Pin) mỏng nhẹ, dễ sử dụng." 
+            },
+            { 
+                label: "Chất liệu", 
+                value: "Vỏ và dây thép không gỉ, mặt kính khoáng." 
+            }
+        ]
     }
 ];
 

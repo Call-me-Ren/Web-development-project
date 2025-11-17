@@ -46,7 +46,6 @@
     </footer>
 
     <script src="products.js"></script>
-    
     <script src="Giaodien.js"></script>
     <script>
     lucide.createIcons(); // Vẫn gọi để render icon "arrow-left"
@@ -65,7 +64,6 @@
         }
 
         // 2. Tìm sản phẩm trong mảng 'allProducts' (từ file products.js)
-        // Lưu ý: allProducts được định nghĩa trong products.js và được tải trước Giaodien.js
         if (typeof allProducts === 'undefined') {
             productContainer.innerHTML = "<p class='text-red-500 font-bold'>Lỗi: Không thể tải dữ liệu sản phẩm (allProducts).</p>";
             return;
@@ -79,74 +77,116 @@
         }
 
         // 3. Render HTML cho sản phẩm
+        // 3. Render HTML cho sản phẩm
         renderProductDetails(product);
+        
+        // 4. HIỂN THỊ CÁC THÔNG SỐ KỸ THUẬT CÓ CẤU TRÚC
+        renderSpecsList(product); 
+        // ---------------------------------------------
 
-        // 4. Gắn sự kiện cho nút "Thêm vào giỏ"
-        // Thêm kiểm tra tồn kho ban đầu để cập nhật trạng thái nút
+        // 5. Gắn sự kiện cho nút "Thêm vào giỏ"
         const inventoryMap = typeof calculateAllInventory === 'function' ? calculateAllInventory(allProducts) : new Map();
         const stock = inventoryMap.get(product.id) || 0;
         
         attachAddToCartEvent(product, stock);
+        
+        // 5. GỌI HÀM HIỂN THỊ SPECS ĐÃ ĐƯỢC CẤU TRÚC
+        renderSpecsList(product); 
     });
 
-    function renderProductDetails(product) {
-        const container = document.getElementById("product-detail-container");
-        
-        // Cập nhật trạng thái Hết hàng/Trong kho ban đầu
-        const inventoryMap = typeof calculateAllInventory === 'function' ? calculateAllInventory(allProducts) : new Map();
-        const stock = inventoryMap.get(product.id) || 0;
-        
-        let buttonHtml = '';
-        if (stock > 0) {
-            buttonHtml = `
-                <button id="detail-add-to-cart" class="w-full md:w-auto bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 smooth-transition text-lg">
-                    <i class="fa-solid fa-cart-plus mr-2"></i>
-                    Thêm vào giỏ
-                </button>
-            `;
-        } else {
-            buttonHtml = `
-                <button id="detail-add-to-cart" class="w-full md:w-auto bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed text-lg" disabled>
-                    <i class="fa-solid fa-ban mr-2"></i>
-                    Hết hàng
-                </button>
-            `;
+    /**
+     * HÀM MỚI: Render các đặc điểm kỹ thuật (specs) thành danh sách có xuống dòng
+     */
+    function renderSpecsList(product) {
+        const specsList = document.getElementById('specs-list');
+        const longDescP = document.getElementById('product-long-desc');
+
+        if (!specsList) return;
+
+        // Nếu sản phẩm có specs, ẩn mô tả dài và hiển thị danh sách
+        if (product.specs && product.specs.length > 0) {
+            if (longDescP) longDescP.style.display = 'none'; // Ẩn mô tả dài dạng khối
+
+            product.specs.forEach(spec => {
+                const li = document.createElement('li');
+                // Sử dụng <strong> để in đậm nhãn và thẻ <li> để tạo ngắt dòng
+                li.className = 'mb-2';
+                li.innerHTML = `
+                    <p class="text-gray-700 leading-relaxed">
+                        <i class="fa-solid fa-circle-check text-indigo-600 text-xs mr-2"></i>
+                        <strong>${spec.label}:</strong> ${spec.value}
+                    </p>`;
+                specsList.appendChild(li);
+            });
+            
+        } else if (longDescP) {
+            // Nếu không có specs, đảm bảo mô tả dài vẫn hiển thị
+             longDescP.style.display = 'block';
         }
+    }
 
-        container.innerHTML = `
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <img id="product-img" src="${product.image}" alt="${product.name}" class="w-full h-auto object-cover rounded-lg shadow-md">
-                </div>
 
-                <div class="flex flex-col justify-center">
-                    <h1 id="product-name" class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">${product.name}</h1>
-                    
-                    <p id="product-desc" class="text-gray-600 mb-6 leading-relaxed">
-                        ${product.description_long || product.description_short || 'Chưa có mô tả chi tiết cho sản phẩm này.'}
-                    </p>
-                    
-                    <div class="mb-6">
-                        <span class="text-gray-500 text-sm">Phân loại:</span>
-                        <span class="font-semibold text-indigo-600">${product.category === 'nam' ? 'Đồng hồ Nam' : (product.category === 'nu' ? 'Đồng hồ Nữ' : 'Đồng hồ Đôi')}</span>
-                    </div>
-
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between bg-gray-100 p-4 rounded-lg">
-                        <div class="mb-4 md:mb-0">
-                            <span class="text-gray-600 text-lg">Giá bán:</span>
-                            <p id="product-price" class="text-3xl font-bold text-indigo-600">
-                                ${Number(product.price).toLocaleString('vi-VN')}₫
-                            </p>
-                        </div>
-                        ${buttonHtml}
-                    </div>
-                    <p class="mt-2 text-sm text-gray-500 font-semibold">Tồn kho: 
-                        <span class="${stock > 5 ? 'text-green-600' : (stock > 0 ? 'text-orange-500' : 'text-red-500')}">${stock > 0 ? stock : 'Hết hàng'}</span>
-                    </p>
-                </div>
-            </div>
+    function renderProductDetails(product) {
+    const container = document.getElementById("product-detail-container");
+    
+    // ... (Phần kiểm tra tồn kho giữ nguyên)
+    const inventoryMap = typeof calculateAllInventory === 'function' ? calculateAllInventory(allProducts) : new Map();
+    const stock = inventoryMap.get(product.id) || 0;
+    
+    let buttonHtml = '';
+    if (stock > 0) {
+        buttonHtml = `
+            <button id="detail-add-to-cart" class="w-full md:w-auto bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 smooth-transition text-lg">
+                <i class="fa-solid fa-cart-plus mr-2"></i>
+                Thêm vào giỏ
+            </button>
+        `;
+    } else {
+        buttonHtml = `
+            <button id="detail-add-to-cart" class="w-full md:w-auto bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed text-lg" disabled>
+                <i class="fa-solid fa-ban mr-2"></i>
+                Hết hàng
+            </button>
         `;
     }
+
+    container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <img id="product-img" src="${product.image}" alt="${product.name}" class="w-full h-auto object-cover rounded-lg shadow-md">
+            </div>
+
+            <div class="flex flex-col justify-center">
+                <h1 id="product-name" class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">${product.name}</h1>
+                
+                <p id="product-long-desc" class="text-gray-600 mb-6 leading-relaxed">
+                    ${product.description_long || product.description_short || 'Chưa có mô tả chi tiết cho sản phẩm này.'}
+                </p>
+                
+                <h4 class="text-xl font-semibold text-gray-800 mt-4 mb-3 border-b pb-2">Đặc Điểm Kỹ Thuật</h4>
+                <ul id="specs-list" class="list-none p-0">
+                    </ul>
+                <div class="mb-6 mt-6">
+                    <span class="text-gray-500 text-sm">Phân loại:</span>
+                    <span class="font-semibold text-indigo-600">${product.category === 'nam' ? 'Đồng hồ Nam' : (product.category === 'nu' ? 'Đồng hồ Nữ' : 'Đồng hồ Đôi')}</span>
+                </div>
+
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between bg-gray-100 p-4 rounded-lg">
+                    <div class="mb-4 md:mb-0">
+                        <span class="text-gray-600 text-lg">Giá bán:</span>
+                        <p id="product-price" class="text-3xl font-bold text-indigo-600">
+                            ${Number(product.price).toLocaleString('vi-VN')}₫
+                        </p>
+                    </div>
+                    ${buttonHtml}
+                </div>
+                <p class="mt-2 text-sm text-gray-500 font-semibold">Tồn kho: 
+                    <span class="${stock > 5 ? 'text-green-600' : (stock > 0 ? 'text-orange-500' : 'text-red-500')}">${stock > 0 ? stock : 'Hết hàng'}</span>
+                </p>
+            </div>
+        </div>
+    `;
+}
 
     // ĐÃ SỬA: Thêm logic kiểm tra tồn kho
     function attachAddToCartEvent(product) {
@@ -171,7 +211,6 @@
                 localStorage.setItem(CART_KEY, JSON.stringify(cart)); 
             }
 // === BƯỚC SỬA: KIỂM TRA TỒN KHO THỰC TẾ (Sử dụng hàm từ Giaodien.js) ===
-            // allProducts được tải từ products.js
             const inventoryMap = typeof calculateAllInventory === 'function' ? calculateAllInventory(allProducts) : new Map(); 
             const stock = inventoryMap.get(product.id) || 0;
             
@@ -215,6 +254,41 @@
             btn.classList.add('animate-pulse');
             setTimeout(() => btn.classList.remove('animate-pulse'), 1000);
         });
+    }
+
+    /**
+     * HÀM MỚI: Render các đặc điểm kỹ thuật (specs) thành danh sách có xuống dòng
+     */
+    function renderSpecsList(product) {
+        const specsList = document.getElementById('specs-list');
+        const longDescP = document.getElementById('product-long-desc'); // Khối mô tả dài ban đầu
+
+        if (!specsList || !product.specs) return;
+
+        // Nếu sản phẩm có specs, ta tiến hành hiển thị danh sách
+        if (product.specs.length > 0) {
+            // Ẩn mô tả dài dạng khối để tránh trùng lặp
+            if (longDescP) longDescP.style.display = 'none'; 
+            
+            specsList.innerHTML = ''; // Đảm bảo làm sạch list
+            
+            product.specs.forEach(spec => {
+                const li = document.createElement('li');
+                
+                // Sử dụng <strong> để in đậm nhãn và thẻ <li>/class mb-2 để tạo ngắt dòng
+                li.className = 'mb-2'; 
+                li.innerHTML = `
+                    <p class="text-gray-700 leading-relaxed">
+                        <i class="fa-solid fa-circle-check text-indigo-600 text-xs mr-2"></i>
+                        <strong>${spec.label}:</strong> ${spec.value}
+                    </p>`;
+                specsList.appendChild(li);
+            });
+            
+        } else if (longDescP) {
+            // Nếu không có specs (hoặc specs rỗng), đảm bảo mô tả dài vẫn hiển thị
+             longDescP.style.display = 'block';
+        }
     }
 </script>
 </body>
