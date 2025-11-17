@@ -738,21 +738,21 @@ function scrollToProductTop() {
 /**
  * Quản lý đăng nhập / avatar / đăng xuất / hiển thị tên (ĐÃ SỬA: QUẢN LÝ CẢ 2 NÚT LOGIN/REGISTER)
  */
+/**
+ * Quản lý đăng nhập / avatar / đăng xuất / hiển thị tên (ĐÃ SỬA: ĐẢM BẢO HIỂN THỊ ĐÚNG THỨ TỰ HỌ TÊN)
+ */
 function initializeLoginUI() {
     // Lấy các element từ DOM
-    const loginRegisterButtons = document.getElementById("login-register-buttons"); // Khối chứa 2 nút Login/Register MỚI
-    const loginBtn = document.getElementById("header-login-btn");                  // Nút Đăng nhập
-    const registerBtn = document.getElementById("header-register-btn");            // Nút Đăng ký
+    const loginRegisterButtons = document.getElementById("login-register-buttons"); // Khối chứa 2 nút Login/Register
     
     const userInfoArea = document.getElementById("user-info-area");     // Khu vực chứa Tên + Avatar
     const welcomeText = document.getElementById("user-welcome-text");   // Chỗ hiển thị "Chào..."
-    const userAvatar = document.getElementById("user-avatar");
     const userMenu = document.getElementById("user-menu");
     const menuUserName = document.getElementById("menu-user-name");     // Tên trong menu xổ xuống
     
-    // Element mobile (giữ nguyên logic cũ)
+    // Element mobile
     const mobileLoginLink = document.querySelector('#mobile-menu a[href="dangnhap.html"]');
-    const mobileRegisterLink = document.querySelector('#mobile-menu a[href="dangky.html"]'); // Thêm nút đăng ký mobile
+    const mobileRegisterLink = document.querySelector('#mobile-menu a[href="dangky.html"]');
     const mobileUserMenu = document.getElementById('mobile-user-menu');
     const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
     const desktopLogoutBtn = document.getElementById('logout-btn-desktop');
@@ -772,23 +772,23 @@ function initializeLoginUI() {
         if (isLoggedIn && currentUser) {
             // === ĐÃ ĐĂNG NHẬP ===
             
-            // 1. Ẩn khối chứa Đăng nhập/Đăng ký
             if(loginRegisterButtons) loginRegisterButtons.classList.add("hidden");
 
-            // 2. Hiện khu vực User (Tên + Avatar)
             if(userInfoArea) {
                 userInfoArea.classList.remove("hidden");
                 userInfoArea.classList.add("flex");
             }
 
-            // 3. Hiển thị tên chào mừng
+            // 3. Hiển thị tên chào mừng (LOGIC ĐÃ SỬA TẠI ĐÂY)
             let displayName = "Khách hàng";
             if (currentUser.lastname && currentUser.firstname) {
-                displayName = `${currentUser.lastname} ${currentUser.firstname}`;
+                // Hiển thị Họ trước, Tên sau (Ví dụ: Nguyễn Văn A)
+                // Giả định: currentUser.firstname = Họ, currentUser.lastname = Tên
+                displayName = `${currentUser.firstname} ${currentUser.lastname}`; 
             } else if (currentUser.lastname) {
-                displayName = currentUser.lastname;
+                displayName = currentUser.lastname; // Nếu chỉ có Tên
             } else if (currentUser.firstname) {
-                displayName = currentUser.firstname;
+                displayName = currentUser.firstname; // Nếu chỉ có Họ
             } else if (currentUser.email) {
                 displayName = currentUser.email.split('@')[0]; // Lấy phần trước @
             }
@@ -796,7 +796,7 @@ function initializeLoginUI() {
             if(welcomeText) welcomeText.textContent = `Chào, ${displayName}`;
             if(menuUserName) menuUserName.textContent = displayName;
 
-            // Mobile: Ẩn link Đăng nhập/Đăng ký, Hiện menu User
+            // Mobile
             if(mobileLoginLink) mobileLoginLink.classList.add("hidden");
             if(mobileRegisterLink) mobileRegisterLink.classList.add("hidden");
             if(mobileUserMenu) mobileUserMenu.classList.remove("hidden");
@@ -804,16 +804,17 @@ function initializeLoginUI() {
         } else {
             // === CHƯA ĐĂNG NHẬP ===
             
-            // 1. Hiện khối chứa Đăng nhập/Đăng ký
-            if(loginRegisterButtons) loginRegisterButtons.classList.remove("hidden");
+            if(loginRegisterButtons) {
+                loginRegisterButtons.classList.remove("hidden");
+                loginRegisterButtons.classList.add("flex");
+            }
 
-            // 2. Ẩn khu vực User
             if(userInfoArea) {
                 userInfoArea.classList.add("hidden");
                 userInfoArea.classList.remove("flex");
             }
 
-            // Mobile: Hiện link Đăng nhập/Đăng ký, Ẩn menu User
+            // Mobile
             if(mobileLoginLink) mobileLoginLink.classList.remove("hidden");
             if(mobileRegisterLink) mobileRegisterLink.classList.remove("hidden");
             if(mobileUserMenu) mobileUserMenu.classList.add("hidden");
@@ -823,7 +824,7 @@ function initializeLoginUI() {
     // Chạy hàm cập nhật ngay khi tải trang
     updateLoginUI();
 
-    // --- CÁC SỰ KIỆN CLICK ---
+    // --- CÁC SỰ KIỆN CLICK (Giữ nguyên) ---
 
     // 1. Toggle Menu khi nhấn vào Avatar hoặc Tên
     if(userInfoArea) {
@@ -859,7 +860,6 @@ function initializeLoginUI() {
         mobileLogoutBtn.addEventListener("click", (e) => { e.preventDefault(); doLogout(); });
     }
 }
-
 /**
  * Gắn sự kiện cho menu mobile (hamburger)
  */
