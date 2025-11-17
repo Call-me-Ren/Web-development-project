@@ -113,7 +113,11 @@
             <nav class="admin-nav">
                 <a href="dashboard.html">Bảng điều khiển</a>
                 <a href="quanly_khachhang.html">Quản lý Người dùng</a>
+                <a href="quanly_sanpham.html">Quản lý Sản phẩm</a>
                 <a href="quanly_nhaphang.html" class="active">Quản lý Nhập hàng</a>
+                <a href="quanly_giaban.html">Quản lý Giá bán</a>
+                <a href="quanly_donhang.html">Quản lý Đơn hàng</a>
+                <a href="quanly_tonkho.html">Quản lý Tồn kho</a>
                 <a href="#" id="admin-logout-btn" class="logout">Đăng xuất</a>
             </nav>
         </aside>
@@ -574,7 +578,7 @@
                     const newPrice = parseFloat(priceInput.value);
                     const newQty = parseInt(qtyInput.value);
 
-                    if (newPrice <= 0 || newQty <= 0) {
+                    if (newPrice <= 0 || newQty <= 0 || isNaN(newPrice) || isNaN(newQty)) {
                         hasError = true;
                     }
 
@@ -586,7 +590,7 @@
                 });
 
                 if (hasError) {
-                     alert("Giá nhập và Số lượng phải là số dương!");
+                     alert("Giá nhập và Số lượng phải là số dương hợp lệ!");
                      return;
                 }
                 

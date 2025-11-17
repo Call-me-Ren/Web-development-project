@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Đơn hàng - Admin WatchTime</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <style>
+        /* Thêm các class trạng thái đơn hàng để làm đẹp */
+        .status-MoiDat { background-color: #fef3c7; color: #d97706; } /* Vàng */
+        .status-DaXacNhan { background-color: #e0f2fe; color: #0ea5e9; } /* Xanh nhạt */
+        .status-DangXuLy { background-color: #fee2e2; color: #ef4444; } /* Đỏ nhạt */
+        .status-DaGiao { background-color: #d1fae5; color: #059669; } /* Xanh lá */
+        .status-DaHuy { background-color: #f3f4f6; color: #4b5563; text-decoration: line-through; } /* Xám */
+        
+        .order-status { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; display: inline-block; }
+        
+        /* Modal cho xem chi tiết */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-item-list { border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; }
+        .modal-item-list div { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f7fafc; }
+        .modal-item-list div:last-child { border-bottom: none; }
+        
+        .btn-update-status { background-color: #3b82f6; color: white; margin-left: 10px;}
+        .btn-update-status:hover { background-color: #2563eb; }
+        .btn-confirm-cancel { background-color: #ef4444; color: white; }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <h1>WatchTime</h1>
+            <a href="#" id="admin-close-btn" class="admin-close-btn">&times;</a>
+            <nav class="admin-nav">
+    <a href="dashboard.html">Bảng điều khiển</a>
+    <a href="quanly_khachhang.html">Quản lý Người dùng</a>
+    <a href="quanly_sanpham.html">Quản lý Sản phẩm</a> 
+    <a href="quanly_nhaphang.html">Quản lý Nhập hàng</a>
+    <a href="quanly_giaban.html">Quản lý Giá bán</a>
+    <a href="quanly_donhang.html">Quản lý Đơn hàng</a>
+    <a href="quanly_tonkho.html">Quản lý Tồn kho</a>
+    <a href="#" id="admin-logout-btn" class="logout">Đăng xuất</a>
+</nav>
+        </aside>
+
+        <main class="admin-main">
+            <button id="admin-menu-btn" class="admin-menu-btn">☰</button>
+            <h2>Quản lý Đơn hàng</h2>
+            
+            <p class="mb-4 text-gray-600">Tổng cộng: <strong id="total-orders-display">0</strong> đơn hàng.</p>
+
+            <div class="admin-form">
+                <h3 class="text-lg font-bold mb-4">Bộ lọc và Tra cứu</h3>
+                <div class="filter-bar">
+                    <div class="form-group">
+                        <label for="filter-status">Trạng thái</label>
+                        <select id="filter-status">
+                            <option value="all">-- Tất cả --</option>
+                            <option value="Mới đặt">Mới đặt (Chưa xử lý)</option>
+                            <option value="Đã xác nhận">Đã xác nhận</option>
+                            <option value="Đang xử lý">Đang xử lý</option>
+                            <option value="Đã giao">Đã giao thành công</option>
+                            <option value="Đã hủy">Đã hủy</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-date-from">Từ ngày</label>
+                        <input type="date" id="filter-date-from">
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-date-to">Đến ngày</label>
+                        <input type="date" id="filter-date-to">
+                    </div>
+                    <div class="form-group">
+                        <label for="sort-by">Sắp xếp</label>
+                        <select id="sort-by">
+                            <option value="newest">Mới nhất</option>
+                            <option value="oldest">Cũ nhất</option>
+                            <option value="address">Địa chỉ (Alphabet)</option>
+                            <option value="total_asc">Tổng tiền (Tăng dần)</option>
+                            <option value="total_desc">Tổng tiền (Giảm dần)</option>
+                        </select>
+                    </div>
+                    <button id="btn-apply-filter" class="btn-action btn-submit" style="background-color: #3b82f6;">Áp dụng</button>
+                    <button id="btn-clear-filter" class="btn-action btn-cancel">Xóa lọc</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Mã Đơn & Ngày đặt</th>
+                            <th>Khách hàng</th>
+                            <th>Địa chỉ (Quận/Huyện)</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th>HÀNH ĐỘNG</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-table-body">
+                        <tr><td colspan="6" style="text-align: center;">Đang tải dữ liệu...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="order-detail-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">Chi tiết Đơn hàng: <span id="modal-order-id"></span></h3>
+            
+            <div style="border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <p><strong>Ngày đặt:</strong> <span id="modal-date"></span></p>
+                <p><strong>Khách hàng:</strong> <span id="modal-customer-name"></span> (<span id="modal-customer-phone"></span>)</p>
+                <p><strong>Địa chỉ:</strong> <span id="modal-address"></span></p>
+                <p><strong>Tổng tiền:</strong> <span id="modal-total" class="font-bold text-red-600 text-lg"></span></p>
+                <p class="mt-2"><strong>Trạng thái hiện tại:</strong> <span id="modal-current-status" class="order-status status-MoiDat"></span></p>
+            </div>
+            
+            <h4 class="text-md font-semibold mt-4 mb-2">Sản phẩm đã đặt</h4>
+            <div class="modal-item-list" id="modal-item-list">
+            </div>
+
+            <div class="form-group mt-6 border-t pt-4">
+                <label for="modal-status-select">Cập nhật Trạng thái đơn hàng</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <select id="modal-status-select" style="flex-grow: 1;">
+                        <option value="Mới đặt">Mới đặt (Chưa xử lý)</option>
+                        <option value="Đã xác nhận">Đã xác nhận</option>
+                        <option value="Đang xử lý">Đang xử lý (Đang giao)</option>
+                        <option value="Đã giao">Đã giao thành công</option>
+                        <option value="Đã hủy">Đã hủy</option>
+                    </select>
+                    <button type="button" id="modal-update-status-btn" class="btn-action btn-update-status">Cập nhật</button>
+                </div>
+                <div id="status-warning" class="text-danger text-sm mt-2 hidden">Lưu ý: Đơn hàng đã Hủy/Đã giao không thể thay đổi trạng thái khác.</div>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" id="modal-close-btn" class="btn-cancel">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        // CÁC KEYS TỪ admin.js
+        const ORDERS_KEY = 'allOrders';
+        
+        let allOrders = [];
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            checkAdminLogin();
+            attachLogoutEvent();
+            attachMobileMenuEvents();
+            
+            loadDataAndInit();
+            attachFilterEvents();
+            attachOrderTableEvents();
+            attachModalEvents();
+        });
+        
+        // ======================================================
+        // CÁC HÀM TẢI DỮ LIỆU & RENDER
+        // ======================================================
+        function loadDataAndInit() {
+            allOrders = getFromStorage(ORDERS_KEY, []);
+            document.getElementById('total-orders-display').textContent = allOrders.length;
+            loadOrderTable(allOrders);
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'Mới đặt': return 'status-MoiDat';
+                case 'Đã xác nhận': return 'status-DaXacNhan';
+                case 'Đang xử lý': return 'status-DangXuLy';
+                case 'Đã giao': return 'status-DaGiao';
+                case 'Đã hủy': return 'status-DaHuy';
+                default: return 'status-MoiDat';
+            }
+        }
+        
+        function loadOrderTable(ordersToRender) {
+            const tableBody = document.getElementById("order-table-body");
+            if (!tableBody) return; 
+
+            tableBody.innerHTML = "";
+            
+            if (ordersToRender.length === 0) { 
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Không tìm thấy đơn hàng nào khớp với bộ lọc.</td></tr>`; 
+                return; 
+            }
+            
+            ordersToRender.forEach(order => {
+                const tr = document.createElement("tr");
+                const statusClass = getStatusClass(order.status);
+                
+                // Trích xuất tên Quận/Huyện từ Địa chỉ
+                const addressParts = order.customer.address.split(',').map(s => s.trim());
+                const district = addressParts.length > 1 ? addressParts[addressParts.length - 2] : 'Không rõ';
+
+                tr.innerHTML = `
+                    <td>
+                        <strong>${order.id}</strong> 
+                        <div class="details">${formatDate(order.createdAt)}</div>
+                    </td>
+                    <td>
+                        <strong>${order.customer.name}</strong> 
+                        <div class="details">${order.customer.phone}</div>
+                    </td>
+                    <td>${district}</td>
+                    <td><strong class="text-red-600">${formatVND(order.total)}</strong></td>
+                    <td><span class="order-status ${statusClass}">${order.status}</span></td>
+                    <td>
+                        <button class="btn-action btn-edit" data-id="${order.id}">Xem & Sửa trạng thái</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // ======================================================
+        // CHỨC NĂNG LỌC VÀ SẮP XẾP
+        // ======================================================
+
+        function attachFilterEvents() {
+            document.getElementById('btn-apply-filter')?.addEventListener('click', applyFiltersAndSort);
+            document.getElementById('btn-clear-filter')?.addEventListener('click', clearFiltersAndReload);
+        }
+
+        function clearFiltersAndReload() {
+            document.getElementById('filter-status').value = 'all';
+            document.getElementById('filter-date-from').value = '';
+            document.getElementById('filter-date-to').value = '';
+            document.getElementById('sort-by').value = 'newest';
+            loadDataAndInit();
+        }
+
+        function applyFiltersAndSort() {
+            const statusFilter = document.getElementById('filter-status').value;
+            const dateFrom = document.getElementById('filter-date-from').value;
+            const dateTo = document.getElementById('filter-date-to').value;
+            const sortBy = document.getElementById('sort-by').value;
+
+            let filteredOrders = [...allOrders];
+
+            // 1. Lọc theo Trạng thái
+            if (statusFilter !== 'all') {
+                filteredOrders = filteredOrders.filter(o => o.status === statusFilter);
+            }
+
+            // 2. Lọc theo Ngày đặt
+            if (dateFrom) {
+                const start = new Date(dateFrom).getTime();
+                filteredOrders = filteredOrders.filter(o => new Date(o.createdAt).getTime() >= start);
+            }
+            if (dateTo) {
+                const end = new Date(dateTo);
+                // Thêm 1 ngày để bao gồm cả đơn hàng trong ngày kết thúc
+                end.setDate(end.getDate() + 1); 
+                const endTimestamp = end.getTime();
+                filteredOrders = filteredOrders.filter(o => new Date(o.createdAt).getTime() < endTimestamp);
+            }
+
+            // 3. Sắp xếp
+            filteredOrders.sort((a, b) => {
+                const dateA = new Date(a.createdAt).getTime();
+                const dateB = new Date(b.createdAt).getTime();
+
+                switch (sortBy) {
+                    case 'oldest': return dateA - dateB;
+                    case 'address': 
+                        // Sắp xếp theo Địa chỉ (Quận/Huyện)
+                        const addrA = a.customer.address.toLowerCase().split(',').slice(-2, -1).join('').trim();
+                        const addrB = b.customer.address.toLowerCase().split(',').slice(-2, -1).join('').trim();
+                        if (addrA < addrB) return -1;
+                        if (addrA > addrB) return 1;
+                        return 0;
+                    case 'total_asc': return a.total - b.total;
+                    case 'total_desc': return b.total - a.total;
+                    case 'newest': // Mặc định
+                    default: return dateB - dateA;
+                }
+            });
+
+            loadOrderTable(filteredOrders);
+            document.getElementById('total-orders-display').textContent = filteredOrders.length;
+        }
+
+        // ======================================================
+        // CHỨC NĂNG MODAL CHI TIẾT & SỬA TRẠNG THÁI
+        // ======================================================
+
+        function attachOrderTableEvents() {
+            document.getElementById("order-table-body").addEventListener('click', (e) => {
+                const btn = e.target.closest('.btn-action');
+                if (btn && btn.dataset.id) {
+                    openOrderDetailModal(btn.dataset.id);
+                }
+            });
+        }
+        
+        function openOrderDetailModal(orderId) {
+            const modal = document.getElementById('order-detail-modal');
+            const order = allOrders.find(o => o.id === orderId);
+
+            if (!order) { alert("Không tìm thấy đơn hàng!"); return; }
+            
+            // Điền thông tin chung
+            document.getElementById('modal-order-id').textContent = order.id;
+            document.getElementById('modal-date').textContent = formatDate(order.createdAt);
+            document.getElementById('modal-customer-name').textContent = order.customer.name;
+            document.getElementById('modal-customer-phone').textContent = order.customer.phone;
+            document.getElementById('modal-address').textContent = order.customer.address;
+            document.getElementById('modal-total').textContent = formatVND(order.total);
+            
+            const currentStatusEl = document.getElementById('modal-current-status');
+            currentStatusEl.textContent = order.status;
+            currentStatusEl.className = `order-status ${getStatusClass(order.status)}`;
+            
+            // Kiểm tra trạng thái không cho sửa
+            const statusSelect = document.getElementById('modal-status-select');
+            const updateBtn = document.getElementById('modal-update-status-btn');
+            const warningEl = document.getElementById('status-warning');
+            
+            statusSelect.value = order.status;
+            statusSelect.dataset.orderId = orderId; // Lưu ID để dùng cho hàm update
+
+            if (order.status === 'Đã hủy' || order.status === 'Đã giao') {
+                statusSelect.disabled = true;
+                updateBtn.disabled = true;
+                warningEl.classList.remove('hidden');
+            } else {
+                statusSelect.disabled = false;
+                updateBtn.disabled = false;
+                warningEl.classList.add('hidden');
+            }
+
+            // Render chi tiết sản phẩm
+            const itemsList = document.getElementById('modal-item-list');
+            itemsList.innerHTML = '';
+            order.items.forEach(item => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <span style="flex: 1 1 60%;"><strong>${item.name}</strong> (Mã: ${item.id})</span>
+                    <span style="flex: 1 1 20%; text-align: center;">SL: ${item.qty}</span>
+                    <span style="flex: 1 1 20%; text-align: right; font-weight: bold;">${formatVND(item.price * item.qty)}</span>
+                `;
+                itemsList.appendChild(div);
+            });
+
+            modal.style.display = 'flex';
+        }
+
+        function attachModalEvents() {
+            const modal = document.getElementById('order-detail-modal');
+            const closeBtn = document.getElementById('modal-close-btn');
+            const updateBtn = document.getElementById('modal-update-status-btn');
+
+            closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+            
+            updateBtn.addEventListener('click', () => {
+                const orderId = document.getElementById('modal-status-select').dataset.orderId;
+                const newStatus = document.getElementById('modal-status-select').value;
+                updateOrderStatus(orderId, newStatus);
+                modal.style.display = 'none';
+            });
+            
+             // Đóng modal khi click ra ngoài
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+        
+        // Cần hàm này trong admin.js
+        window.updateOrderStatus = function(orderId, newStatus) {
+            const allOrders = getFromStorage(ORDERS_KEY, []);
+            const index = allOrders.findIndex(o => o.id === orderId);
+
+            if (index === -1) {
+                alert("Lỗi: Không tìm thấy đơn hàng để cập nhật.");
+                return;
+            }
+            
+            // Xử lý logic nghiệp vụ
+            if (allOrders[index].status === 'Đã hủy' || allOrders[index].status === 'Đã giao') {
+                alert("Không thể thay đổi trạng thái của đơn hàng đã hoàn tất hoặc đã hủy.");
+                return;
+            }
+
+            allOrders[index].status = newStatus;
+            saveToStorage(ORDERS_KEY, allOrders); // Lưu lại
+            
+            // Tải lại bảng với bộ lọc hiện tại
+            applyFiltersAndSort();
+            
+            // Cập nhật tồn kho nếu chuyển sang trạng thái "Đã giao"
+            if (newStatus === 'Đã giao') {
+                // KICK: Gửi tín hiệu thay đổi ORDERS_KEY để Giaodien.js tự động cập nhật tồn kho
+                localStorage.setItem(ORDERS_KEY, JSON.stringify(allOrders));
+                alert(`Đã cập nhật đơn hàng ${orderId} sang trạng thái "${newStatus}"! Tồn kho đã được cập nhật.`);
+            } else {
+                alert(`Đã cập nhật đơn hàng ${orderId} sang trạng thái "${newStatus}"!`);
+            }
+        };
+
+    </script>
+</body>
+</html>

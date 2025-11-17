@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tồn kho & Báo cáo - Admin WatchTime</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <style>
+        .report-card { background-color: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .summary-item { padding: 1rem; border-radius: 6px; text-align: center; border: 1px solid #e2e8f0; }
+        .summary-item .value { font-size: 1.8rem; font-weight: 700; margin-top: 5px; }
+        .text-import { color: #3b82f6; }
+        .text-export { color: #ef4444; }
+        .text-inventory { color: #16a34a; }
+
+        /* Cảnh báo */
+        #low-stock-warning { border-left: 5px solid #f59e0b; background-color: #fffbeb; color: #b45309; padding: 1rem; margin-bottom: 2rem; border-radius: 8px; }
+        #low-stock-warning .warning-list { list-style: none; padding-left: 0; margin-top: 10px; }
+        #low-stock-warning .warning-list li { margin-bottom: 5px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <h1>WatchTime</h1>
+            <a href="#" id="admin-close-btn" class="admin-close-btn">&times;</a>
+            <nav class="admin-nav">
+                <a href="dashboard.html">Bảng điều khiển</a>
+                <a href="quanly_khachhang.html">Quản lý Người dùng</a>
+                <a href="quanly_sanpham.html">Quản lý Sản phẩm</a>
+                <a href="quanly_nhaphang.html">Quản lý Nhập hàng</a>
+                <a href="quanly_giaban.html">Quản lý Giá bán</a>
+                <a href="quanly_donhang.html">Quản lý Đơn hàng</a>
+                <a href="quanly_tonkho.html" class="active">Quản lý Tồn kho</a>
+                <a href="#" id="admin-logout-btn" class="logout">Đăng xuất</a>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <button id="admin-menu-btn" class="admin-menu-btn">☰</button>
+            <h2>Quản lý Tồn kho & Báo cáo</h2>
+            
+            <div id="low-stock-warning" class="hidden">
+                <p class="font-bold">⚠️ Cảnh báo tồn kho thấp (Dưới 5 sản phẩm):</p>
+                <ul id="low-stock-list" class="warning-list">
+                    </ul>
+            </div>
+
+            <div class="report-card">
+                <h3 class="text-xl font-bold mb-4">Báo cáo tổng hợp (Nhập - Xuất - Tồn)</h3>
+                
+                <div class="filter-bar" style="margin-bottom: 1.5rem; padding: 1rem;">
+                    <div class="form-group" style="flex: 1 1 200px;">
+                        <label for="report-date-from">Từ ngày</label>
+                        <input type="date" id="report-date-from">
+                    </div>
+                    <div class="form-group" style="flex: 1 1 200px;">
+                        <label for="report-date-to">Đến ngày</label>
+                        <input type="date" id="report-date-to">
+                    </div>
+                    <button id="btn-generate-report" class="btn-action btn-submit" style="background-color: #3b82f6;">Xem Báo cáo</button>
+                    <button id="btn-clear-report" class="btn-action btn-cancel">Reset</button>
+                </div>
+                
+                <div id="report-summary" class="summary-grid">
+                    <div class="summary-item">
+                        <div class="text-gray-600">Tổng Nhập (SP)</div>
+                        <div class="value text-import" id="total-import-qty">0</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="text-gray-600">Tổng Xuất (SP)</div>
+                        <div class="value text-export" id="total-export-qty">0</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="text-gray-600">Tổng Tồn kho hiện tại</div>
+                        <div class="value text-inventory" id="total-current-inventory">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-card">
+                <h3 class="text-xl font-bold mb-4">Tra cứu Tồn kho chi tiết</h3>
+
+                <div class="admin-form" style="padding: 1rem; margin-bottom: 1rem;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div class="form-group" style="flex: 1 1 250px;">
+                            <label for="search-inventory-input">Tìm sản phẩm</label>
+                            <input type="text" id="search-inventory-input" placeholder="Nhập mã hoặc tên sản phẩm...">
+                        </div>
+                        <div class="form-group" style="flex: 1 1 150px;">
+                            <label for="filter-inventory-category">Theo loại</label>
+                            <select id="filter-inventory-category">
+                                <option value="all">-- Tất cả --</option>
+                                </select>
+                        </div>
+                        <button type="button" id="btn-search-inventory" class="btn-action btn-edit" style="align-self: flex-end; height: 38px;">Tra cứu</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Mã & Tên SP</th>
+                                <th>Phân loại</th>
+                                <th>Giá bán</th>
+                                <th>Số lượng Tồn kho</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body">
+                            <tr><td colspan="4" style="text-align: center;">Vui lòng nhập từ khóa hoặc nhấn Tra cứu.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        // CÁC KEYS TỪ admin.js
+        const PRODUCTS_KEY = 'watchtime_products';
+        const ORDERS_KEY = 'allOrders';
+        const IMPORTS_KEY = 'watchtime_imports';
+        const CATEGORY_KEY = 'watchtime_categories'; 
+        
+        let allProducts = [];
+        let allCategories = [];
+        let allImports = [];
+        let allOrders = [];
+
+        // Ngưỡng cảnh báo tồn kho (dưới 5 sản phẩm)
+        const LOW_STOCK_THRESHOLD = 5;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            checkAdminLogin();
+            attachLogoutEvent();
+            attachMobileMenuEvents();
+            
+            loadBaseData();
+            populateCategorySelect();
+            
+            // Tải báo cáo và cảnh báo ban đầu
+            generateReport();
+            checkLowStockWarning();
+            
+            attachReportEvents();
+            attachInventorySearchEvents();
+        });
+        
+        // ======================================================
+        // CÁC HÀM TẢI DỮ LIỆU & HELPERS
+        // ======================================================
+        function loadBaseData() {
+            // Đảm bảo dữ liệu được lấy mới nhất từ localStorage
+            allProducts = getFromStorage(PRODUCTS_KEY, []);
+            allCategories = getFromStorage(CATEGORY_KEY, []);
+            allImports = getFromStorage(IMPORTS_KEY, []).filter(i => i.status === 'Đã hoàn thành');
+            allOrders = getFromStorage(ORDERS_KEY, []).filter(o => o.status === 'Đã giao');
+        }
+
+        function populateCategorySelect() {
+            const select = document.getElementById("filter-inventory-category");
+            if (!select) return;
+
+            allCategories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = cat.name;
+                select.appendChild(option);
+            });
+        }
+        
+        // ======================================================
+        // CHỨC NĂNG TÍNH TOÁN TỒN KHO
+        // ======================================================
+        /**
+         * Tính tồn kho (Tổng nhập hoàn thành - Tổng xuất đã giao)
+         * @returns {Map<string, number>} Map<productId, stockQty>
+         */
+        function calculateAllInventory() {
+            // LƯU Ý: Hàm này phụ thuộc vào `allProducts`, `allImports`, `allOrders` đã được tải mới nhất
+            const inventoryMap = new Map();
+
+            allProducts.forEach(prod => {
+                const id = prod.id;
+                let tongNhap = 0;
+                let tongXuat = 0;
+
+                // 1. Tính toán Nhập (dựa trên allImports đã lọc 'Đã hoàn thành')
+                allImports.forEach(imp => {
+                    const item = imp.items.find(i => (i.productId || i.id) === id);
+                    if (item) {
+                        tongNhap += item.qty;
+                    }
+                });
+
+                // 2. Tính toán Xuất (dựa trên allOrders đã lọc 'Đã giao')
+                allOrders.forEach(order => {
+                    const item = order.items.find(i => (i.id || i.productId) === id); 
+                    if (item) {
+                        tongXuat += item.qty;
+                    }
+                });
+                
+                // 3. Tính Tồn
+                let ton = tongNhap - tongXuat;
+                if (ton < 0) ton = 0; 
+                inventoryMap.set(id, ton);
+            });
+            
+            return inventoryMap;
+        }
+
+        // ======================================================
+        // CẢNH BÁO TỒN KHO THẤP
+        // ======================================================
+        function checkLowStockWarning() {
+            loadBaseData(); // Đảm bảo dữ liệu mới nhất
+            const inventoryMap = calculateAllInventory();
+            const warningEl = document.getElementById('low-stock-warning');
+            const listEl = document.getElementById('low-stock-list');
+            listEl.innerHTML = '';
+            
+            let lowStockProducts = [];
+
+            allProducts.forEach(prod => {
+                const stock = inventoryMap.get(prod.id) || 0;
+                if (stock > 0 && stock <= LOW_STOCK_THRESHOLD) {
+                    lowStockProducts.push({ name: prod.name, stock: stock, id: prod.id });
+                }
+            });
+
+            if (lowStockProducts.length > 0) {
+                warningEl.classList.remove('hidden');
+                lowStockProducts.sort((a, b) => a.stock - b.stock); // Sắp xếp cái ít nhất lên trước
+                
+                lowStockProducts.forEach(prod => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `Mã ${prod.id}: <strong>${prod.name}</strong> - còn 
+                        <span class="text-danger font-bold">${prod.stock}</span> SP.
+                    `;
+                    listEl.appendChild(li);
+                });
+            } else {
+                warningEl.classList.add('hidden');
+            }
+        }
+
+        // ======================================================
+        // BÁO CÁO NHẬP - XUẤT - TỒN
+        // ======================================================
+
+        function attachReportEvents() {
+            document.getElementById('btn-generate-report')?.addEventListener('click', generateReport);
+            document.getElementById('btn-clear-report')?.addEventListener('click', clearReportFilters);
+        }
+        
+        function clearReportFilters() {
+            document.getElementById('report-date-from').value = '';
+            document.getElementById('report-date-to').value = '';
+            generateReport();
+        }
+
+        function generateReport() {
+            loadBaseData(); // Đảm bảo dữ liệu mới nhất TRƯỚC KHI TÍNH TOÁN
+            const dateFrom = document.getElementById('report-date-from').value;
+            const dateTo = document.getElementById('report-date-to').value;
+            
+            let startTimestamp = 0;
+            let endTimestamp = Infinity;
+            
+            // Xử lý Ngày bắt đầu
+            if (dateFrom) {
+                const start = new Date(dateFrom);
+                startTimestamp = start.getTime();
+            }
+            // Xử lý Ngày kết thúc (bao gồm cả ngày đó)
+            if (dateTo) {
+                const end = new Date(dateTo);
+                end.setDate(end.getDate() + 1); 
+                endTimestamp = end.getTime();
+            }
+
+            let totalImportQty = 0;
+            let totalExportQty = 0;
+
+            // 1. Tính Tổng Nhập trong khoảng thời gian
+            allImports.forEach(imp => {
+                const importDate = new Date(imp.creationDate || imp.importDate).getTime();
+                if (importDate >= startTimestamp && importDate < endTimestamp) {
+                    totalImportQty += imp.totalQuantity;
+                }
+            });
+
+            // 2. Tính Tổng Xuất trong khoảng thời gian
+            allOrders.forEach(order => {
+                const orderDate = new Date(order.createdAt).getTime();
+                if (orderDate >= startTimestamp && orderDate < endTimestamp) {
+                    // Cần tính tổng số lượng sản phẩm trong đơn hàng
+                    const orderQty = (order.items || []).reduce((sum, item) => sum + item.qty, 0);
+                    totalExportQty += orderQty;
+                }
+            });
+            
+            // 3. Tính Tổng Tồn kho hiện tại (Không theo filter ngày)
+            const inventoryMap = calculateAllInventory();
+            let totalCurrentInventory = 0;
+            inventoryMap.forEach(qty => totalCurrentInventory += qty);
+
+            // 4. Hiển thị kết quả
+            document.getElementById('total-import-qty').textContent = totalImportQty.toLocaleString('vi-VN');
+            document.getElementById('total-export-qty').textContent = totalExportQty.toLocaleString('vi-VN');
+            document.getElementById('total-current-inventory').textContent = totalCurrentInventory.toLocaleString('vi-VN');
+        }
+
+        // ======================================================
+        // TRA CỨU TỒN KHO CHI TIẾT
+        // ======================================================
+        
+        function attachInventorySearchEvents() {
+            document.getElementById('btn-search-inventory')?.addEventListener('click', searchInventory);
+            document.getElementById('search-inventory-input')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchInventory();
+            });
+            document.getElementById('filter-inventory-category')?.addEventListener('change', searchInventory);
+        }
+
+        function searchInventory() {
+            loadBaseData(); // Đảm bảo dữ liệu mới nhất TRƯỚC KHI TÍNH TOÁN VÀ LỌC
+            const searchTerm = document.getElementById('search-inventory-input').value.toLowerCase().trim();
+            const categoryFilter = document.getElementById('filter-inventory-category').value;
+            const tableBody = document.getElementById("inventory-table-body");
+            
+            const inventoryMap = calculateAllInventory();
+            
+            let filteredProducts = allProducts.filter(prod => {
+                const matchSearch = searchTerm === '' || 
+                                    prod.id.toLowerCase().includes(searchTerm) || 
+                                    prod.name.toLowerCase().includes(searchTerm);
+                const matchCategory = categoryFilter === 'all' || prod.category === categoryFilter;
+                
+                // Chỉ hiển thị sản phẩm còn tồn kho hoặc khớp với tìm kiếm/lọc
+                const stock = inventoryMap.get(prod.id) || 0;
+                return matchSearch && matchCategory && (stock > 0 || searchTerm !== '');
+            });
+            
+            // Sắp xếp: Cái nào tồn kho ít hơn/hết hàng lên đầu
+            filteredProducts.sort((a, b) => {
+                const stockA = inventoryMap.get(a.id) || 0;
+                const stockB = inventoryMap.get(b.id) || 0;
+                return stockA - stockB;
+            });
+
+            tableBody.innerHTML = "";
+            if (filteredProducts.length === 0) {
+                 tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Không tìm thấy sản phẩm nào khớp với tìm kiếm/lọc.</td></tr>`; 
+                 return;
+            }
+
+            filteredProducts.forEach(prod => {
+                const stock = inventoryMap.get(prod.id) || 0;
+                const categoryName = allCategories.find(c => c.id === prod.category)?.name || 'Không rõ';
+                const stockClass = stock > LOW_STOCK_THRESHOLD ? 'text-success' : (stock > 0 ? 'text-warning' : 'text-danger');
+                
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>${prod.name}</strong> <div class="details">Mã: ${prod.id}</div></td>
+                    <td>${categoryName}</td>
+                    <td>${formatVND(prod.price)}</td>
+                    <td><strong class="${stockClass}">${stock.toLocaleString('vi-VN')}</strong></td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>

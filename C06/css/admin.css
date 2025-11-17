@@ -243,7 +243,21 @@ body {
 .text-profit { color: #16a34a; font-weight: 500; }
 .text-final-price { color: #1d4ed8; font-weight: bold; }
 
-
+/* --- CSS BỔ SUNG CHO TRANG QUẢN LÝ SẢN PHẨM --- */
+.tab-container { display: flex; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; }
+.tab-button { padding: 10px 15px; cursor: pointer; background: transparent; border: none; font-weight: 600; color: #64748b; transition: all 0.3s; margin-bottom: -2px; }
+.tab-button.active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
+.tab-content { padding: 10px 0; }
+.tab-content.hidden { display: none; }
+.product-image-preview { width: 100px; height: 100px; object-fit: cover; border: 1px solid #e2e8f0; border-radius: 4px; margin-top: 10px; }
+.btn-toggle-status { background-color: #10b981; color: white; }
+.btn-toggle-status.selling { background-color: #dc2626; }
+.btn-toggle-status:hover { opacity: 0.8; }
+/* Nút mới cho Quản lý Danh mục */
+.btn-add-category { background-color: #3b82f6; color: white; }
+.btn-add-category:hover { background-color: #2563eb; }
+.category-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #fff; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px; }
+/* --- KẾT THÚC CSS BỔ SUNG --- */
 
 /* ========================================= */
 /* === Mã CSS Responsive (Bản Hamburger) === */

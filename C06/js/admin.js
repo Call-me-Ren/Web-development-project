@@ -29,6 +29,7 @@ function attachMobileMenuEvents() {
 const PRODUCTS_KEY = 'watchtime_products'; // Key sản phẩm gốc
 const ORDERS_KEY = 'allOrders'; 
 const IMPORTS_KEY = 'watchtime_imports'; 
+const CATEGORY_KEY = 'watchtime_categories'; // Bổ sung key Category
 
 
 /* --- HÀM CHUNG --- */
@@ -79,6 +80,14 @@ function getFromStorage(key, defaultValue = []) {
 }
 function saveToStorage(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
+    
+    // BỔ SUNG: Nếu lưu PRODUCTS_KEY hoặc CATEGORY_KEY hoặc ORDERS_KEY
+    // ta cần kích hoạt lại lắng nghe để client cập nhật giao diện
+    if (key === PRODUCTS_KEY || key === CATEGORY_KEY || key === ORDERS_KEY) {
+        // Cần kích hoạt sự kiện 'storage' ở các tab khác
+        // Bằng cách đơn giản nhất là ghi đè lại chính key đó (dù giá trị đã giống)
+        localStorage.setItem(key, JSON.stringify(data));
+    }
 }
 
 // BỔ SUNG: Hàm kiểm tra và buộc đăng xuất Admin (dùng khi tài khoản bị khóa)
@@ -383,4 +392,41 @@ window.updateProductMarginAndPrice = function(productId, newMargin) {
     localStorage.setItem(PRODUCTS_KEY, JSON.stringify(allProducts));
     
     alert(`Đã cập nhật Tỉ lệ Lợi nhuận (${newMargin}%) và Giá bán mới thành công!`);
+};
+
+/* ================================================================
+  PHẦN 4: QUẢN LÝ ĐƠN HÀNG (LOGIC MỚI)
+================================================================
+*/
+
+/**
+ * Cập nhật trạng thái đơn hàng (Được gọi từ quanly_donhang.html)
+ */
+window.updateOrderStatus = function(orderId, newStatus) {
+    const allOrders = getFromStorage(ORDERS_KEY, []);
+    const index = allOrders.findIndex(o => o.id === orderId);
+
+    if (index === -1) {
+        alert("Lỗi: Không tìm thấy đơn hàng để cập nhật.");
+        return;
+    }
+    
+    const currentStatus = allOrders[index].status;
+
+    // Ngăn cản thay đổi trạng thái nếu đã Hủy/Đã giao
+    if (currentStatus === 'Đã hủy' || currentStatus === 'Đã giao') {
+        alert("Không thể thay đổi trạng thái của đơn hàng đã hoàn tất hoặc đã hủy.");
+        return;
+    }
+    
+    allOrders[index].status = newStatus;
+    saveToStorage(ORDERS_KEY, allOrders); 
+    
+    // Nếu chuyển sang trạng thái "Đã giao", cần kích hoạt cập nhật tồn kho ở Client
+    if (newStatus === 'Đã giao') {
+        // KICK: Gửi tín hiệu thay đổi ORDERS_KEY để Giaodien.js tự động cập nhật tồn kho
+        localStorage.setItem(ORDERS_KEY, JSON.stringify(allOrders));
+    }
+    
+    // Lưu ý: Cập nhật lại giao diện bảng sẽ được thực hiện ở file HTML gọi hàm này.
 };
