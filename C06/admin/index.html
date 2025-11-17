@@ -37,19 +37,18 @@
             const errorMsg = document.getElementById("error-message");
 
             // --- TÀI KHOẢN ADMIN (Hard-code) ---
-            // Vì không có CSDL, chúng ta sẽ gán cứng tài khoản admin
-            const ADMIN_USER = "admin";
-            const ADMIN_PASS = "123456";
+            // ĐÃ CẬP NHẬT TỪ: admin/123456
+            const ADMIN_USER = "quanly1";
+            const ADMIN_PASS = "abcd1234";
 
             if (user === ADMIN_USER && pass === ADMIN_PASS) {
                 // Đăng nhập thành công
                 // Lưu trạng thái đăng nhập admin vào sessionStorage
-                // (Dùng sessionStorage để admin tự đăng xuất khi đóng trình duyệt)
                 sessionStorage.setItem("isAdminLoggedIn", "true");
                 
                 // Chuyển hướng tới trang dashboard
                 alert("Đăng nhập admin thành công!");
-                window.location.href = "dashboard.html"; // Trang này chúng ta sẽ tạo ở bước sau
+                window.location.href = "dashboard.html"; 
                 
             } else {
                 // Đăng nhập thất bại

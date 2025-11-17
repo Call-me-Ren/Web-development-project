@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Khách hàng - Admin WatchTime</title>
+    <title>Quản lý Người dùng - Admin WatchTime</title>
     <link rel="stylesheet" href="../css/admin.css">
     <style>
         .admin-table { width: 100%; border-collapse: collapse; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
@@ -12,10 +12,34 @@
         .admin-table tr:last-child td { border-bottom: none; }
         .admin-table tr:hover { background-color: #fdfdfd; }
         .btn-action { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.8rem; margin-right: 5px; }
-        .btn-reset { background-color: #3b82f6; color: white; }
-        .btn-reset:hover { background-color: #2563eb; }
+        /* Nút hành động */
+        .btn-doi-mk { background-color: #3b82f6; color: white; }
+        .btn-doi-mk:hover { background-color: #2563eb; }
         .btn-toggle-lock { background-color: #ef4444; color: white; }
         .btn-toggle-lock:hover { background-color: #dc2626; }
+        
+        /* CSS cho form thêm */
+        .admin-form { background-color: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+        .form-group { margin-bottom: 0.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4b5563; }
+        .form-group input { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; }
+        .btn-submit { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 700; color: #ffffff; background-color: #16a34a; border: none; border-radius: 6px; cursor: pointer; }
+        /* Responsive cho form thêm */
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+        
+        /* TỐI ƯU HÓA: Buộc các cột nội dung hiển thị trên một dòng */
+        .admin-table td:nth-child(1), /* Tên tài khoản */
+        .admin-table td:nth-child(2), /* Họ tên */
+        .admin-table td:nth-child(3), /* Số điện thoại */
+        .admin-table td:nth-child(4), /* Địa chỉ */
+        .admin-table td:nth-child(5) { /* Trạng thái */
+            white-space: nowrap;
+        }
+        /* Cột hành động vẫn giữ nguyên để các nút nằm cạnh nhau */
+
     </style>
 </head>
 <body>
@@ -25,7 +49,7 @@
             <a href="#" id="admin-close-btn" class="admin-close-btn">&times;</a>
             <nav class="admin-nav">
                 <a href="dashboard.html">Bảng điều khiển</a>
-                <a href="quanly_khachhang.html" class="active">Quản lý Khách hàng</a>
+                <a href="quanly_khachhang.html" class="active">Quản lý Người dùng</a>
                 <a href="quanly_loaisp.html">Quản lý Loại Sản phẩm</a>
                 <a href="quanly_sanpham.html">Quản lý Sản phẩm</a>
                 <a href="quanly_nhaphang.html">Quản lý Nhập hàng</a>
@@ -39,17 +63,36 @@
 
         <main class="admin-main">
             <button id="admin-menu-btn" class="admin-menu-btn">☰</button>
-            <h2>Quản lý Khách hàng</h2>
+            <h2>Quản lý Người dùng</h2>
+            
+            <form id="add-user-form" class="admin-form">
+                <h3 class="text-xl font-bold mb-4">Thêm tài khoản mới</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="new-user-email">Tên tài khoản</label>
+                        <input type="text" id="new-user-email" placeholder="Ví dụ: khachhang1, user01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-user-pass">Mật khẩu</label>
+                        <input type="text" id="new-user-pass" placeholder="Mật khẩu mới" required>
+                    </div>
+                    <div class="form-group" style="align-self: flex-end;">
+                        <button type="submit" class="btn-submit" style="width: 100%;">Thêm tài khoản</button>
+                    </div>
+                </div>
+            </form>
+
+            <h3 class="text-xl font-bold mt-8 mb-4">Danh sách Người dùng</h3>
             <div class="table-container">
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Email (Tài khoản)</th>
+                            <th>Tên tài khoản</th>
                             <th>Họ tên</th>
                             <th>Số điện thoại</th>
                             <th>Địa chỉ</th>
                             <th>Trạng thái</th>
-                            <th>Hành động</th>
+                            <th>HÀNH ĐỘNG (THAY ĐỔI MẬT KHẨU / KHOÁ)</th>
                         </tr>
                     </thead>
                     <tbody id="user-table-body">
@@ -66,6 +109,7 @@
             checkAdminLogin();
             attachLogoutEvent();
             loadUserTable();
+            attachAddUserFormEvent();
             attachMobileMenuEvents();
         });
     </script>
