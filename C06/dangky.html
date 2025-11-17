@@ -17,58 +17,48 @@
 
       <div class="form-register">
         <div class="full-name">
-          <input type="text" id="firstname" placeholder="Họ" />
-          <input type="text" id="lastname" placeholder="Tên" />
+          <div class="input-group">
+            <label for="firstname">Họ</label>
+            <input type="text" id="firstname" placeholder="Nhập họ của bạn" />
+          </div>
+          <div class="input-group">
+            <label for="lastname">Tên</label>
+            <input type="text" id="lastname" placeholder="Nhập tên của bạn" />
+          </div>
         </div>
 
-        <div class="email">
-          <input type="text" id="email" placeholder="Tên đăng Nhập" />
+        <div class="input-group email">
+          <label for="email">Tên đăng Nhập</label>
+          <input type="text" id="email" placeholder="Ví dụ: nguyenvanA" />
         </div>
 
-        <div class="number">
-          <input type="tel" id="number" placeholder="Số điện thoại" />
+        <div class="input-group number">
+          <label for="number">Số điện thoại</label>
+          <input type="tel" id="number" placeholder="Nhập số điện thoại" />
         </div>
 
-        <div class="road">
-          <input type="text" id="address" placeholder="Địa chỉ" />
+        <div class="input-group road">
+          <label for="address">Địa chỉ</label>
+          <input type="text" id="address" placeholder="Nhập địa chỉ của bạn" />
         </div>
 
-        <div class="password">
-          <input type="password" id="password" placeholder="Mật khẩu mới" />
+        <div class="input-group password">
+          <label for="password">Mật khẩu mới</label>
+          <input type="password" id="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" />
           <div class="eye" data-target="password">
             <i class="far fa-eye"></i>
           </div>
         </div>
 
-        <div class="password-confirm">
+        <div class="input-group password-confirm">
+          <label for="repassword">Nhập lại mật khẩu</label>
           <input
             type="password"
             id="repassword"
-            placeholder="Nhập lại mật khẩu"
+            placeholder="Nhập lại mật khẩu đã tạo"
           />
           <div class="eye" data-target="repassword">
             <i class="far fa-eye"></i>
-          </div>
-        </div>
-
-        <div class="birthday">
-          <p class="font-sub">Ngày sinh</p>
-          <div class="c-birthday">
-            <div class="day">
-              <select id="day">
-                <option value="">Ngày</option>
-              </select>
-            </div>
-            <div class="month">
-              <select id="month">
-                <option value="">Tháng</option>
-              </select>
-            </div>
-            <div class="year">
-              <select id="year">
-                <option value="">Năm</option>
-              </select>
-            </div>
           </div>
         </div>
 
