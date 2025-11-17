@@ -165,7 +165,7 @@ function saveToStorage(key, data) {
         // TÀI KHOẢN MẪU MỚI (Khóa/Không khóa)
         { key: 'khachhang1', username: 'khachhang1', password: '123456', firstname: 'Khách', lastname: 'Hàng 1', isLocked: false, number: 'Chưa có', address: 'Chưa có', isAdmin: false },
         { key: 'khachhang2', username: 'khachhang2', password: '123456', firstname: 'Khách', lastname: 'Hàng 2 (Khóa)', isLocked: true, number: 'Chưa có', address: 'Chưa có', isAdmin: false },
-        { key: 'khachhang3', username: 'khachhang3', password: '123456', firstname: 'Khách', lastname: 'Hàng 3', isLocked: false, number: 'Chưa có', address: 'Chưa có', isAdmin: false }
+        { key: 'khachhang3', username: 'khachhang3', password: '123456', firstname: 'Khách', lastname: 'Hàng 3', isLocked: true, number: 'Chưa có', address: 'Chưa có', isAdmin: false }
     ];
 
     defaultUsers.forEach(user => {
