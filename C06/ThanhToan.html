@@ -45,6 +45,8 @@ textarea{min-height:88px;resize:vertical}
 .muted{color:var(--muted)}
 .hidden{display:none}
 .qr-img{max-width:320px;width:90%;height:auto;border-radius:8px;border:8px solid #fff;box-shadow:0 6px 20px rgba(2,6,23,0.06);display:block;margin:12px auto}
+#orderSummaryArea{margin-top:20px} /* New style for summary area */
+
 @media(min-width:820px){.grid{display:grid;grid-template-columns:1fr 360px;gap:20px}.bottom-summary{display:none}header{align-items:center}.page{margin-top:18px}}
 @media(max-width:820px){
   body{background:#f9fafb}
@@ -68,6 +70,7 @@ textarea{min-height:88px;resize:vertical}
   #mobileOrderArea .card{margin-top:10px;padding:14px}
   .qr-img{width:100%;max-width:280px}
   .card,#totalWrap{box-shadow:0 4px 12px rgba(0,0,0,0.06)}
+  #orderSummaryArea{margin-bottom:100px} /* Add margin bottom to avoid overlap with totalWrap */
 }
 </style>
 </head>
@@ -100,8 +103,8 @@ textarea{min-height:88px;resize:vertical}
   </div>
   <div>
     <label for="address">Địa chỉ giao hàng</label>
-    <textarea id="address" placeholder="Ví dụ: 123 Nguyễn Trãi, Quận 1, TP.HCM"></textarea>
-    <div class="note">Để trống để dùng địa chỉ đã lưu trong tài khoản (nếu có).</div>
+<textarea id="address" placeholder="Ví dụ: 123 Nguyễn Trãi, Quận 1, TP.HCM"></textarea>
+<div class="note">Để trống để dùng địa chỉ đã lưu trong tài khoản (nếu có).</div>
   </div>
 
   <div>
@@ -114,7 +117,7 @@ textarea{min-height:88px;resize:vertical}
   </div>
 
   <div style="margin-top:12px">
-    <button id="placeOrderBtnMobile" class="btn" style="width:100%;">Đặt hàng</button>
+    <button id="placeOrderBtnMobile" class="btn" style="width:100%">Đặt hàng</button>
   </div>
 
   <div id="formBankArea" class="card hidden" style="padding:12px;margin-top:12px">
@@ -134,6 +137,22 @@ textarea{min-height:88px;resize:vertical}
 </div>
 </div>
 
+<div id="orderSummaryArea" class="card hidden">
+    <h3 style="margin-top:0; color:var(--brand)">✅ Đặt hàng thành công!</h3>
+    <div style="margin-bottom:8px"><strong>Mã đơn:</strong> <span id="summaryOrderId"></span></div>
+    <div style="margin-bottom:4px"><strong>Ngày đặt:</strong> <span id="summaryDateTime"></span></div>
+    <div style="margin-bottom:4px"><strong>Người nhận:</strong> <span id="summaryCustomerName"></span></div>
+    <div style="margin-bottom:4px"><strong>Địa chỉ:</strong> <span id="summaryAddress"></span></div>
+    <div style="margin-bottom:12px"><strong>SĐT:</strong> <span id="summaryPhone"></span></div>
+    
+    <div style="font-weight:700; margin-bottom:8px">Sản phẩm:</div>
+    <div id="summaryItemsList" style="margin-bottom:12px; border-top:1px solid #eee; padding-top:8px;"></div>
+    
+    <div style="display:flex;justify-content:space-between;align-items:center; border-top:1px solid #eee; padding-top:12px">
+      <div><strong>Phương thức:</strong> <span id="summaryPayment"></span></div>
+      <div style="font-weight:800; font-size:18px; color:crimson" id="summaryTotal"></div>
+    </div>
+</div>
 <div id="mobileOrderArea" style="margin-top:12px"></div>
 </div>
 
@@ -155,164 +174,264 @@ textarea{min-height:88px;resize:vertical}
 </div>
 
 <script>
-// ======== GIỎ HÀNG ========
+// === STORAGE KEYS ===
 const CART_KEY='watchtime_cart';
-function getCart(){ return JSON.parse(localStorage.getItem(CART_KEY)||'[]'); }
-function saveCart(c){ localStorage.setItem(CART_KEY,JSON.stringify(c)); renderCartUI(); }
-function sumCart(c){ return (c||[]).reduce((s,i)=>s+(Number(i.price)||0)*(i.qty||1),0); }
-function formatVND(n){ return Number(n).toLocaleString('vi-VN')+'₫'; }
-function e(s){ return String(s||'').replace(/[&<>"]+/g,''); }
+const ORDERS_KEY='allOrders';
+const IMPORTS_KEY='watchtime_imports';
 
-function renderCartUI(){
-    const cart=getCart(),cartList=document.getElementById('cartList'),empty=document.getElementById('cartEmptyNotice'),totalWrap=document.getElementById('totalWrap'),totalPrice=document.getElementById('totalPrice');
-    cartList.innerHTML='';
-    if(!cart.length){ empty.classList.remove('hidden'); totalWrap.style.display='none'; totalPrice.textContent='0₫'; return; }
-    empty.classList.add('hidden');
-    cart.forEach((it,idx)=>{
-        const div=document.createElement('div'); div.className='cart-item';
-        div.innerHTML=`<div class="meta"><div style="font-weight:700">${e(it.name)}</div><div class="muted" style="font-size:13px;margin-top:6px">Mã: ${e(it.id||'')}</div></div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="price">${formatVND(it.price*it.qty)}</div>
-        <div style="display:flex;gap:6px;align-items:center"><div class="qty"><button data-action="dec">−</button><div class="count">${it.qty}</div><button data-action="inc">+</button></div><button class="remove-btn">Xóa</button></div></div>`;
-        cartList.appendChild(div);
-        div.querySelector('[data-action="dec"]').addEventListener('click',()=>{ 
-            if(it.qty>1){ it.qty--; saveCart(getCart()); } 
-            else if(confirm('Giảm sẽ xóa sản phẩm. Xóa?')){ getCart().splice(idx,1); saveCart(getCart()); } 
-        });
-        div.querySelector('[data-action="inc"]').addEventListener('click',()=>{ it.qty++; saveCart(getCart()); });
-        div.querySelector('.remove-btn').addEventListener('click',()=>{ if(confirm('Xóa sản phẩm?')){ getCart().splice(idx,1); saveCart(getCart()); } });
+// === HELPERS ===
+function getStorageData(key, def) { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : (def===undefined?[]:def); } catch(e) { return def===undefined?[]:def; } }
+function saveStorageData(key, v){ localStorage.setItem(key, JSON.stringify(v)); }
+function getCart(){ return getStorageData(CART_KEY, []); }
+function saveCart(c){ saveStorageData(CART_KEY, c); renderCartUI(); }
+function sumCart(c){ return (c||[]).reduce((s,i)=>s + (Number(i.price)||0) * (i.qty||1), 0); }
+function formatVND(n){ return Number(n).toLocaleString('vi-VN') + '₫'; }
+function e(s){ return String(s||'').replace(/[&<>"']/g, ''); }
+
+// === INVENTORY ===
+function calculateAllInventory(){
+    
+    // --- ĐÃ THÊM: KHỞI TẠO DỮ LIỆU NHẬP HÀNG GIẢ ĐỊNH NẾU CHƯA CÓ ---
+    // Điều này đảm bảo tồn kho ban đầu > 0 cho các sản phẩm trong giỏ hàng demo
+    if (!localStorage.getItem(IMPORTS_KEY) || getStorageData(IMPORTS_KEY).length === 0) {
+        const mockImport = {
+            id: 'IMP' + Date.now().toString().slice(-10),
+            status: 'Đã hoàn thành',
+            items: [
+                // Thêm tồn kho 100 cho sản phẩm Đồng hồ OIP
+                { id: 'sp_oip', name: 'Đồng hồ OIP', qty: 100, price: 4000000 }
+                // Nếu có sản phẩm khác, thêm vào đây: { id: 'mã_sp', name: 'Tên SP', qty: 50, price: ... }
+            ],
+            createdAt: new Date().toISOString()
+        };
+        saveStorageData(IMPORTS_KEY, [mockImport]);
+    }
+    // ------------------------------------------------------------------
+
+    const imports = getStorageData(IMPORTS_KEY, []).filter(i=>i.status==='Đã hoàn thành');
+    const orders = getStorageData(ORDERS_KEY, []).filter(o=>o.status==='Đã giao');
+    const inventory = new Map();
+
+    // gather all product ids from imports/orders/cart
+    const ids = new Set();
+    imports.forEach(imp => imp.items && imp.items.forEach(it => ids.add(it.productId || it.id)));
+    orders.forEach(o => o.items && o.items.forEach(it => ids.add(it.productId || it.id)));
+    getCart().forEach(i => ids.add(i.id));
+
+    ids.forEach(id => {
+        let inQty = 0, outQty = 0;
+        imports.forEach(imp => { const it = imp.items && imp.items.find(i => (i.productId||i.id)===id); if(it) inQty += (it.qty||0); });
+        orders.forEach(o => { const it = o.items && o.items.find(i => (i.id||i.productId)===id); if(it) outQty += (it.qty||0); });
+        inventory.set(id, Math.max(0, inQty - outQty));
     });
-    totalPrice.textContent=formatVND(sumCart(cart));
-    totalWrap.style.display='flex';
+    return inventory;
 }
 
-// ======== NGƯỜI NHẬN ========
-function initializeRecipientSelect(){
-    const select=document.getElementById('recipient'); if(!select) return;
-    select.innerHTML='';
+// === RENDER CART ===
+function renderCartUI(){
+    const cart = getCart();
+    const cartList = document.getElementById('cartList');
+    const empty = document.getElementById('cartEmptyNotice');
+    const totalWrap = document.getElementById('totalWrap');
+    const totalPrice = document.getElementById('totalPrice');
+    const inventory = calculateAllInventory();
 
-    const allRegisteredUsers = JSON.parse(localStorage.getItem('registeredUsers')||'[]');
-    const subAccounts = JSON.parse(localStorage.getItem('subAccounts')||'[]');
-    const currentUser = JSON.parse(localStorage.getItem('currentUser')||'null');
+    cartList.innerHTML = '';
+    if(!cart.length){ empty.classList.remove('hidden'); totalWrap.style.display='none'; totalPrice.textContent='0₫'; return; }
+    empty.classList.add('hidden');
 
-    // Người dùng đã đăng ký
-    allRegisteredUsers.forEach((user,index)=>{
-        if(user.address){
-            const opt=document.createElement('option');
-            opt.value=`reg_user_${index}`;
-            opt.textContent=`${user.name} — ${user.address}`;
-            select.appendChild(opt);
-        }
+    cart.forEach((it, idx) => {
+        const div = document.createElement('div'); div.className='cart-item';
+        div.innerHTML = `
+<div class="meta"><div style="font-weight:700">${e(it.name)}</div><div class="muted" style="font-size:13px;margin-top:6px">Mã: ${e(it.id||'')}</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="price">${formatVND((it.price||0)*it.qty)}</div>
+            <div style="display:flex;gap:6px;align-items:center"><div class="qty"><button data-action="dec">−</button><div class="count">${it.qty}</div><button data-action="inc">+</button></div><button class="remove-btn">Xóa</button></div></div>
+        `;
+        cartList.appendChild(div);
+
+        div.querySelector('[data-action="dec"]').addEventListener('click', ()=>{
+            const current = getCart();
+            if(current[idx].qty > 1){ current[idx].qty--; saveCart(current); }
+            else if(confirm('Giảm sẽ xóa sản phẩm. Xóa?')){ current.splice(idx,1); saveCart(current); }
+        });
+        div.querySelector('[data-action="inc"]').addEventListener('click', ()=>{
+            const stock = inventory.get(it.id) || 0;
+            const newQty = it.qty + 1;
+            if(newQty > stock){ alert(`Sản phẩm "${it.name}" chỉ còn ${stock}`); }
+            else { const current = getCart(); current[idx].qty++; saveCart(current); }
+        });
+        div.querySelector('.remove-btn').addEventListener('click', ()=>{ if(confirm('Xóa sản phẩm?')){ const current = getCart(); current.splice(idx,1); saveCart(current); } });
     });
 
-    // Tài khoản đang đăng nhập
+    totalPrice.textContent = formatVND(sumCart(cart));
+    totalWrap.style.display = 'flex';
+}
+
+// === RECIPIENTS ===
+function initializeRecipientSelect(){
+    const select = document.getElementById('recipient'); if(!select) return;
+    select.innerHTML = '';
+
+    const currentUser = getStorageData('currentUser', null);
+    const subAccounts = getStorageData('subAccounts', []);
+    const allRegisteredUsers = getStorageData('registeredUsers', []);
+
     if(currentUser && currentUser.address){
-        const opt=document.createElement('option');
-        opt.value='default_user';
-        opt.textContent=`${currentUser.firstname||''} ${currentUser.lastname||''} — ${currentUser.address}`;
+        const opt = document.createElement('option'); opt.value='default_user';
+        const fullName = `${currentUser.firstname||''} ${currentUser.lastname||''}`.trim();
+        opt.textContent = `Địa chỉ của tôi: ${fullName ? fullName + ' — ' : ''}${currentUser.address}`;
         select.appendChild(opt);
     }
 
-    // Tài khoản phụ
-    subAccounts.forEach((sub,idx)=>{
-        if(sub.name && sub.address){
-            const opt=document.createElement('option');
-            opt.value=`sub_${idx}`;
-            opt.textContent=`${sub.name} — ${sub.address}`;
-            select.appendChild(opt);
-        }
-    });
+    subAccounts.forEach((sub, idx) => { if(sub.name && sub.address){ const opt=document.createElement('option'); opt.value=`sub_${idx}`; opt.textContent=`Tài khoản phụ: ${sub.name} — ${sub.address}`; select.appendChild(opt); } });
 
-    // Nhập mới
-    const optNew=document.createElement('option');
-    optNew.value='new_input';
-    optNew.textContent='Nhập thông tin người nhận mới';
-    select.appendChild(optNew);
+    allRegisteredUsers.forEach((user, idx) => { if(user.address){ const opt=document.createElement('option'); opt.value=`reg_user_${idx}`; opt.textContent = `${user.name} — ${user.address}`; select.appendChild(opt); } });
 
-    select.addEventListener('change',handleRecipientChange);
-    handleRecipientChange();
+    const optNew = document.createElement('option'); optNew.value='new_input'; optNew.textContent='Nhập thông tin người nhận mới'; select.appendChild(optNew);
+select.addEventListener('change', handleRecipientChange);
+handleRecipientChange();
 }
 
 function handleRecipientChange(){
-    const select=document.getElementById('recipient'); if(!select) return;
-    const val=select.value; 
-    const nameInput=document.getElementById('name'); 
-    const phoneInput=document.getElementById('phone'); 
-    const addressInput=document.getElementById('address');
+    const select = document.getElementById('recipient'); if(!select) return;
+    const val = select.value;
+    const nameInput = document.getElementById('name');
+    const phoneInput = document.getElementById('phone');
+    const addressInput = document.getElementById('address');
 
-    nameInput.disabled=phoneInput.disabled=addressInput.disabled=false;
-    nameInput.value=phoneInput.value=addressInput.value='';
+    nameInput.disabled = phoneInput.disabled = addressInput.disabled = false;
+    nameInput.value = phoneInput.value = addressInput.value = '';
 
-    const allRegisteredUsers = JSON.parse(localStorage.getItem('registeredUsers')||'[]');
-    const subAccounts = JSON.parse(localStorage.getItem('subAccounts')||'[]');
-    const currentUser = JSON.parse(localStorage.getItem('currentUser')||'null');
+    const currentUser = getStorageData('currentUser', null);
+    const subAccounts = getStorageData('subAccounts', []);
+    const allRegisteredUsers = getStorageData('registeredUsers', []);
 
-    if(val==='default_user' && currentUser){
-        nameInput.value=`${currentUser.firstname||''} ${currentUser.lastname||''}`.trim(); 
-        phoneInput.value=currentUser.number||''; 
-        addressInput.value=currentUser.address||''; 
-        nameInput.disabled=phoneInput.disabled=addressInput.disabled=true; 
-    }
-    else if(val.startsWith('sub_')){
-        const idx=parseInt(val.split('_')[1]); 
-        const sub=subAccounts[idx];
-        if(sub){ nameInput.value=sub.name; phoneInput.value=sub.phone; addressInput.value=sub.address; nameInput.disabled=phoneInput.disabled=addressInput.disabled=true; } 
-    }
-    else if(val.startsWith('reg_user_')){
-        const idx=parseInt(val.split('_')[2]||val.split('_')[1]); 
-        const user=allRegisteredUsers[idx];
-        if(user){ nameInput.value=user.name; phoneInput.value=user.number; addressInput.value=user.address; nameInput.disabled=phoneInput.disabled=addressInput.disabled=true; }
+    if(val === 'default_user' && currentUser){
+        nameInput.value = `${currentUser.firstname||''} ${currentUser.lastname||''}`.trim();
+        phoneInput.value = currentUser.number || '';
+        addressInput.value = currentUser.address || '';
+        nameInput.disabled = phoneInput.disabled = addressInput.disabled = true;
+    } else if(val.startsWith('sub_')){
+        const idx = parseInt(val.split('_')[1], 10);
+        const sub = subAccounts[idx]; if(sub){ nameInput.value=sub.name; phoneInput.value=sub.phone||''; addressInput.value=sub.address||''; nameInput.disabled=phoneInput.disabled=addressInput.disabled=true; }
+    } else if(val.startsWith('reg_user_')){
+        const idx = parseInt(val.split('_')[2], 10);
+        const user = allRegisteredUsers[idx]; if(user){ nameInput.value=user.name; phoneInput.value=user.number||''; addressInput.value=user.address||''; nameInput.disabled=phoneInput.disabled=addressInput.disabled=true; }
     }
 }
 
-// ======== THANH TOÁN ========
-let selectedPayment='cod';
-const formBankArea = document.getElementById('formBankArea');
-const formQrArea = document.getElementById('formQrArea');
-document.querySelectorAll('input[name="payment"]').forEach(r=>r.addEventListener('change',()=>{
-    selectedPayment=document.querySelector('input[name="payment"]:checked').value;
-    formBankArea.classList.add('hidden'); formQrArea.classList.add('hidden');
-    if(selectedPayment==='bank') formBankArea.classList.remove('hidden');
-    else if(selectedPayment==='online') formQrArea.classList.remove('hidden');
-}));
+// === PAYMENT UI ===
+let selectedPayment = 'cod';
+function setupPaymentListeners(){
+    document.querySelectorAll('input[name="payment"]').forEach(r => r.addEventListener('change', ()=>{
+        selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+        document.getElementById('formBankArea').classList.add('hidden');
+        document.getElementById('formQrArea').classList.add('hidden');
+        if(selectedPayment === 'bank') document.getElementById('formBankArea').classList.remove('hidden');
+        if(selectedPayment === 'online') document.getElementById('formQrArea').classList.remove('hidden');
+        // Ẩn tóm tắt đơn hàng khi thay đổi phương thức thanh toán
+        document.getElementById('orderSummaryArea').classList.add('hidden');
+    }));
+}
 
-// ======== TẠO ĐƠN HÀNG ========
+// === ORDER BUILD & SHOW ===
 function buildOrder(){
-    const cart=getCart(); if(!cart.length){ alert('Giỏ hàng rỗng'); return null; }
+    const cart = getCart(); if(!cart.length){ alert('Giỏ hàng trống'); return null; }
 
-    let name=document.getElementById('name').value.trim();
-    let phone=document.getElementById('phone').value.trim();
-    let address=document.getElementById('address').value.trim();
+    const inventory = calculateAllInventory();
+    
+    // --- ĐÃ SỬA: KHÔI PHỤC LOGIC CHẶN ĐẶT HÀNG NẾU KHÔNG ĐỦ TỒN KHO ---
+    // Vì đã thêm Mock Data, nên logic này sẽ hoạt động chính xác.
+    for(const item of cart){ 
+        const stock = inventory.get(item.id) || 0; 
+        if(item.qty > stock){ 
+            alert(`Sản phẩm "${item.name}" chỉ còn ${stock} sản phẩm trong kho!`); 
+            return null; 
+        } 
+    }
+    // ------------------------------------------------------------------
 
-    if(!name||!phone||!address){ alert('Vui lòng nhập đầy đủ Họ tên, SĐT, Địa chỉ'); return null; }
+    const name = document.getElementById('name').value.trim();
+const phone = document.getElementById('phone').value.trim();
+    const address = document.getElementById('address').value.trim();
+    if(!name || !phone || !address){ alert('Vui lòng nhập đầy đủ Họ tên, SĐT, Địa chỉ'); return null; }
+const pm = document.querySelector('input[name="payment"]:checked').value;
+    const currentUser = getStorageData('currentUser', null);
 
-    const pm=document.querySelector('input[name="payment"]:checked').value;
-    const currentUser = JSON.parse(localStorage.getItem('currentUser')||'null');
-    return { 
-        id:'ORD'+Date.now(), 
-        userEmail:currentUser?currentUser.email:'guest', 
-        customer:{name,phone,address}, 
-        items:cart.map(i=>({...i})), 
-        total:sumCart(cart), 
-        paymentMethod:pm, 
-        status:'Mới đặt' 
+    return {
+        id: 'ORD' + Date.now().toString().slice(-10), // Rút gọn ID cho dễ nhìn
+        userEmail: currentUser ? currentUser.email : 'guest',
+        customer: { name, phone, address },
+        items: cart.map(i => ({ ...i })),
+        total: sumCart(cart),
+        paymentMethod: pm,
+        status: 'Mới đặt',
+        createdAt: new Date().toISOString()
     };
 }
 
-function showOrderSummary(order){
-    if(order.paymentMethod==='online') document.getElementById('qrContent').textContent = `WATCHTIME.${order.id}`;
-    alert(`Đơn hàng ${order.id} đã tạo thành công.\nTổng: ${formatVND(order.total)}\nPhương thức: ${order.paymentMethod}`);
-    const allOrders = JSON.parse(localStorage.getItem('allOrders') || '[]'); 
-    allOrders.push(order); 
-    localStorage.setItem('allOrders', JSON.stringify(allOrders));
-    localStorage.removeItem(CART_KEY); 
-    renderCartUI();
+// Hàm mới để hiển thị tóm tắt đơn hàng ngay trên trang
+function renderOrderSummary(order){
+    if(order.paymentMethod === 'online') document.getElementById('qrContent').textContent = `WATCHTIME.${order.id}`;
+
+    document.getElementById('summaryOrderId').textContent = order.id;
+    document.getElementById('summaryCustomerName').textContent = order.customer.name;
+    document.getElementById('summaryAddress').textContent = order.customer.address;
+    document.getElementById('summaryPhone').textContent = order.customer.phone;
+    document.getElementById('summaryDateTime').textContent = new Date(order.createdAt).toLocaleString('vi-VN');
+    
+    let paymentText = '';
+    switch(order.paymentMethod){
+        case 'cod': paymentText = 'Tiền mặt (COD)'; break;
+        case 'bank': paymentText = 'Chuyển khoản'; break;
+        case 'online': paymentText = 'Thanh toán QR'; break;
+    }
+    document.getElementById('summaryPayment').textContent = paymentText;
+    document.getElementById('summaryTotal').textContent = formatVND(order.total);
+
+    const itemsList = document.getElementById('summaryItemsList'); itemsList.innerHTML = '';
+    order.items.forEach(item => {
+        const itemDiv = document.createElement('div'); itemDiv.style.marginBottom = '6px';
+        itemDiv.innerHTML = `<div style="font-weight:600">${e(item.name)}</div><div style="display:flex;justify-content:space-between;color:var(--muted);font-size:13px"><span>Mã: ${e(item.id)} | Số lượng: ${item.qty}</span><span>${formatVND(item.price*item.qty)}</span></div>`; 
+        itemsList.appendChild(itemDiv);
+    });
+
+    document.getElementById('orderSummaryArea').classList.remove('hidden');
+
+    
 }
 
-document.addEventListener('DOMContentLoaded',()=>{
+
+function showOrderSummary(order){
+    const allOrders = getStorageData(ORDERS_KEY, []);
+    allOrders.push(order); saveStorageData(ORDERS_KEY, allOrders);
+    
+    localStorage.removeItem(CART_KEY); // Xóa giỏ hàng sau khi đặt thành công
+    renderCartUI(); // Cập nhật lại giao diện giỏ hàng
+
+    // Thay thế Modal bằng việc hiển thị thông tin ngay dưới form
+    renderOrderSummary(order);
+}
+
+// === INIT ===
+document.addEventListener('DOMContentLoaded', ()=>{
+    
+    // Tải lại dữ liệu tồn kho giả định (nếu cần) trước khi render giỏ hàng
+    calculateAllInventory(); 
+    
     renderCartUI();
     initializeRecipientSelect();
-    document.getElementById('checkoutBtnDesktop')?.addEventListener('click',()=>{ const o=buildOrder(); if(o) showOrderSummary(o); });
-    document.getElementById('placeOrderBtnMobile')?.addEventListener('click',()=>{ const o=buildOrder(); if(o) showOrderSummary(o); });
+    setupPaymentListeners();
+
+    // Thay thế logic pop-up bằng gọi showOrderSummary trực tiếp
+    document.getElementById('checkoutBtnDesktop')?.addEventListener('click', ()=>{ 
+        const o = buildOrder(); 
+        if(o) showOrderSummary(o); 
+    });
+    document.getElementById('placeOrderBtnMobile')?.addEventListener('click', ()=>{ 
+        const o = buildOrder(); 
+        if(o) showOrderSummary(o); 
+    });
 });
 </script>
 </body>

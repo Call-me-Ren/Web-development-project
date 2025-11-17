@@ -110,117 +110,120 @@
         </div>
     </footer>
 
-    <script>
-        lucide.createIcons(); // Render icon "arrow-left"
+   <script>
+    lucide.createIcons(); // Render icon "arrow-left"
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const container = document.getElementById("order-history-container");
-            const loadingMsg = document.getElementById("loading-message");
+    document.addEventListener("DOMContentLoaded", () => {
+        const container = document.getElementById("order-history-container");
+        const loadingMsg = document.getElementById("loading-message");
 
-            // 1. Kiểm tra đăng nhập
-            const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-            if (!currentUser) {
-                alert("Vui lòng đăng nhập để xem lịch sử đơn hàng!");
-                window.location.href = "dangnhap.html";
-                return;
-            }
-            const userEmail = currentUser.email;
+        // 1. Kiểm tra đăng nhập
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (!currentUser) {
+            alert("Vui lòng đăng nhập để xem lịch sử đơn hàng!");
+            window.location.href = "dangnhap.html";
+            return;
+        }
+        const userEmail = currentUser.email;
 
-            // 2. Lấy tất cả đơn hàng từ localStorage
-            const ORDERS_KEY = 'allOrders';
-let allOrders = [];
-            try {
-                allOrders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
-            } catch (e) {
-                console.error("Lỗi khi đọc lịch sử đơn hàng:", e);
-                loadingMsg.textContent = "Không thể tải lịch sử đơn hàng.";
-                loadingMsg.classList.add("text-red-500");
-                return;
-            }
-
-            // 3. Lọc đơn hàng của user
-            const myOrders = allOrders.filter(order => order.userEmail === userEmail);
-            myOrders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
-
-            loadingMsg.classList.add("hidden");
-
-            if (myOrders.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center bg-white p-6 rounded-lg shadow">
-                        <p class="text-gray-600 text-lg">Bạn chưa có đơn hàng nào.</p>
-                        <a href="index.html" class="mt-4 inline-block bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 smooth-transition empty-cta">
-                            Bắt đầu mua sắm
-                        </a>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = myOrders.map(order => createOrderCard(order)).join('');
-        });
-
-        function formatVND(n) { return Number(n).toLocaleString('vi-VN') + '₫'; }
-
-        function formatDate(isoString) {
-            const date = new Date(isoString);
-            return date.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        // 2. Lấy tất cả đơn hàng từ localStorage
+        const ORDERS_KEY = 'allOrders';
+        let allOrders = [];
+        try {
+            allOrders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
+        } catch (e) {
+            console.error("Lỗi khi đọc lịch sử đơn hàng:", e);
+            loadingMsg.textContent = "Không thể tải lịch sử đơn hàng.";
+            loadingMsg.classList.add("text-red-500");
+            return;
         }
 
-        function createOrderCard(order) {
-            const itemsHtml = (order.items || []).map(item => `
-                <div class="order-item">
-                    <div class="item-details">
-                        <p class="font-semibold text-gray-800">${item.name}</p>
-                        <p class="text-sm text-gray-500">Số lượng: ${item.qty}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-semibold text-indigo-600">${formatVND(item.price * item.qty)}</p>
-                    </div>
-                </div>
-            `).join('');
+        // 3. Lọc đơn hàng của user
+        const myOrders = allOrders.filter(order => order.userEmail === userEmail);
+        
+        // --- ĐÃ SỬA LỖI: Sắp xếp theo thuộc tính 'createdAt' thay vì 'orderDate' ---
+        myOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // --------------------------------------------------------------------------
 
-            let statusColor = 'text-blue-600';
-            if (order.status && (order.status.includes('Đã giao') || order.status.includes('Hoàn tất'))) statusColor = 'text-green-600';
-            else if (order.status && order.status.includes('Hủy')) statusColor = 'text-red-600';
-            else if (order.status && order.status.includes('Đang xử lý')) statusColor = 'text-yellow-600';
+        loadingMsg.classList.add("hidden");
 
-            return `
-                <div class="order-card">
-                    <div class="order-header">
-                        <div>
-                            <p class="text-sm text-gray-500">Mã đơn hàng</p>
-<p class="font-bold text-gray-800">${order.id}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Ngày đặt</p>
-                            <p class="font-semibold text-gray-700">${formatDate(order.orderDate)}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Trạng thái</p>
-                            <p class="font-bold ${statusColor}">${order.status || 'Đang xử lý'}</p>
-                        </div>
-                    </div>
-
-                    <div class="order-body">
-                        <div class="mb-4">
-                            <p class="font-semibold">Địa chỉ giao hàng:</p>
-                            <p class="text-gray-600">${order.customer?.name || ''}, ${order.customer?.phone || ''}</p>
-                            <p class="text-gray-600">${order.customer?.address || ''}</p>
-                        </div>
-
-                        <p class="font-semibold mb-2">Sản phẩm đã đặt:</p>
-                        <div class="max-h-60 overflow-y-auto pr-2">
-                            ${itemsHtml}
-                        </div>
-                    </div>
-
-                    <div class="order-header border-t border-b-0">
-                        <p class="text-lg font-bold">Tổng tiền:</p>
-                        <p class="text-2xl font-bold text-red-600">${formatVND(order.total)}</p>
-                    </div>
+        if (myOrders.length === 0) {
+            container.innerHTML = `
+                <div class="text-center bg-white p-6 rounded-lg shadow">
+                    <p class="text-gray-600 text-lg">Bạn chưa có đơn hàng nào.</p>
+                    <a href="index.html" class="mt-4 inline-block bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 smooth-transition empty-cta">
+                        Bắt đầu mua sắm
+                    </a>
                 </div>
             `;
+            return;
         }
-    </script>
+
+        container.innerHTML = myOrders.map(order => createOrderCard(order)).join('');
+    });
+
+    function formatVND(n) { return Number(n).toLocaleString('vi-VN') + '₫'; }
+
+    function formatDate(isoString) {
+        const date = new Date(isoString);
+        return date.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function createOrderCard(order) {
+        const itemsHtml = (order.items || []).map(item => `
+            <div class="order-item">
+                <div class="item-details">
+                    <p class="font-semibold text-gray-800">${item.name}</p>
+                    <p class="text-sm text-gray-500">Số lượng: ${item.qty}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-indigo-600">${formatVND(item.price * item.qty)}</p>
+                </div>
+            </div>
+        `).join('');
+
+        let statusColor = 'text-blue-600';
+        if (order.status && (order.status.includes('Đã giao') || order.status.includes('Hoàn tất'))) statusColor = 'text-green-600';
+        else if (order.status && order.status.includes('Hủy')) statusColor = 'text-red-600';
+        else if (order.status && order.status.includes('Đang xử lý')) statusColor = 'text-yellow-600';
+
+        return `
+            <div class="order-card">
+                <div class="order-header">
+                    <div>
+                        <p class="text-sm text-gray-500">Mã đơn hàng</p>
+                        <p class="font-bold text-gray-800">${order.id}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Ngày đặt</p>
+                        <p class="font-semibold text-gray-700">${formatDate(order.createdAt)}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Trạng thái</p>
+                        <p class="font-bold ${statusColor}">${order.status || 'Đang xử lý'}</p>
+                    </div>
+                </div>
+
+                <div class="order-body">
+                    <div class="mb-4">
+                        <p class="font-semibold">Địa chỉ giao hàng:</p>
+                        <p class="text-gray-600">${order.customer?.name || ''}, ${order.customer?.phone || ''}</p>
+                        <p class="text-gray-600">${order.customer?.address || ''}</p>
+                    </div>
+
+                    <p class="font-semibold mb-2">Sản phẩm đã đặt:</p>
+                    <div class="max-h-60 overflow-y-auto pr-2">
+                        ${itemsHtml}
+                    </div>
+                </div>
+
+                <div class="order-header border-t border-b-0">
+                    <p class="text-lg font-bold">Tổng tiền:</p>
+                    <p class="text-2xl font-bold text-red-600">${formatVND(order.total)}</p>
+                </div>
+            </div>
+        `;
+    }
+</script>
 </body>
 </html>
