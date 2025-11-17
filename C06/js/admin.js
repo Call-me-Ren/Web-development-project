@@ -159,7 +159,7 @@ function saveToStorage(key, data) {
 // THÊM: Tự động thêm tài khoản quanly1 và các tài khoản mẫu vào danh sách user
 (function initializeQuanLyUser() {
     const defaultUsers = [
-        // Tài khoản Quản lý (đã yêu cầu trước)
+        // Tài khoản Quản lý (key được gán cứng để dễ phân biệt)
         { key: 'quanly1_user', username: 'quanly1', password: 'abcd1234', firstname: 'Quản', lastname: 'Lý', isLocked: false, number: '0123456789', address: 'Hà Nội' },
         
         // TÀI KHOẢN MẪU MỚI (Khóa/Không khóa)
@@ -178,10 +178,8 @@ function saveToStorage(key, data) {
                 isLocked: user.isLocked,
                 number: user.number,
                 address: user.address,
-                // Giữ lại email nếu đây là tài khoản được tạo từ form đăng ký email cũ (nếu có)
                 email: user.username.includes('@') ? user.username : undefined 
             };
-            // Lưu với key chuẩn, trừ tài khoản quanly1_user
             const storageKey = user.key === 'quanly1_user' ? 'quanly1_user' : user.username; 
             localStorage.setItem(storageKey, JSON.stringify(userObj));
             console.log(`Đã thêm tài khoản mẫu: ${user.username}`);
@@ -220,8 +218,13 @@ function loadUserTable() {
         const tr = document.createElement("tr");
         const isLocked = user.isLocked || false;
         
+        // KIỂM TRA VÀ THÊM NHÃN ADMIN
+        const isAdminAccount = user.storageKey === 'quanly1_user';
+        const usernameDisplay = isAdminAccount ? `${user.username} <span style="background:#dc2626; color:white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 5px;">ADMIN</span>` : user.username;
+
+
         // CHỈ TẠO 4 CỘT: Tên tài khoản, Mật khẩu, Trạng thái, Hành động
-        tr.innerHTML = `<td>${user.username}</td><td>${user.password}</td><td style="color: ${isLocked ? 'red' : 'green'}; font-weight: bold;">${isLocked ? 'Đã khóa' : 'Hoạt động'}</td><td><button class="btn-action btn-doi-mk" data-key="${user.storageKey}">Khởi tạo Mật khẩu</button><button class="btn-action btn-toggle-lock" data-key="${user.storageKey}">${isLocked ? 'Mở khóa' : 'Khoá'}</button></td>`;
+        tr.innerHTML = `<td>${usernameDisplay}</td><td>${user.password}</td><td style="color: ${isLocked ? 'red' : 'green'}; font-weight: bold;">${isLocked ? 'Đã khóa' : 'Hoạt động'}</td><td><button class="btn-action btn-doi-mk" data-key="${user.storageKey}">Khởi tạo Mật khẩu</button><button class="btn-action btn-toggle-lock" data-key="${user.storageKey}">${isLocked ? 'Mở khóa' : 'Khoá'}</button></td>`;
         tableBody.appendChild(tr);
     });
     attachTableActions();
@@ -975,18 +978,18 @@ function loadPriceTable() {
     tableBody.innerHTML = "";
 
     products.forEach(prod => {
-        const id = prod.id;
-        const inv = inventory[id] || { giaVon: 0 };
-        const giaVon = inv.giaVon;
+        id = prod.id;
+        inv = inventory[id] || { giaVon: 0 };
+        giaVon = inv.giaVon;
         
         // CẬP NHẬT LOGIC LẤY LỢI NHUẬN
-        const category = categories.find(c => c.id === prod.category);
-        const profitMarginPercent = (category && category.margin) ? category.margin : 50; // Mặc định 50% nếu loại SP không có
-        const profitMargin = profitMarginPercent / 100; // 50 -> 0.5
+        category = categories.find(c => c.id === prod.category);
+        profitMarginPercent = (category && category.margin) ? category.margin : 50; // Mặc định 50% nếu loại SP không có
+        profitMargin = profitMarginPercent / 100; // 50 -> 0.5
         
-        const giaBanDeXuat = giaVon * (1 + profitMargin);
+        giaBanDeXuat = giaVon * (1 + profitMargin);
         
-        const tr = document.createElement("tr");
+        tr = document.createElement("tr");
         tr.innerHTML = `
             <td>
                 <strong>${prod.name}</strong>
