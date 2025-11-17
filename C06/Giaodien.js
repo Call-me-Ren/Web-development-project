@@ -1,17 +1,6 @@
 /* === PHẦN 1: LOGIC RENDER SẢN PHẨM === */
 
 /**
- * Tạo HTML cho một thẻ sản phẩm
- * @param {object} product - Đối tượng sản phẩm
- * @returns {string} - Chuỗi HTML
- */
-/**
- * Tạo HTML cho một thẻ sản phẩm (Đã sửa canh đều nút bấm)
- */
-/**
- * Tạo HTML cho một thẻ sản phẩm (ĐÃ SỬA: KHÔNG MỜ ẢNH, HOVER HIỆN CHỮ HẾT HÀNG)
- */
-/**
  * Tạo HTML cho một thẻ sản phẩm (ĐÃ SỬA: NÚT THÊM GIỎ, HẾT HÀNG MÀU XÁM, KHÔNG CLICK ĐƯỢC)
  */
 function createProductCard(product) {
@@ -25,7 +14,6 @@ function createProductCard(product) {
     let actionHtml = '';
     let overlayHtml = '';
     let opacityClass = '';
-    let clickEventClass = ''; 
     let linkClasses = ''; // Thêm biến mới cho class của thẻ <a>
 
     if (stock > 0) {
@@ -143,8 +131,10 @@ function initializeActiveNav() {
         
         // Kiểm tra link Sản Phẩm
         if (linkPath === 'sanpham.html' && currentPath.endsWith('sanpham.html')) {
-            link.classList.add(...activeClasses);
-            link.classList.remove(...inactiveClasses);
+            // SỬA LỖI: Không cần làm gì vì class 'active' đã được thêm trực tiếp vào HTML (sanpham.html)
+            // nhưng giữ lại logic này nếu người dùng muốn tự động hơn
+             link.classList.add(...activeClasses);
+             link.classList.remove(...inactiveClasses);
         }
         
         // Kiểm tra link Về Chúng Tôi, Liên Hệ, v.v...
@@ -163,8 +153,6 @@ let globalInventory = new Map();
 // Tạo một biến cục bộ để lưu trữ dữ liệu sản phẩm,
 // thay vì phụ thuộc vào 'allProducts' (chỉ tải 1 lần) từ 'products.js'
 let currentProductData = [];
-
-/* === PHẦN 2: LOGIC KHỞI TẠO (ĐÃ CẬP NHẬT ĐỂ CHIA TRANG) === */
 
 /* === PHẦN 2: LOGIC KHỞI TẠO (ĐÃ CẬP NHẬT LẦN CUỐI) === */
 document.addEventListener("DOMContentLoaded", () => {
@@ -192,7 +180,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const homeGrid = document.getElementById("featured-grid");    
 
     // === TRƯỜNG HỢP 1: TRANG SẢN PHẨM (sanpham.html) ===
-    // === TRƯỜNG HỢP 1: TRANG SẢN PHẨM (sanpham.html) ===
     if (shopGrid) {
         renderProducts(currentProductData); 
         allProductCards = Array.from(document.querySelectorAll(".product-card"));
@@ -203,6 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 2. Đọc tham số URL
         const urlParams = new URLSearchParams(window.location.search);
         const urlCategory = urlParams.get('category');
+        const urlSearch = urlParams.get('search'); // Lấy search term nếu có từ trang khác chuyển sang
         
         // 3. Nếu tìm thấy tham số category trên URL, ĐẶT GIÁ TRỊ cho dropdown
         if (urlCategory && urlCategory !== 'all') {
@@ -211,6 +199,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Đặt giá trị dropdown theo URL
                 categorySelect.value = urlCategory; 
             }
+        }
+        // BỔ SUNG: Nếu có tham số search, đặt vào ô tìm kiếm
+        if (urlSearch) {
+             const searchInputEl = document.getElementById('search-input');
+             if (searchInputEl) {
+                 searchInputEl.value = urlSearch;
+             }
+             // Đồng bộ lên header
+             const headerSearch = document.getElementById('search');
+             if(headerSearch) { headerSearch.value = urlSearch; }
         }
         
         // 4. Khởi tạo các thành phần khác
@@ -263,10 +261,14 @@ function attachClickEventToGrid(gridElement) {
         
         e.preventDefault(); e.stopPropagation();
         
+        // Kiểm tra nút bị disable (Hết hàng)
         if (btn.disabled) { alert("Sản phẩm này hiện đã hết hàng!"); return; }
         
         const card = btn.closest('.product-card');
         const id = card.dataset.id;
+        
+        // Tái tính toán tồn kho trước khi thêm vào giỏ
+        globalInventory = calculateAllInventory(currentProductData);
         const stock = globalInventory.get(id) || 0;
         
         if (localStorage.getItem("isLoggedIn") !== "true") {
@@ -300,12 +302,6 @@ function attachClickEventToGrid(gridElement) {
 // hoặc đơn giản là trong initializeAddToCart cũ, gọi attachClickEventToGrid(document.getElementById("product-grid"));
 
 /**
- * Gắn sự kiện cho Lọc
- */
-/**
- * Gắn sự kiện cho Tìm kiếm (ĐÃ SỬA: ĐỒNG BỘ HEADER VÀ BODY)
- */
-/**
  * Gắn sự kiện cho Tìm kiếm (ĐÃ SỬA: ĐỒNG BỘ HEADER VÀ BODY VÀ GỌI HÀM LỌC CHO BODY)
  */
 function initializeSearch() {
@@ -334,9 +330,8 @@ function initializeSearch() {
                 e.preventDefault();
                 // Nếu đang ở trang khác, chuyển hướng sang trang sản phẩm
                 if (!bodySearch) {
-                    // Nếu cần truyền keyword sang trang mới, bạn nên dùng URL parameter
-                    // Vd: window.location.href = "sanpham.html?search=" + headerSearch.value;
-                    window.location.href = "sanpham.html"; 
+                    // SỬA LỖI: Chuyển hướng sang trang sản phẩm với tham số tìm kiếm
+                    window.location.href = `sanpham.html?search=${headerSearch.value.trim()}`; 
                 } else {
                     // Nếu đang ở trang sản phẩm, focus xuống ô search dưới
                     bodySearch.focus();
@@ -357,19 +352,21 @@ function initializeSearch() {
                 applyFiltersAndSearch();
             }
         });
+        
+        // Bổ sung: Gắn sự kiện cho nút tìm kiếm trên thân trang (nếu có)
+        const searchBtn = document.querySelector('.search button[data-lucide="search"]')?.closest('a');
+        if(searchBtn) {
+            searchBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if(bodySearch) {
+                    applyFiltersAndSearch();
+                }
+            });
+        }
     }
 }
 
-/**
- * Gắn sự kiện cho Tìm kiếm
- */
-/**
- * Gắn sự kiện cho Tìm kiếm (ĐÃ SỬA: ĐỒNG BỘ HEADER VÀ BODY)
- */
 
-/**
- * Gắn sự kiện cho các nút "Thêm vào giỏ" 
- */
 /**
  * Gắn sự kiện cho các nút "Thêm vào giỏ"
  * (Sử dụng hàm chung attachClickEventToGrid)
@@ -502,9 +499,6 @@ function initializeLanguageToggle() {
 
 /* === PHẦN 3: CÁC HÀM TIỆN ÍCH (Lọc, Phân trang, Login) === */
 
-/**
- * Khởi tạo menu xổ xuống thể loại trên Header
- */
 /**
  * Khởi tạo menu xổ xuống thể loại trên Header VÀ ĐÁNH DẤU THỂ LOẠI ĐANG CHỌN
  */
@@ -642,14 +636,12 @@ function loadCategoryFilter() {
 
 
 /**
- * Lọc và tìm kiếm kết hợp
- */
-/**
  * Lọc, Tìm kiếm VÀ SẮP XẾP (Đẩy hết hàng xuống cuối)
  */
 function applyFiltersAndSearch() {
     // 1. Lấy giá trị từ các ô input mới
-    const category = document.getElementById("filter-category").value;
+    const categoryEl = document.getElementById("filter-category");
+    const category = categoryEl ? categoryEl.value : "all"; // Fix: kiểm tra sự tồn tại của element
     
     // Lưu ý: ID input tìm kiếm bây giờ là "search-input"
     const searchInputEl = document.getElementById("search-input");
@@ -662,13 +654,20 @@ function applyFiltersAndSearch() {
     minPrice = minPrice ? parseFloat(minPrice) : 0;
     maxPrice = maxPrice ? parseFloat(maxPrice) : Infinity;
 
+    // SỬA: Lấy lại tham chiếu đến các thẻ nếu chúng chưa được tạo (khi refresh)
+    if (allProductCards.length === 0) {
+        allProductCards = Array.from(document.querySelectorAll(".product-card"));
+    }
+    
     let currentList = allProductCards; 
 
     // 2. Lọc danh sách
     currentList = currentList.filter(card => {
         const productCategory = card.dataset.category;
-        // Lấy giá tiền, xóa hết ký tự '₫', dấu chấm để so sánh
-        const priceText = card.querySelector(".text-lg").textContent.replace(/[^\d]/g, "");
+        
+        // Fix: Lấy giá tiền, xóa hết ký tự '₫', dấu chấm, dấu phẩy để so sánh
+        const priceElement = card.querySelector(".text-lg") || card.querySelector(".text-gray-400"); // Lấy giá bất kể còn hay hết hàng
+        const priceText = priceElement ? priceElement.textContent.replace(/[^\d]/g, "") : "0";
         const price = parseFloat(priceText);
         
         const productName = card.querySelector("h3").innerText.toLowerCase();
@@ -684,6 +683,8 @@ function applyFiltersAndSearch() {
     currentList.sort((a, b) => {
         const idA = a.dataset.id;
         const idB = b.dataset.id;
+        // Tái tính toán tồn kho trước khi so sánh
+        globalInventory = calculateAllInventory(currentProductData); 
         const stockA = globalInventory.get(idA) || 0;
         const stockB = globalInventory.get(idB) || 0;
 
@@ -706,9 +707,6 @@ function initializePagination() {
     renderPagination(allProductCards);
 }
 
-/**
- * Hiển thị sản phẩm cho một trang cụ thể
- */
 /**
  * Hiển thị sản phẩm cho một trang cụ thể (ĐÃ SỬA: VẼ LẠI THỨ TỰ DOM)
  */
@@ -810,9 +808,6 @@ btn.className = `px-3 py-1 rounded-md ${i === currentPage ? 'bg-indigo-600 text-
 }
 
 /**
- * Cuộn màn hình lên đầu lưới sản phẩm
- */
-/**
  * Cuộn màn hình lên đầu lưới sản phẩm (ĐÃ NÂNG CẤP CHO MOBILE)
  */
 function scrollToProductTop() {
@@ -846,16 +841,7 @@ function scrollToProductTop() {
 }
 
 /**
- * Quản lý đăng nhập / avatar / đăng xuất
- */
-/**
- * Quản lý đăng nhập / avatar / đăng xuất / hiển thị tên
- */
-/**
- * Quản lý đăng nhập / avatar / đăng xuất / hiển thị tên (ĐÃ SỬA: QUẢN LÝ CẢ 2 NÚT LOGIN/REGISTER)
- */
-/**
- * Quản lý đăng nhập / avatar / đăng xuất / hiển thị tên (ĐÃ SỬA: ĐẢM BẢO HIỂN THỊ ĐÚNG THỨ TỰ HỌ TÊN)
+ * Quản lý đăng nhập / avatar / đăng xuất (ĐÃ SỬA: ĐẢM BẢO HIỂN THỊ ĐÚNG THỨ TỰ HỌ TÊN)
  */
 function initializeLoginUI() {
     // Lấy các element từ DOM
@@ -907,6 +893,8 @@ function initializeLoginUI() {
                 displayName = currentUser.firstname; // Nếu chỉ có Họ
             } else if (currentUser.email) {
                 displayName = currentUser.email.split('@')[0]; // Lấy phần trước @
+            } else if (currentUser.username) {
+                 displayName = currentUser.username;
             }
 
             if(welcomeText) welcomeText.textContent = `Chào, ${displayName}`;
@@ -1071,13 +1059,6 @@ function getStorageData(key, defaultValue = []) {
     }
 }
 
-/**
- * TÍNH TOÁN TỒN KHO
- * Chấp nhận một mảng sản phẩm làm tham số
- */
-/**
- * TÍNH TOÁN TỒN KHO (ĐÃ SỬA ĐỂ DEMO CÓ SẴN HÀNG)
- */
 /**
  * TÍNH TOÁN TỒN KHO (ĐÃ SỬA: 3 SẢN PHẨM ĐẦU TIÊN HẾT HÀNG ĐỂ DEMO)
  */
