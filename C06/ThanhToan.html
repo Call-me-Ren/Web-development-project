@@ -1,524 +1,319 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Thanh toán - WatchTime</title>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#f7f8fb; --card:#ffffff; --muted:#6b7280; --brand:#2563eb; --accent:#111827; --danger:#ef4444;
-      --radius:12px; --gap:14px; --shadow:0 6px 20px rgba(2,6,23,0.06);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font-family:'Be Vietnam Pro',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#0f172a;background:var(--bg);-webkit-font-smoothing:antialiased}
-    a{color:inherit}
-
-    /* Page container */
-    .page{max-width:1100px;margin:12px auto;padding:12px}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-    .brand{display:flex;align-items:center;gap:12px}
-    .brand h1{margin:0;font-size:18px;color:var(--brand);font-weight:800}
-
-    /* Mobile-first grid: stack, on wide screens show two-column */
-    .grid{display:block;gap:16px}
-    .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
-    label{display:block;font-weight:600;margin-bottom:8px;font-size:14px;color:#0f172a}
-    input,textarea,select{width:100%;padding:12px;border:1px solid #e6e9ee;border-radius:10px;font-size:15px;background:#fff}
-    textarea{min-height:88px;resize:vertical}
-    .note{color:var(--muted);font-size:13px;margin-top:8px}
-
-    /* payment methods */
-    .payment-methods{display:flex;gap:8px;flex-wrap:wrap}
-    .pay-pill{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:1px solid #eef2ff;cursor:pointer;background:#fff;min-width:140px}
-    .pay-pill input{margin:0}
-
-    /* cart list */
-    .cart-list{display:flex;flex-direction:column;gap:10px}
-    .cart-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;border:1px solid #f1f5f9}
-    .cart-item .meta{flex:1}
-    .cart-item .price{text-align:right;min-width:80px;font-weight:700}
-
-    /* controls */
-    .btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff;padding:10px 14px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
-    .btn.secondary{background:#111;color:#fff}
-    .btn.ghost{background:transparent;border:1px solid #e6e9ee;color:var(--accent)}
-    .remove-btn{background:transparent;border:1px solid #f1f5f9;border-radius:8px;padding:6px 8px;cursor:pointer;color:var(--danger)}
-    .qty{display:inline-flex;align-items:center;border-radius:8px;border:1px solid #e6e9ee;overflow:hidden}
-    .qty button{background:#fff;border:none;padding:8px 10px;cursor:pointer}
-    .qty .count{min-width:28px;text-align:center;padding:8px}
-/* summary box inside cart card (desktop and mobile) */
-    #totalWrap{margin-top:12px;text-align:right}
-    #totalWrap .total-label{color:var(--muted);font-size:13px}
-    #totalWrap .total-amount{font-weight:800;font-size:18px;color:crimson}
-
-    /* layout for desktop */
-    @media(min-width:820px){
-      .grid{display:grid;grid-template-columns:1fr 360px;gap:20px}
-      .bottom-summary{display:none}
-      header{align-items:center}
-      .page{margin-top:18px}
-    }
-
-    /* Mobile: hide the floating bottom summary, show and float #totalWrap as sticky bottom panel */
-    @media(max-width:820px){
-      .bottom-summary{display:none !important}
-
-      /* Make the in-card total sticky and visible at bottom on mobile */
-      #totalWrap{display:flex !important;position:fixed;left:12px;right:12px;bottom:12px;background:linear-gradient(180deg,#ffffff,#fbfdff);padding:12px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.08);justify-content:space-between;align-items:center;z-index:1000}
-
-      /* Ensure cart card content isn't hidden behind sticky total */
-      #cartCard{padding-bottom:86px}
-
-      /* Hide duplicate small labels inside cart card content area to save space */
-      #cartCard .muted, #cartCard .small-label{display:none}
-    }
-
-    /* accessible hit areas */
-    .icon-btn{display:inline-flex;align-items:center;justify-content:center;padding:8px;border-radius:10px}
-
-    /* empty states */
-    .empty{padding:18px;text-align:center;border-radius:10px}
-
-    /* subtle helpers */
-    .muted{color:var(--muted)}
-    .hidden{display:none}
-    .qr-img{max-width:320px;width:90%;height:auto;border-radius:8px;border:8px solid #fff;box-shadow:0 6px 20px rgba(2,6,23,0.06);display:block;margin:12px auto}
-  /* === CSS TỐI ƯU CHO MOBILE (màn hình nhỏ) === */
-@media (max-width: 820px) {
-  body {
-    background: #f9fafb;
-  }
-
-  /* Giảm khoảng cách viền để vừa màn hình nhỏ */
-  .page {
-    padding: 8px;
-  }
-
-  /* Tiêu đề & header */
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-  header h1 {
-    font-size: 16px;
-  }
-  .brand a {
-    font-size: 14px;
-  }
-
-  /* Form card */
-  .card {
-    padding: 12px;
-    border-radius: 10px;
-  }
-
-  label {
-    font-size: 13px;
-    margin-bottom: 6px;
-  }
-
-  input, textarea, select {
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  textarea {
-    min-height: 70px;
-  }
-
- .payment-methods {
-        display: flex; /* Đảm bảo là flex container */
-        gap: 6px; 
-        flex-wrap: wrap; /* Cho phép các ô xuống dòng */
-        justify-content: space-around; /* Phân bổ đều các ô */
-    }
-    
-    .pay-pill {
-        min-width: unset; /* Bỏ giới hạn min-width: 140px của desktop */
-        flex-grow: 1; /* Cho phép các ô mở rộng ra */
-        padding: 8px 6px; 
-        
-        /* FIX: Điều chỉnh hiển thị để chữ không bị tràn */
-        display: block; /* Quan trọng: Dùng block để chữ có thể xuống dòng */
-        text-align: center; /* Căn giữa nội dung */
-        white-space: normal; /* Đảm bảo chữ xuống dòng */
-    }
-
-    .pay-pill input {
-        display: inline-block; /* Giữ radio button không chiếm hết dòng */
-        margin-right: 4px;
-    }
-
-  /* Giỏ hàng */
-  .cart-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .cart-item .meta {
-    width: 100%;
-  }
-  .cart-item .price {
-    text-align: left;
-  }
-
-  /* Thanh tổng tiền (đã có sticky ở bản gốc) */
-  #totalWrap {
-    font-size: 15px;
-  }
-
-  /* QR hoặc xác nhận đơn hàng */
-  #mobileOrderArea .card {
-    margin-top: 10px;
-    padding: 14px;
-  }
-
-  .qr-img {
-    width: 100%;
-    max-width: 280px;
-  }
-
-  /* Bo tròn nhẹ và đổ bóng nhỏ cho toàn trang */
-  .card, #totalWrap {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thanh toán - WatchTime</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f8fb; --card:#ffffff; --muted:#6b7280; --brand:#2563eb; --accent:#111827; --danger:#ef4444;
+  --radius:12px; --gap:14px; --shadow:0 6px 20px rgba(2,6,23,0.06);
 }
-
-  </style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:'Be Vietnam Pro',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#0f172a;background:var(--bg);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.page{max-width:1100px;margin:12px auto;padding:12px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand h1{margin:0;font-size:18px;color:var(--brand);font-weight:800}
+.grid{display:block;gap:16px}
+.card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+label{display:block;font-weight:600;margin-bottom:8px;font-size:14px;color:#0f172a}
+input,textarea,select{width:100%;padding:12px;border:1px solid #e6e9ee;border-radius:10px;font-size:15px;background:#fff}
+textarea{min-height:88px;resize:vertical}
+.note{color:var(--muted);font-size:13px;margin-top:8px}
+.payment-methods{display:flex;gap:8px;flex-wrap:wrap}
+.pay-pill{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:1px solid #eef2ff;cursor:pointer;background:#fff;min-width:140px}
+.pay-pill input{margin:0}
+.cart-list{display:flex;flex-direction:column;gap:10px}
+.cart-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;border:1px solid #f1f5f9}
+.cart-item .meta{flex:1}
+.cart-item .price{text-align:right;min-width:80px;font-weight:700}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff;padding:10px 14px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+.btn.secondary{background:#111;color:#fff}
+.btn.ghost{background:transparent;border:1px solid #e6e9ee;color:var(--accent)}
+.remove-btn{background:transparent;border:1px solid #f1f5f9;border-radius:8px;padding:6px 8px;cursor:pointer;color:var(--danger)}
+.qty{display:inline-flex;align-items:center;border-radius:8px;border:1px solid #e6e9ee;overflow:hidden}
+.qty button{background:#fff;border:none;padding:8px 10px;cursor:pointer}
+.qty .count{min-width:28px;text-align:center;padding:8px}
+#totalWrap{margin-top:12px;text-align:right;display:none;align-items:center;justify-content:space-between}
+#totalWrap .total-label{color:var(--muted);font-size:13px}
+#totalWrap .total-amount{font-weight:800;font-size:18px;color:crimson}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;padding:8px;border-radius:10px}
+.empty{padding:18px;text-align:center;border-radius:10px}
+.muted{color:var(--muted)}
+.hidden{display:none}
+.qr-img{max-width:320px;width:90%;height:auto;border-radius:8px;border:8px solid #fff;box-shadow:0 6px 20px rgba(2,6,23,0.06);display:block;margin:12px auto}
+@media(min-width:820px){.grid{display:grid;grid-template-columns:1fr 360px;gap:20px}.bottom-summary{display:none}header{align-items:center}.page{margin-top:18px}}
+@media(max-width:820px){
+  body{background:#f9fafb}
+  .page{padding:8px}
+  header{flex-direction:column;align-items:flex-start;gap:6px}
+  header h1{font-size:16px}
+  .brand a{font-size:14px}
+  .card{padding:12px;border-radius:10px}
+  label{font-size:13px;margin-bottom:6px}
+  input,textarea,select{padding:10px;font-size:14px}
+  textarea{min-height:70px}
+  .payment-methods{display:flex;gap:6px;flex-wrap:wrap;justify-content:space-around}
+  .pay-pill{min-width:unset;flex-grow:1;display:block;text-align:center;white-space:normal;padding:8px 6px}
+  .pay-pill input{display:inline-block;margin-right:4px}
+  .cart-item{flex-direction:column;align-items:flex-start}
+  .cart-item .meta{width:100%}
+  .cart-item .price{text-align:left}
+  #totalWrap{font-size:15px;display:flex !important;position:fixed;left:12px;right:12px;bottom:12px;background:linear-gradient(180deg,#ffffff,#fbfdff);padding:12px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.08);justify-content:space-between;align-items:center;z-index:1000}
+  #cartCard{padding-bottom:86px}
+  #cartCard .muted,#cartCard .small-label{display:none}
+  #mobileOrderArea .card{margin-top:10px;padding:14px}
+  .qr-img{width:100%;max-width:280px}
+  .card,#totalWrap{box-shadow:0 4px 12px rgba(0,0,0,0.06)}
+}
+</style>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <div class="brand">
-        <a href="index.html" aria-label="Quay về trang chủ" class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18l-6-6 6-6" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Quay về trang chủ</a>
-        <h1>Thanh toán đơn hàng</h1>
-      </div>
-    </header>
+<div class="page">
+<header>
+<div class="brand">
+<a href="index.html" aria-label="Quay về trang chủ" class="icon-btn">⟵ Quay về trang chủ</a>
+<h1>Thanh toán đơn hàng</h1>
+</div>
+</header>
 
-    <div class="grid">
-      <!-- left: form -->
-      <div>
-        <div class="card" id="checkoutForm">
-          <div style="display:flex;gap:12px;flex-direction:column">
-            <div>
-              <label for="name">Họ và tên</label>
-              <input id="name" type="text" placeholder="Họ và tên người nhận" autocomplete="name">
-            </div>
-            <div>
-              <label for="phone">Số điện thoại</label>
-              <input id="phone" type="tel" placeholder="Số điện thoại liên hệ" autocomplete="tel">
-            </div>
-            <div>
-              <label for="address">Địa chỉ giao hàng</label>
-<textarea id="address" placeholder="Ví dụ: 123 Nguyễn Trãi, Quận 1, TP.HCM"></textarea>
-              <div class="note">Để trống để dùng địa chỉ đã lưu trong tài khoản (nếu có).</div>
-            </div>
+<div class="grid">
+<div>
+<div class="card" id="checkoutForm">
+<div style="display:flex;gap:12px;flex-direction:column">
 
-            <div>
-              <label>Phương thức thanh toán</label>
-              <div class="payment-methods" role="radiogroup">
-                <label class="pay-pill"><input type="radio" name="payment" value="cod" checked> Tiền mặt (COD)</label>
-                <label class="pay-pill"><input type="radio" name="payment" value="bank"> Chuyển khoản</label>
-                <label class="pay-pill"><input type="radio" name="payment" value="online"> Thanh toán QR</label>
-              </div>
-            </div>
-
-            <!-- Mobile đặt hàng button (hiện ở trong form để dễ thấy trên mobile) -->
-            <div style="margin-top:12px">
-              <button id="placeOrderBtnMobile" class="btn" style="width:100%;">Đặt hàng</button>
-            </div>
-
-            <!-- NOTE: formBankArea sẽ không hiển thị tự động khi chọn radio nữa.
-                 Thông tin chuyển khoản sẽ được hiển thị trong bước xác nhận khi nhấn Đặt hàng (nếu chọn bank). -->
-            <div id="formBankArea" class="card hidden" style="padding:12px; margin-top:12px">
-              <div style="font-weight:700">Thông tin chuyển khoản</div>
-              <div class="note" style="margin-top:8px">Ngân hàng: <strong>Vietcombank</strong><br>Chủ TK: <strong>WATCHTIME JSC</strong><br>Số TK: <strong>0123456789</strong></div>
-              <div style="margin-top:8px">
-                <label for="formTransferRef">Ghi chú (mã giao dịch)</label>
-                <input id="formTransferRef" placeholder="Ghi chú / Mã đơn hàng">
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Mobile: confirmation area appears below form -->
-        <div id="mobileOrderArea" style="margin-top:12px"></div>
-      </div>
-
-      <!-- right: cart summary (desktop & mobile) -->
-      <aside>
-        <div class="card" id="cartCard">
-          <h3 style="margin:0 0 8px">Giỏ hàng</h3>
-          <div id="cartEmptyNotice" class="empty muted hidden">Giỏ hàng trống</div>
-          <div id="cartList" class="cart-list"></div>
-
-          <!-- TOTAL: This will be visible on desktop in-card and on mobile will be made sticky by CSS -->
-          <div id="totalWrap" style="display:none;align-items:center;justify-content:space-between">
-            <div style="display:flex;flex-direction:column;align-items:flex-end">
-              <div class="total-label">Tổng tiền</div>
-              <div class="total-amount" id="totalPrice">0₫</div>
-            </div>
-            <div style="margin-left:12px"><button id="checkoutBtnDesktop" class="btn">Đặt hàng</button></div>
-          </div>
-        </div>
-      </aside>
-    </div>
-
+  <div id="recipientSelectArea" style="margin-bottom:12px">
+    <label for="recipient">Người nhận & Địa chỉ</label>
+    <select id="recipient" class="w-full rounded-lg border border-gray-300 p-2"></select>
   </div>
 
+  <div>
+    <label for="name">Họ và tên</label>
+    <input id="name" type="text" placeholder="Họ và tên người nhận" autocomplete="name">
+  </div>
+  <div>
+    <label for="phone">Số điện thoại</label>
+    <input id="phone" type="tel" placeholder="Số điện thoại liên hệ" autocomplete="tel">
+  </div>
+  <div>
+    <label for="address">Địa chỉ giao hàng</label>
+    <textarea id="address" placeholder="Ví dụ: 123 Nguyễn Trãi, Quận 1, TP.HCM"></textarea>
+    <div class="note">Để trống để dùng địa chỉ đã lưu trong tài khoản (nếu có).</div>
+  </div>
+
+  <div>
+    <label>Phương thức thanh toán</label>
+    <div class="payment-methods" role="radiogroup">
+      <label class="pay-pill"><input type="radio" name="payment" value="cod" checked> Tiền mặt (COD)</label>
+      <label class="pay-pill"><input type="radio" name="payment" value="bank"> Chuyển khoản</label>
+      <label class="pay-pill"><input type="radio" name="payment" value="online"> Thanh toán QR</label>
+    </div>
+  </div>
+
+  <div style="margin-top:12px">
+    <button id="placeOrderBtnMobile" class="btn" style="width:100%;">Đặt hàng</button>
+  </div>
+
+  <div id="formBankArea" class="card hidden" style="padding:12px;margin-top:12px">
+    <div style="font-weight:700">Thông tin chuyển khoản</div>
+    <div class="note" style="margin-top:8px">Ngân hàng: <strong>Vietcombank</strong><br>Chủ TK: <strong>WATCHTIME JSC</strong><br>Số TK: <strong>0123456789</strong></div>
+    <div style="margin-top:8px">
+      <label for="formTransferRef">Ghi chú (mã giao dịch)</label>
+      <input id="formTransferRef" placeholder="Ghi chú / Mã đơn hàng">
+    </div>
+  </div>
+
+  <div id="formQrArea" class="card hidden" style="padding:12px;margin-top:12px;text-align:center">
+      <div style="font-weight:700">Quét mã QR để thanh toán</div>
+      <img src="images/qr.jpg" alt="Mã QR thanh toán" class="qr-img"> 
+      <div class="note" style="margin-top:8px">Nội dung chuyển khoản: <strong id="qrContent"></strong></div>
+  </div>
+</div>
+</div>
+
+<div id="mobileOrderArea" style="margin-top:12px"></div>
+</div>
+
+<aside>
+<div class="card" id="cartCard">
+<h3 style="margin:0 0 8px">Giỏ hàng</h3>
+<div id="cartEmptyNotice" class="empty muted hidden">Giỏ hàng trống</div>
+<div id="cartList" class="cart-list"></div>
+<div id="totalWrap">
+  <div style="display:flex;flex-direction:column;align-items:flex-end">
+    <div class="total-label">Tổng tiền</div>
+    <div class="total-amount" id="totalPrice">0₫</div>
+  </div>
+  <div style="margin-left:12px"><button id="checkoutBtnDesktop" class="btn">Đặt hàng</button></div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+
 <script>
-/* === CODE TÍNH TỒN KHO & HELPERS (Được chuyển lên đầu) === */
-const IMPORTS_KEY = 'watchtime_imports';
-const ORDERS_KEY = 'allOrders';
-const CART_KEY = 'watchtime_cart';
-const currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-let userData = currentUser ? (JSON.parse(localStorage.getItem(currentUser.email)) || null) : null;
-
-function getStorageData(key, defaultValue = []) {
-    try {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : defaultValue;
-    } catch (e) {
-        console.error(`Lỗi khi đọc ${key}:`, e);
-        return defaultValue;
-    }
-}
-
-function calculateAllInventory() {
-    const allImports = getStorageData(IMPORTS_KEY, []).filter(i => i.status === 'Đã hoàn thành'); 
-    const allOrders = getStorageData(ORDERS_KEY, []).filter(o => o.status === 'Đã giao'); 
-    
-    const inventoryMap = new Map();
-    const productIdsInCart = getCart().map(i => i.id);
-
-    productIdsInCart.forEach(id => {
-        let tongNhap = 0;
-        let tongXuat = 0;
-
-        allImports.forEach(imp => {
-            const item = imp.items.find(i => i.productId === id);
-            if (item) {
-                tongNhap += item.qty;
-            }
-        });
-
-        allOrders.forEach(order => {
-            const item = order.items.find(i => i.id === id); 
-            if (item) {
-                tongXuat += item.qty;
-            }
-        });
-        
-        inventoryMap.set(id, tongNhap - tongXuat);
-    });
-    
-    return inventoryMap;
-}
-
-/* ======= Helpers Khác ======= */
-
-function getCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; } }
-function saveCart(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); renderCartUI(); }
-function sumCart(c){ return (c||[]).reduce((s,i)=> s + (Number(i.price)||0) * (i.qty||1),0); }
-function formatVND(n){ return Number(n).toLocaleString('vi-VN') + '₫'; }
+// ======== GIỎ HÀNG ========
+const CART_KEY='watchtime_cart';
+function getCart(){ return JSON.parse(localStorage.getItem(CART_KEY)||'[]'); }
+function saveCart(c){ localStorage.setItem(CART_KEY,JSON.stringify(c)); renderCartUI(); }
+function sumCart(c){ return (c||[]).reduce((s,i)=>s+(Number(i.price)||0)*(i.qty||1),0); }
+function formatVND(n){ return Number(n).toLocaleString('vi-VN')+'₫'; }
 function e(s){ return String(s||'').replace(/[&<>"]+/g,''); }
 
-/* ======= Render cart (mobile-friendly) ======= */
-/* ======= Render cart (mobile-friendly) - ĐÃ SỬA LỖI KIỂM TRA TỒN KHO KHI BẤM + ======= */
 function renderCartUI(){
-    const cart = getCart();
-    const cartList = document.getElementById('cartList');
-    const empty = document.getElementById('cartEmptyNotice');
-    const totalWrap = document.getElementById('totalWrap');
-    const totalPrice = document.getElementById('totalPrice');
-
-    // Tính toán tồn kho một lần khi render
-    const inventory = calculateAllInventory(); 
-
+    const cart=getCart(),cartList=document.getElementById('cartList'),empty=document.getElementById('cartEmptyNotice'),totalWrap=document.getElementById('totalWrap'),totalPrice=document.getElementById('totalPrice');
     cartList.innerHTML='';
-    if(!cart || cart.length === 0){ empty.classList.remove('hidden'); if(totalWrap) totalWrap.style.display='none'; if(totalPrice) totalPrice.textContent='0₫'; return; }
-
+    if(!cart.length){ empty.classList.remove('hidden'); totalWrap.style.display='none'; totalPrice.textContent='0₫'; return; }
     empty.classList.add('hidden');
-    cart.forEach((it, idx)=>{
-        const div = document.createElement('div'); div.className='cart-item';
-        div.innerHTML = `<div class="meta"><div style="font-weight:700">${e(it.name)}</div><div class="muted" style="font-size:13px;margin-top:6px">Mã: ${e(it.id||'')}</div></div>
-             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="price">${formatVND(it.price * it.qty)}</div>
-             <div style="display:flex;gap:6px;align-items:center"><div class="qty"><button data-action="dec">−</button><div class="count">${it.qty}</div><button data-action="inc">+</button></div><button class="remove-btn">Xóa</button></div></div>`;
+    cart.forEach((it,idx)=>{
+        const div=document.createElement('div'); div.className='cart-item';
+        div.innerHTML=`<div class="meta"><div style="font-weight:700">${e(it.name)}</div><div class="muted" style="font-size:13px;margin-top:6px">Mã: ${e(it.id||'')}</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="price">${formatVND(it.price*it.qty)}</div>
+        <div style="display:flex;gap:6px;align-items:center"><div class="qty"><button data-action="dec">−</button><div class="count">${it.qty}</div><button data-action="inc">+</button></div><button class="remove-btn">Xóa</button></div></div>`;
         cartList.appendChild(div);
-
-        // bind
-        div.querySelector('[data-action="dec"]').addEventListener('click', ()=>{ if(it.qty>1){ it.qty--; cart[idx]=it; saveCart(cart);} else if(confirm('Giảm sẽ xóa sản phẩm. Xóa?')){ cart.splice(idx,1); saveCart(cart);} });
-        
-        // === LOGIC MỚI: KIỂM TRA TỒN KHO TRƯỚC KHI TĂNG ===
-        div.querySelector('[data-action="inc"]').addEventListener('click', ()=>{ 
-            const stock = inventory.get(it.id) || 0;
-            const newQty = it.qty + 1;
-            
-            if (newQty > stock) {
-                alert(`Lỗi: Số lượng tối đa có thể mua cho sản phẩm "${it.name}" là ${stock}.`);
-            } else {
-                it.qty = newQty; 
-                cart[idx] = it; 
-                saveCart(cart); // Lưu và render lại UI
-            }
+        div.querySelector('[data-action="dec"]').addEventListener('click',()=>{ 
+            if(it.qty>1){ it.qty--; saveCart(getCart()); } 
+            else if(confirm('Giảm sẽ xóa sản phẩm. Xóa?')){ getCart().splice(idx,1); saveCart(getCart()); } 
         });
-        // === KẾT THÚC LOGIC MỚI ===
-        
-        div.querySelector('.remove-btn').addEventListener('click', ()=>{ if(confirm('Xóa sản phẩm?')){ cart.splice(idx,1); saveCart(cart); } });
+        div.querySelector('[data-action="inc"]').addEventListener('click',()=>{ it.qty++; saveCart(getCart()); });
+        div.querySelector('.remove-btn').addEventListener('click',()=>{ if(confirm('Xóa sản phẩm?')){ getCart().splice(idx,1); saveCart(getCart()); } });
+    });
+    totalPrice.textContent=formatVND(sumCart(cart));
+    totalWrap.style.display='flex';
+}
+
+// ======== NGƯỜI NHẬN ========
+function initializeRecipientSelect(){
+    const select=document.getElementById('recipient'); if(!select) return;
+    select.innerHTML='';
+
+    const allRegisteredUsers = JSON.parse(localStorage.getItem('registeredUsers')||'[]');
+    const subAccounts = JSON.parse(localStorage.getItem('subAccounts')||'[]');
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')||'null');
+
+    // Người dùng đã đăng ký
+    allRegisteredUsers.forEach((user,index)=>{
+        if(user.address){
+            const opt=document.createElement('option');
+            opt.value=`reg_user_${index}`;
+            opt.textContent=`${user.name} — ${user.address}`;
+            select.appendChild(opt);
+        }
     });
 
-    const total = sumCart(cart);
-    if(totalPrice) totalPrice.textContent = formatVND(total);
-    if(totalWrap) totalWrap.style.display='flex';
-}
-
-/* fill user info if present */
-function prefill(){ if(userData){ const nm = (userData.firstname||'') + (userData.lastname?(' '+userData.lastname):''); if(nm.trim()) document.getElementById('name').value = nm; if(userData.number) document.getElementById('phone').value = userData.number; } }
-
-/* payment UI toggles */
-const radios = document.querySelectorAll('input[name="payment"]');
-let selectedPayment = document.querySelector('input[name="payment"]:checked').value;
-radios.forEach(r=>r.addEventListener('change', ()=>{ selectedPayment = document.querySelector('input[name="payment"]:checked').value; }));
-
-/* show order summary + place order flow */
-function showOrderSummary(order){
-    const target = document.getElementById('mobileOrderArea'); target.innerHTML = '';
-    const s = document.createElement('div'); s.className='card';
-
-    if(order.paymentMethod === 'online'){
-        s.innerHTML = `<div style="font-weight:800">Thanh toán bằng QR - Đơn #${order.id}</div>
-              <div style="margin-top:8px">Tổng cần thanh toán: <strong style="color:crimson">${formatVND(order.total)}</strong></div>
-              <div style="margin-top:8px">Vui lòng quét mã QR dưới đây bằng ứng dụng ngân hàng hoặc ví để thanh toán.</div>
-              <img src="images/qr.jpg" alt="Mã QR Thanh toán" class="qr-img">
-              <div style="margin-top:8px;text-align:center;display:flex;gap:8px;justify-content:center">
-                <button id="qrDoneBtn" class="btn">Đã quét & Hoàn tất</button>
-                <button id="qrCancelBtn" class="btn ghost">Hủy</button>
-              </div>
-              <div class="note" style="margin-top:8px">Lưu ý: Sau khi quét và chuyển thành công, nhấn "Đã quét & Hoàn tất" để lưu đơn và xóa giỏ hàng.</div>`;
-        target.appendChild(s);
-
-        document.getElementById('qrDoneBtn').addEventListener('click', ()=>{ completeOrder(order); });
-        document.getElementById('qrCancelBtn').addEventListener('click', ()=>{ target.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); });
-        s.scrollIntoView({behavior:'smooth'});
-        return;
+    // Tài khoản đang đăng nhập
+    if(currentUser && currentUser.address){
+        const opt=document.createElement('option');
+        opt.value='default_user';
+        opt.textContent=`${currentUser.firstname||''} ${currentUser.lastname||''} — ${currentUser.address}`;
+        select.appendChild(opt);
     }
 
-    if(order.paymentMethod === 'bank'){
-        const bankInfo = `<div style="font-weight:700">Thông tin chuyển khoản</div>
-              <div class="note" style="margin-top:8px">Ngân hàng: <strong>Vietcombank</strong><br>Chủ TK: <strong>WATCHTIME JSC</strong><br>Số TK: <strong>0123456789</strong></div>
-              <div style="margin-top:8px">
-                <label for="confirmTransferRef">Ghi chú / Mã giao dịch (nếu đã chuyển)</label>
-                <input id="confirmTransferRef" placeholder="Nhập mã giao dịch (nếu có)">
-              </div>`;
-        s.innerHTML = `<div style="font-weight:800">Chuyển khoản - Xác nhận đơn #${order.id}</div>
-<div style="margin-top:8px"><strong>Người nhận:</strong> ${e(order.customer.name)} — ${e(order.customer.phone)}</div>
-              <div style="margin-top:6px"><strong>Địa chỉ:</strong> ${e(order.customer.address)}</div>
-              <div style="margin-top:8px"><strong>Sản phẩm:</strong><ul style="margin:6px 0 0 16px"></ul></div>
-              ${bankInfo}
-              <div style="text-align:right;margin-top:8px;font-weight:800">Tổng: <span style="color:crimson">${formatVND(order.total)}</span></div>
-              <div style="margin-top:12px;display:flex;gap:8px"><button id="bankDoneBtn" class="btn">Tôi đã chuyển khoản & Hoàn tất</button><button id="bankCancelBtn" class="btn ghost">Hủy</button></div>
-              <div class="note" style="margin-top:8px">Vui lòng chuyển đúng số tiền và ghi rõ mã đơn để chúng tôi đối soát.</div>`;
-        const ul = (new DOMParser()).parseFromString('<div>'+s.innerHTML+'</div>','text/html').body.querySelector('ul'); 
-        target.appendChild(s);
-        const ulNode = s.querySelector('ul');
-        order.items.forEach(it=>{ const li = document.createElement('li'); li.textContent = `${it.name} x ${it.qty} — ${formatVND(it.price * it.qty)}`; ulNode.appendChild(li); });
-
-        document.getElementById('bankDoneBtn').addEventListener('click', ()=>{ 
-            const ref = document.getElementById('confirmTransferRef').value.trim();
-            if(ref) order.transferRef = ref;
-            completeOrder(order); 
-        });
-        document.getElementById('bankCancelBtn').addEventListener('click', ()=>{ target.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); });
-        s.scrollIntoView({behavior:'smooth'});
-        return;
-    }
-
-    // COD or fallback: previous confirmation UI
-    s.innerHTML = `<div style="font-weight:800">Xác nhận đơn hàng #${order.id}</div>
-        <div style="margin-top:8px"><strong>Người nhận:</strong> ${e(order.customer.name)} — ${e(order.customer.phone)}</div>
-        <div style="margin-top:6px"><strong>Địa chỉ:</strong> ${e(order.customer.address)}</div>
-        <div style="margin-top:8px"><strong>Sản phẩm:</strong><ul style="margin:6px 0 0 16px"></ul></div>
-        <div style="text-align:right;margin-top:8px;font-weight:800">Tổng: <span style="color:crimson">${formatVND(order.total)}</span></div>
-        <div style="margin-top:12px"><button id="confirmBtn" class="btn">Hoàn tất & Lưu đơn hàng</button></div>`;
-    const ul2 = s.querySelector('ul'); order.items.forEach(it=>{ const li = document.createElement('li'); li.textContent = `${it.name} x ${it.qty} — ${formatVND(it.price * it.qty)}`; ul2.appendChild(li); });
-    target.appendChild(s);
-    document.getElementById('confirmBtn').addEventListener('click', ()=>{ completeOrder(order); });
-    s.scrollIntoView({behavior:'smooth'});
-}
-
-/* completeOrder: save to localStorage + clear cart + UI */
-function completeOrder(order){
-    let allOrders = []; try{ allOrders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || []; }catch(e){ allOrders = []; }
-    allOrders.push(order); localStorage.setItem(ORDERS_KEY, JSON.stringify(allOrders));
-    localStorage.removeItem(CART_KEY);
-    renderCartUI();
-    // hide form, show success
-    document.getElementById('checkoutForm').classList.add('hidden');
-    const mobileArea = document.getElementById('mobileOrderArea'); mobileArea.innerHTML = `<div class="card"><div style="font-weight:800;color:green">Cảm ơn! Đã ghi nhận đơn #${order.id}</div><div style="margin-top:10px;display:flex;gap:8px"><a href="index.html" class="btn secondary">Về trang chủ</a><a href="lichsu.html" class="btn ghost">Lịch sử đơn hàng</a></div></div>`;
-}
-
-/* build order object from form (ĐÃ THÊM KIỂM TRA TỒN KHO) */
-function buildOrder(){
-    const cart = getCart(); 
-    if(!cart || cart.length===0){ alert('Giỏ hàng rỗng'); return null; }
-    
-    // === KIỂM TRA TỒN KHO TRƯỚC KHI TẠO ĐƠN HÀNG ===
-    const inventory = calculateAllInventory(); 
-    let isInventoryValid = true;
-    let insufficientItemName = '';
-    
-    // Duyệt qua giỏ hàng để kiểm tra
-    for (const item of cart) {
-        const stock = inventory.get(item.id) || 0;
-        
-        if (item.qty > stock) {
-            isInventoryValid = false;
-            insufficientItemName = item.name;
-            break; 
+    // Tài khoản phụ
+    subAccounts.forEach((sub,idx)=>{
+        if(sub.name && sub.address){
+            const opt=document.createElement('option');
+            opt.value=`sub_${idx}`;
+            opt.textContent=`${sub.name} — ${sub.address}`;
+            select.appendChild(opt);
         }
-    }
-    
-    if (!isInventoryValid) {
-        // Thông báo lỗi và chặn tạo đơn hàng
-        alert(`Sản phẩm "${insufficientItemName}" hiện không đủ số lượng tồn kho (${inventory.get(cart.find(i => i.name === insufficientItemName).id)}). Vui lòng điều chỉnh giỏ hàng.`);
-        return null;
-    }
-    // === KẾT THÚC KIỂM TRA TỒN KHO ===
+    });
 
-    const name = document.getElementById('name').value.trim(); const phone = document.getElementById('phone').value.trim(); let address = document.getElementById('address').value.trim();
-    if(!address && userData && userData.address) address = userData.address;
-    if(!name || !phone || !address){ alert('Vui lòng nhập đầy đủ Họ tên, SĐT và Địa chỉ.'); return null; }
-    const pm = document.querySelector('input[name="payment"]:checked').value;
-    
-    return {
-      id: 'ORD' + Date.now(), userEmail: currentUser ? currentUser.email : 'guest',
-      customer: { name, phone, address }, items: cart.map(i=>({...i})), total: sumCart(cart), paymentMethod: pm, status: 'Mới đặt', orderDate: new Date().toISOString()
+    // Nhập mới
+    const optNew=document.createElement('option');
+    optNew.value='new_input';
+    optNew.textContent='Nhập thông tin người nhận mới';
+    select.appendChild(optNew);
+
+    select.addEventListener('change',handleRecipientChange);
+    handleRecipientChange();
+}
+
+function handleRecipientChange(){
+    const select=document.getElementById('recipient'); if(!select) return;
+    const val=select.value; 
+    const nameInput=document.getElementById('name'); 
+    const phoneInput=document.getElementById('phone'); 
+    const addressInput=document.getElementById('address');
+
+    nameInput.disabled=phoneInput.disabled=addressInput.disabled=false;
+    nameInput.value=phoneInput.value=addressInput.value='';
+
+    const allRegisteredUsers = JSON.parse(localStorage.getItem('registeredUsers')||'[]');
+    const subAccounts = JSON.parse(localStorage.getItem('subAccounts')||'[]');
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')||'null');
+
+    if(val==='default_user' && currentUser){
+        nameInput.value=`${currentUser.firstname||''} ${currentUser.lastname||''}`.trim(); 
+        phoneInput.value=currentUser.number||''; 
+        addressInput.value=currentUser.address||''; 
+        nameInput.disabled=phoneInput.disabled=addressInput.disabled=true; 
+    }
+    else if(val.startsWith('sub_')){
+        const idx=parseInt(val.split('_')[1]); 
+        const sub=subAccounts[idx];
+        if(sub){ nameInput.value=sub.name; phoneInput.value=sub.phone; addressInput.value=sub.address; nameInput.disabled=phoneInput.disabled=addressInput.disabled=true; } 
+    }
+    else if(val.startsWith('reg_user_')){
+        const idx=parseInt(val.split('_')[2]||val.split('_')[1]); 
+        const user=allRegisteredUsers[idx];
+        if(user){ nameInput.value=user.name; phoneInput.value=user.number; addressInput.value=user.address; nameInput.disabled=phoneInput.disabled=addressInput.disabled=true; }
+    }
+}
+
+// ======== THANH TOÁN ========
+let selectedPayment='cod';
+const formBankArea = document.getElementById('formBankArea');
+const formQrArea = document.getElementById('formQrArea');
+document.querySelectorAll('input[name="payment"]').forEach(r=>r.addEventListener('change',()=>{
+    selectedPayment=document.querySelector('input[name="payment"]:checked').value;
+    formBankArea.classList.add('hidden'); formQrArea.classList.add('hidden');
+    if(selectedPayment==='bank') formBankArea.classList.remove('hidden');
+    else if(selectedPayment==='online') formQrArea.classList.remove('hidden');
+}));
+
+// ======== TẠO ĐƠN HÀNG ========
+function buildOrder(){
+    const cart=getCart(); if(!cart.length){ alert('Giỏ hàng rỗng'); return null; }
+
+    let name=document.getElementById('name').value.trim();
+    let phone=document.getElementById('phone').value.trim();
+    let address=document.getElementById('address').value.trim();
+
+    if(!name||!phone||!address){ alert('Vui lòng nhập đầy đủ Họ tên, SĐT, Địa chỉ'); return null; }
+
+    const pm=document.querySelector('input[name="payment"]:checked').value;
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')||'null');
+    return { 
+        id:'ORD'+Date.now(), 
+        userEmail:currentUser?currentUser.email:'guest', 
+        customer:{name,phone,address}, 
+        items:cart.map(i=>({...i})), 
+        total:sumCart(cart), 
+        paymentMethod:pm, 
+        status:'Mới đặt' 
     };
 }
 
-/* UI bindings */
-document.addEventListener('DOMContentLoaded', ()=>{
-    renderCartUI(); prefill();
+function showOrderSummary(order){
+    if(order.paymentMethod==='online') document.getElementById('qrContent').textContent = `WATCHTIME.${order.id}`;
+    alert(`Đơn hàng ${order.id} đã tạo thành công.\nTổng: ${formatVND(order.total)}\nPhương thức: ${order.paymentMethod}`);
+    const allOrders = JSON.parse(localStorage.getItem('allOrders') || '[]'); 
+    allOrders.push(order); 
+    localStorage.setItem('allOrders', JSON.stringify(allOrders));
+    localStorage.removeItem(CART_KEY); 
+    renderCartUI();
+}
 
-    // Desktop checkout
-    document.getElementById('checkoutBtnDesktop')?.addEventListener('click', ()=>{
-        const o = buildOrder(); if(!o) return;
-        showOrderSummary(o);
-    });
-
-    // Mobile checkout button in form
-    document.getElementById('placeOrderBtnMobile')?.addEventListener('click', ()=>{
-        const o = buildOrder(); if(!o) return;
-        showOrderSummary(o);
-    });
+document.addEventListener('DOMContentLoaded',()=>{
+    renderCartUI();
+    initializeRecipientSelect();
+    document.getElementById('checkoutBtnDesktop')?.addEventListener('click',()=>{ const o=buildOrder(); if(o) showOrderSummary(o); });
+    document.getElementById('placeOrderBtnMobile')?.addEventListener('click',()=>{ const o=buildOrder(); if(o) showOrderSummary(o); });
 });
 </script>
-
-</body>
-</html>
-
 </body>
 </html>
