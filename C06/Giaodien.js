@@ -114,6 +114,47 @@ function renderProducts(products) {
 
 /* === PHẦN 2: LOGIC KHỞI TẠO (CHẠY KHI TẢI TRANG) === */
 
+/**
+ * Đánh dấu liên kết menu trên header dựa trên URL hiện tại
+ */
+function initializeActiveNav() {
+    const currentPath = window.location.pathname;
+    const links = document.querySelectorAll('nav a');
+    
+    // Thêm các class cần dùng để đánh dấu trạng thái hoạt động
+    const activeClasses = ['text-indigo-600', 'font-bold'];
+    const inactiveClasses = ['text-gray-600'];
+
+    links.forEach(link => {
+        const linkPath = link.getAttribute('href');
+        
+        // --- 1. Reset tất cả về trạng thái không hoạt động ---
+        link.classList.remove(...activeClasses);
+        link.classList.add(...inactiveClasses);
+
+        // --- 2. Kiểm tra nếu liên kết khớp với URL hiện tại ---
+        // (Sử dụng link.href để so sánh URL đầy đủ, hoặc linkPath để so sánh tên file)
+        
+        // Kiểm tra link Trang Chủ
+        if (linkPath === 'index.html' && (currentPath.endsWith('index.html') || currentPath === '/')) {
+            link.classList.add(...activeClasses);
+            link.classList.remove(...inactiveClasses);
+        }
+        
+        // Kiểm tra link Sản Phẩm
+        if (linkPath === 'sanpham.html' && currentPath.endsWith('sanpham.html')) {
+            link.classList.add(...activeClasses);
+            link.classList.remove(...inactiveClasses);
+        }
+        
+        // Kiểm tra link Về Chúng Tôi, Liên Hệ, v.v...
+        if (linkPath && currentPath.endsWith(linkPath)) {
+             link.classList.add(...activeClasses);
+             link.classList.remove(...inactiveClasses);
+        }
+    });
+}
+
 let allProductCards = []; // Biến global để lưu trữ các thẻ DOM
 let currentPage = 1;
 const productsPerPage = 8; // số sản phẩm mỗi trang
@@ -136,30 +177,50 @@ document.addEventListener("DOMContentLoaded", () => {
     currentProductData = [...allProducts];
     globalInventory = calculateAllInventory(currentProductData); // Tính toán tồn kho (đã có logic 3 cái hết hàng)
     lucide.createIcons();
+    initializeActiveNav();
+
     initializeLoginUI();
     initializeLanguageToggle();
     initializeMobileMenu();
     initializeStorageListener();
     updateHeaderCartCount();
 
+    initializeCategoryDropdown();
     // --- PHÂN BIỆT XỬ LÝ GIỮA CÁC TRANG ---
 
     const shopGrid = document.getElementById("product-grid");     
     const homeGrid = document.getElementById("featured-grid");    
 
     // === TRƯỜNG HỢP 1: TRANG SẢN PHẨM (sanpham.html) ===
+    // === TRƯỜNG HỢP 1: TRANG SẢN PHẨM (sanpham.html) ===
     if (shopGrid) {
         renderProducts(currentProductData); 
         allProductCards = Array.from(document.querySelectorAll(".product-card"));
         
+        // 1. Bắt buộc phải TẢI CÁC THỂ LOẠI vào dropdown trước
+        loadCategoryFilter(); 
+        
+        // 2. Đọc tham số URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCategory = urlParams.get('category');
+        
+        // 3. Nếu tìm thấy tham số category trên URL, ĐẶT GIÁ TRỊ cho dropdown
+        if (urlCategory && urlCategory !== 'all') {
+            const categorySelect = document.getElementById('filter-category');
+            if (categorySelect) {
+                // Đặt giá trị dropdown theo URL
+                categorySelect.value = urlCategory; 
+            }
+        }
+        
+        // 4. Khởi tạo các thành phần khác
         initializePagination();
-        loadCategoryFilter();
         initializeFilters();
         initializeSearch();
         initializeAddToCart();
 
-        // QUAN TRỌNG: Gọi hàm này ngay lập tức để đẩy hàng hết xuống cuối
-        applyFiltersAndSearch();
+        // 5. QUAN TRỌNG: Gọi hàm lọc để thực thi ngay lập tức
+        applyFiltersAndSearch(); 
     }
 
     // === TRƯỜNG HỢP 2: TRANG CHỦ (index.html) ===
@@ -441,6 +502,61 @@ function initializeLanguageToggle() {
 
 /* === PHẦN 3: CÁC HÀM TIỆN ÍCH (Lọc, Phân trang, Login) === */
 
+/**
+ * Khởi tạo menu xổ xuống thể loại trên Header
+ */
+/**
+ * Khởi tạo menu xổ xuống thể loại trên Header VÀ ĐÁNH DẤU THỂ LOẠI ĐANG CHỌN
+ */
+function initializeCategoryDropdown() {
+    const dropdownList = document.getElementById('dropdown-menu-list');
+    if (!dropdownList) return;
+
+    // Lấy thể loại hiện tại từ URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeCategory = urlParams.get('category') || 'all'; // Mặc định là 'all'
+
+    // 1. Kiểm tra biến global 'allCategories'
+    if (typeof allCategories === 'undefined' || allCategories.length === 0) {
+        console.warn("Không tìm thấy danh sách thể loại để tạo dropdown.");
+        return;
+    }
+    
+    // 2. Tạo nút "Tất cả sản phẩm"
+    let allProductsClass = 'text-gray-700';
+    if (activeCategory === 'all') {
+        allProductsClass = 'text-indigo-600 font-semibold'; // MÀU XANH KHI LỌC TẤT CẢ
+    }
+    
+    let menuHtml = `
+        <a href="sanpham.html" class="block px-4 py-2 hover:bg-indigo-50 ${allProductsClass} border-b border-gray-100">Tất cả sản phẩm</a>
+    `;
+
+    // 3. Thêm các thể loại vào menu
+    allCategories.forEach(category => {
+        let categoryClass = 'text-gray-700';
+        
+        // Đánh dấu thể loại đang được chọn
+        if (activeCategory === category.id) {
+            categoryClass = 'text-indigo-600 font-semibold'; // MÀU XANH KHI THỂ LOẠI ĐANG CHỌN
+        }
+        
+        menuHtml += `
+            <a href="sanpham.html?category=${category.id}" 
+               class="block px-4 py-2 hover:bg-indigo-50 ${categoryClass}"
+               data-key="${category.name}"> 
+               ${category.name}
+            </a>
+        `;
+    });
+
+    dropdownList.innerHTML = menuHtml;
+    
+    // Nếu có hàm đổi ngôn ngữ, gọi nó để dịch các tên thể loại
+    if (typeof window.runLanguageUpdater === 'function') {
+        window.runLanguageUpdater();
+    }
+}
 
 /**
  * Khởi tạo sự kiện cho Lọc (Category và Price)
