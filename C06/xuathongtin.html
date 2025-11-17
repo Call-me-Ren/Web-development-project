@@ -144,23 +144,39 @@
       const saveBtn = document.getElementById("save-btn");
       const cancelBtn = document.getElementById("cancel-btn");
       const backBtn = document.getElementById("back-btn");
+      
+      // Hàm helper kiểm tra ngày hợp lệ (copy từ dangky.js)
+      function isDateValid(day, month, year) {
+        if (!day || !month || !year) return false;
+        const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        // Chuyển string sang number
+        const d = parseInt(day);
+        const m = parseInt(month);
+        const y = parseInt(year);
+
+        if ((y % 4 === 0 && y % 100 !== 0) || y % 400 === 0)
+          daysInMonth[1] = 29;
+        
+        return d <= daysInMonth[m - 1];
+      }
+
 
       // ==== HIỂN THỊ THÔNG TIN ====
       function renderUserInfo() {
         userInfoDiv.innerHTML = `
           <div class="grid grid-cols-2 gap-4">
             <p><strong class="info-label">Họ tên:</strong></p>
-            <p>${userData.firstname} ${userData.lastname}</p>
+            <p>${userData.firstname || ''} ${userData.lastname || ''}</p>
             <p><strong class="info-label">Email:</strong></p>
-            <p>${userData.email}</p>
+            <p>${userData.email || ''}</p>
             <p><strong class="info-label">Số điện thoại:</strong></p>
-            <p>${userData.number}</p>
+            <p>${userData.number || ''}</p>
             <p><strong class="info-label">Địa chỉ:</strong></p>
-            <p>${userData.address}</p>
+            <p>${userData.address || ''}</p>
             <p><strong class="info-label">Ngày sinh:</strong></p>
-            <p>${userData.birthday}</p>
+            <p>${userData.birthday || 'Chưa cập nhật'}</p>
             <p><strong class="info-label">Giới tính:</strong></p>
-            <p>${userData.gender}</p>
+            <p>${userData.gender || 'Chưa cập nhật'}</p>
           </div>
         `;
       }
@@ -176,7 +192,6 @@
         daySelect.innerHTML = '<option value="">Ngày</option>';
         monthSelect.innerHTML = '<option value="">Tháng</option>';
         yearSelect.innerHTML = '<option value="">Năm</option>';
-
 
         // Thêm ngày (1–31)
         for (let d = 1; d <= 31; d++) {
@@ -222,40 +237,73 @@
         if (userData.birthday) {
           const parts = userData.birthday.split('/');
           if (parts.length === 3) {
+            // Lấy giá trị chuỗi (ví dụ: '1' thay vì 1)
             document.getElementById("day").value = parseInt(parts[0]).toString() || "";
             document.getElementById("month").value = parseInt(parts[1]).toString() || "";
             document.getElementById("year").value = parts[2] || "";
           }
+        } else {
+             document.getElementById("day").value = "";
+             document.getElementById("month").value = "";
+             document.getElementById("year").value = "";
         }
       });
 
-      // ==== KHI NHẤN "LƯU" ====
+      // ==== KHI NHẤN "LƯU" (ĐÃ BỔ SUNG VALIDATION) ====
       saveBtn.addEventListener("click", () => {
+        const firstname = document.getElementById("edit-firstname").value.trim();
+        const lastname = document.getElementById("edit-lastname").value.trim();
+        const number = document.getElementById("edit-number").value.trim();
+        const address = document.getElementById("edit-address").value.trim();
+        
         const day = document.getElementById("day").value;
         const month = document.getElementById("month").value;
         const year = document.getElementById("year").value;
+        
+        const phoneRegex = /^\d{10,11}$/;
 
-        // Định dạng ngày sinh giống như đăng ký (D/M/Y)
-        const birthday = (year && month && day) ? `${parseInt(day)}/${parseInt(month)}/${year}` : "";
-
-        // Kiểm tra thông tin trống cơ bản trước khi lưu
-        if (!document.getElementById("edit-firstname").value || 
-            !document.getElementById("edit-lastname").value || 
-            !document.getElementById("edit-number").value || 
-            !document.getElementById("edit-address").value) 
+        // 1. Kiểm tra thông tin trống
+        if (!firstname || !lastname || !number || !address || !day || !month || !year) 
         {
-             alert("Vui lòng nhập đầy đủ Họ, Tên, Số điện thoại và Địa chỉ!");
+             alert("Vui lòng nhập đầy đủ Họ, Tên, Số điện thoại, Địa chỉ và Ngày sinh!");
              return;
         }
+
+        // 2. Kiểm tra Họ & Tên
+        if (firstname.length < 2 || lastname.length < 2) {
+            alert("Họ và Tên phải có ít nhất 2 ký tự!");
+            return;
+        }
+
+        // 3. Kiểm tra Số điện thoại
+        if (!phoneRegex.test(number)) {
+            alert("Số điện thoại không hợp lệ! Vui lòng nhập 10 hoặc 11 chữ số.");
+            return;
+        }
+        
+        // 4. Kiểm tra Địa chỉ
+        if (address.length < 5) {
+            alert("Địa chỉ phải có ít nhất 5 ký tự!");
+            return;
+        }
+
+        // 5. Kiểm tra ngày hợp lệ
+        if (!isDateValid(day, month, year)) {
+            alert(`Ngày ${day}/${month}/${year} không hợp lệ!`);
+            return;
+        }
+        
+        // Định dạng ngày sinh (D/M/Y)
+        const birthday = `${parseInt(day)}/${parseInt(month)}/${year}`;
 
         // Tạo đối tượng dữ liệu mới, giữ lại password cũ
         const newUserData = {
           password: userData.password, 
-          firstname: document.getElementById("edit-firstname").value,
-          lastname: document.getElementById("edit-lastname").value,
+          firstname: firstname,
+          lastname: lastname,
           email: document.getElementById("edit-email").value, // Email không đổi
-          number: document.getElementById("edit-number").value,
-          address: document.getElementById("edit-address").value,
+          number: number,
+          address: address,
           birthday: birthday,
           gender: document.getElementById("edit-gender").value
         };
@@ -263,6 +311,7 @@
         // Cập nhật biến userData và localStorage
         userData = newUserData;
         localStorage.setItem(userData.email, JSON.stringify(userData));
+        localStorage.setItem("currentUser", JSON.stringify(userData)); // QUAN TRỌNG: Cập nhật cả currentUser
         
         // Cập nhật giao diện
         renderUserInfo();

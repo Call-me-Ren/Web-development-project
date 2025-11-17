@@ -130,23 +130,50 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeStorageListener();
 });
 
+
+/* === PHẦN 5: HELPER DEBOUNCE (BỔ SUNG) === */
 /**
- * Gắn sự kiện cho Lọc
+ * Hàm Debounce để giới hạn tần suất gọi hàm (giúp tăng performance khi gõ/lọc)
+ * @param {Function} func - Hàm cần gọi
+ * @param {number} delay - Độ trễ (ms)
+ * @returns {Function} - Hàm đã được Debounce
+ */
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), delay);
+    };
+}
+/* === KẾT THÚC HELPER DEBOUNCE === */
+
+
+/* === PHẦN 3: CÁC HÀM TIỆN ÍCH (Lọc, Phân trang, Login) === */
+
+/**
+ * Gắn sự kiện cho Lọc (ĐÃ DÙNG DEBOUNCE)
  */
 function initializeFilters() {
     const categorySelect = document.getElementById("filter-category");
     const priceSelect = document.getElementById("filter-price");
     
-    if (categorySelect) categorySelect.addEventListener("change", applyFiltersAndSearch);
-    if (priceSelect) priceSelect.addEventListener("change", applyFiltersAndSearch);
+    // Sử dụng debounced function cho sự kiện change (100ms)
+    const debouncedApplyFilters = debounce(applyFiltersAndSearch, 100); 
+
+    if (categorySelect) categorySelect.addEventListener("change", debouncedApplyFilters);
+    if (priceSelect) priceSelect.addEventListener("change", debouncedApplyFilters);
 }
 
 /**
- * Gắn sự kiện cho Tìm kiếm
+ * Gắn sự kiện cho Tìm kiếm (ĐÃ DÙNG DEBOUNCE)
  */
 function initializeSearch() {
     const searchInput = document.querySelector('#search');
-    if (searchInput) searchInput.addEventListener('input', applyFiltersAndSearch);
+    // Sử dụng debounced function cho sự kiện input (300ms, đợi người dùng ngừng gõ)
+    const debouncedApplyFilters = debounce(applyFiltersAndSearch, 300);
+
+    if (searchInput) searchInput.addEventListener('input', debouncedApplyFilters);
 }
 
 /**
@@ -254,6 +281,7 @@ function initializeLanguageToggle() {
             "hero-title": "Bộ Sưu Tập Đồng Hồ Đẳng Cấp",
             "hero-sub": "Khẳng định phong cách và vị thế của bạn với những chiếc đồng hồ tinh xảo nhất.",
             explore: "Khám Phá Ngay",
+            Register: "Đăng ký", // <--- BỔ SUNG
             Login: "Đăng nhập",
             AToCard: "Thêm vào giỏ",
             Profile: "Thông tin cá nhân",
@@ -293,6 +321,7 @@ function initializeLanguageToggle() {
             "hero-title": "Luxury Watch Collection",
             "hero-sub": "Define your style and status with the finest timepieces.",
             explore: "Explore Now",
+            Register: "Register", // <--- BỔ SUNG
             Login: "Login",
             AToCard: "Add to Cart",
             Profile: "Profile",
@@ -354,8 +383,6 @@ function initializeLanguageToggle() {
     }
 }
 
-
-/* === PHẦN 3: CÁC HÀM TIỆN ÍCH (Lọc, Phân trang, Login) === */
 
 /**
  * TẢI DYNAMIC: Tải danh sách loại sản phẩm
@@ -603,16 +630,18 @@ function scrollToProductTop() {
  * Quản lý đăng nhập / avatar / đăng xuất
  */
 function initializeLoginUI() {
-    const loginLink = document.querySelector('a[href="dangnhap.html"]');
+    const loginLink = document.getElementById("login-link-desktop"); // Dùng ID mới
+    const registerLinkDesktop = document.getElementById("register-link-desktop"); // <--- THÊM MỚI
     const userAvatar = document.getElementById("user-avatar");
     const userMenu = document.getElementById("user-menu");
     
   // Thêm cho menu mobile
     const mobileLoginLink = document.querySelector('#mobile-menu a[href="dangnhap.html"]');
+    const mobileRegisterLink = document.getElementById("register-link-mobile"); // <--- THÊM MỚI
     const mobileUserMenu = document.getElementById('mobile-user-menu');
     const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
 
-    if (!loginLink || !userAvatar || !userMenu) {
+    if (!loginLink || !registerLinkDesktop || !userAvatar || !userMenu) { // Cập nhật kiểm tra
         console.warn("Một số element của UI đăng nhập không tìm thấy.");
         return;
     }
@@ -626,21 +655,25 @@ function initializeLoginUI() {
     function updateLoginUI() {
     if (isLoggedIn) {
       // Desktop
-      loginLink.classList.add("hidden"); // Chỉ ẩn nút đăng nhập
+        loginLink.classList.add("hidden"); 
+        registerLinkDesktop.classList.add("hidden"); // <--- ẨN ĐĂNG KÝ
         userAvatar.classList.remove("hidden");
         userAvatar.classList.add("flex");
 
       // Mobile
         if(mobileLoginLink) mobileLoginLink.classList.add("hidden");
+        if(mobileRegisterLink) mobileRegisterLink.classList.add("hidden"); // <--- ẨN ĐĂNG KÝ MOBILE
         if(mobileUserMenu) mobileUserMenu.classList.remove("hidden");
         
     } else {
       // Desktop
-      loginLink.classList.remove("hidden"); // Chỉ hiện nút đăng nhập
+        loginLink.classList.remove("hidden"); 
+        registerLinkDesktop.classList.remove("hidden"); // <--- HIỆN ĐĂNG KÝ
         userAvatar.classList.add("hidden");
 
       // Mobile
         if(mobileLoginLink) mobileLoginLink.classList.remove("hidden");
+        if(mobileRegisterLink) mobileRegisterLink.classList.remove("hidden"); // <--- HIỆN ĐĂNG KÝ MOBILE
         if(mobileUserMenu) mobileUserMenu.classList.add("hidden");
     }
     }

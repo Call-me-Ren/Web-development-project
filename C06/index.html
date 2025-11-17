@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WatchTime - Cửa Hàng Đồng Hồ Uy Tín</title>
     <script src="js/tailwind/tailwind.js"></script>
     <link rel="stylesheet" href="css/font-awesome/css/all.min.css"/>
@@ -54,7 +54,12 @@
                     </span>
                 </a>
 
-                <div class="hidden md:flex items-center"> <a href="dangnhap.html"
+                <div class="hidden md:flex items-center"> 
+                    <a href="dangky.html" id="register-link-desktop"
+                       class="text-gray-600 hover:text-indigo-600 smooth-transition btn ml-2" data-key="Register">
+                        Đăng ký
+                    </a>
+                    <a href="dangnhap.html" id="login-link-desktop"
                     class="text-gray-600 hover:text-indigo-600 smooth-transition btn" data-key = "Login">
                     Đăng nhập
                     </a>
@@ -87,6 +92,7 @@
             <hr class="mx-6">
             
             <div class="px-6 py-3">
+                    <a href="dangky.html" id="register-link-mobile" class="block text-gray-600 hover:bg-gray-100 py-2" data-key="Register">Đăng ký</a>
                     <a href="dangnhap.html" class="block text-gray-600 hover:bg-gray-100 py-2" data-key="Login">Đăng nhập</a>
                     <div id="mobile-user-menu" class="hidden">
                     <a href="xuathongtin.html" class="block py-2 hover:bg-gray-100" data-key="Profile">Thông tin cá nhân</a>
@@ -102,7 +108,6 @@
     </header>
     <main>
         <section id="home" class="relative h-[60vh] md:h-[80vh] overflow-hidden">
-        <!-- Video nền -->
         <video
     autoplay
     loop
@@ -117,10 +122,8 @@
 
 
 
-        <!-- Lớp phủ tối để làm nổi chữ -->
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
 
-        <!-- Nội dung -->
         <div
           class="relative container mx-auto px-6 h-full flex flex-col justify-center items-start text-white"
         >

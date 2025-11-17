@@ -12,17 +12,12 @@ function getProductsFromStorage() {
         if (!products || products.length === 0) {
             console.warn("localStorage 'watchtime_products' trống! Đang tạo dữ liệu mẫu.");
             
-            // js/products.js
-
-// ... (các đoạn code khác giữ nguyên)
-
-            // DỮ LIỆU MẪU (Giờ có 10 sản phẩm)
+            // DỮ LIỆU MẪU (10 sản phẩm)
             const defaultProducts = [
                 { 
                   id: "sp_ben10", 
                   name: "BEN 10 OMNITRIX", 
                   price: 999999999, 
-                  // SỬA ĐƯỜNG DẪN TẠI ĐÂY:
                   image: "images/ben10.webp", 
                   category: "nam", 
                   description_short: "Chỉ dành cho người được chọn...", 
@@ -32,7 +27,6 @@ function getProductsFromStorage() {
                   id: "sp_conan", 
                   name: "Đồng hồ Conan", 
                   price: 67000000, 
-                  // SỬA ĐƯỜNG DẪN TẠI ĐÂY:
                   image: "images/conan.jpg", 
                   category: "nu", 
                   description_short: "Trang bị cơ bản của thám tử.", 
@@ -42,7 +36,6 @@ function getProductsFromStorage() {
                   id: "sp_doraemon", 
                   name: "Time stop watch", 
                   price: 8500000, 
-                  // SỬA ĐƯỜNG DẪN TẠI ĐÂY:
                   image: "images/doraemon.jpg", 
                   category: "nam", 
                   description_short: "Chất lượng Nhật Bản.", 
@@ -52,7 +45,6 @@ function getProductsFromStorage() {
                   id: "sp_oip", 
                   name: "Đồng hồ OIP", 
                   price: 4200000, 
-                  // SỬA ĐƯỜNG DẪN TẠI ĐÂY:
                   image: "images/oip.webp", 
                   category: "doi", 
                   description_short: "Thiết kế hầm hố.", 
@@ -62,19 +54,15 @@ function getProductsFromStorage() {
                   id: "sp_timecity", 
                   name: "Đồng hồ Time City", 
                   price: 696500000, 
-                  // SỬA ĐƯỜNG DẪN TẠI ĐÂY:
                   image: "images/time_city.webp", 
                   category: "doi", 
                   description_short: "Chỉ dành cho giới thượng lưu.", 
                   description_long: "Chỉ dành cho giới thượng lưu. Thiết kế đính kim cương toàn bộ."
                 },
-
-                // === 5 SẢN PHẨM MỚI ĐƯỢC THÊM VÀO ĐỂ TEST ===
                 { 
                   id: "sp_casio_001", 
                   name: "Casio G-Shock GA-2100", 
                   price: 3500000, 
-                  // SỬA ĐƯỜNG DẪN TẠI ĐÂY:
                   image: "images/ảnh đồng hồ nam 1.jpg", 
                   category: "nam", 
                   description_short: "Thiết kế bát giác mạnh mẽ.", 
@@ -84,7 +72,6 @@ function getProductsFromStorage() {
                   id: "sp_daniel_001", 
                   name: "Daniel Wellington Petite", 
                   price: 4200000, 
-                  // SỬA ĐƯỜNG DẪN TẠI ĐÂY:
                   image: "images/ảnh đồng hồ nam 2.jpg", 
                   category: "nu", 
                   description_short: "Tinh tế và thanh lịch.", 
@@ -94,7 +81,6 @@ function getProductsFromStorage() {
                   id: "sp_seiko_001", 
                   name: "Seiko 5 Sports", 
                   price: 7800000, 
-                  // SỬA ĐƯỜNG DẪN TẠI ĐÂY:
                   image: "images/ảnh đồng hồ nam 3.jpg", 
                   category: "nam", 
                   description_short: "Cỗ máy cơ tự động bền bỉ.", 
@@ -104,7 +90,6 @@ function getProductsFromStorage() {
                   id: "sp_citizen_001", 
                   name: "Citizen Eco-Drive Pair", 
                   price: 9500000, 
-                  // SỬA ĐƯỜNG DẪN TẠI ĐÂY:
                   image: "images/xanhhong.jpg", 
                   category: "doi", 
                   description_short: "Đồng hồ cặp năng lượng ánh sáng.", 
@@ -114,14 +99,11 @@ function getProductsFromStorage() {
                   id: "sp_tissot_001", 
                   name: "Tissot Le Locle Nữ", 
                   price: 14500000, 
-                  // SỬA ĐƯỜNG DẪN TẠI ĐÂY:
                   image: "images/nhatban.jpg", 
                   category: "nu", 
                   description_short: "Vẻ đẹp Thụy Sỹ cổ điển.", 
                   description_long: "Đồng hồ Tissot Le Locle Automatic, mặt số la mã, mang đậm phong cách châu Âu."
                 }
-
-                // === KẾT THÚC 5 SẢN PHẨM MỚI ===
             ];
             
             // Lưu dữ liệu mẫu này vào localStorage
@@ -138,5 +120,5 @@ function getProductsFromStorage() {
     }
 }
 
-// Cung cấp biến global 'allProducts' mà Giaodien.js và chitiet.html đang dùng
+// Cung cấp biến global 'allProducts'
 const allProducts = getProductsFromStorage();
