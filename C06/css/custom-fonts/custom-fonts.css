@@ -1,0 +1,155 @@
+.be-vietnam-pro-thin {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 100;
+    font-style: normal;
+}
+
+.be-vietnam-pro-extralight {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+}
+
+.be-vietnam-pro-light {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.be-vietnam-pro-regular {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.be-vietnam-pro-medium {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.be-vietnam-pro-semibold {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.be-vietnam-pro-bold {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.be-vietnam-pro-extrabold {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 800;
+    font-style: normal;
+}
+
+.be-vietnam-pro-black {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 900;
+    font-style: normal;
+}
+
+.be-vietnam-pro-thin-italic {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 100;
+    font-style: italic;
+}
+
+.be-vietnam-pro-extralight-italic {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 200;
+    font-style: italic;
+}
+
+.be-vietnam-pro-light-italic {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.be-vietnam-pro-regular-italic {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.be-vietnam-pro-medium-italic {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 500;
+    font-style: italic;
+}
+
+.be-vietnam-pro-semibold-italic {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 600;
+    font-style: italic;
+}
+
+.be-vietnam-pro-bold-italic {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.be-vietnam-pro-extrabold-italic {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 800;
+    font-style: italic;
+}
+
+.be-vietnam-pro-black-italic {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+}
+
+/* your-project/css/custom-fonts.css */
+
+/* Be Vietnam Pro Light 300 */
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('../fonts/be-vietnam-pro-v11-latin_vietnamese-300.woff2') format('woff2'); /* Đổi tên nếu cần */
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Be Vietnam Pro Regular 400 */
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/be-vietnam-pro-v11-latin_vietnamese-regular.woff2') format('woff2'); /* Đổi tên nếu cần */
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Be Vietnam Pro Medium 500 */
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('../fonts/be-vietnam-pro-v11-latin_vietnamese-500.woff2') format('woff2'); /* Đổi tên nếu cần */
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Be Vietnam Pro SemiBold 600 */
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/be-vietnam-pro-v11-latin_vietnamese-600.woff2') format('woff2'); /* Đổi tên nếu cần */
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Be Vietnam Pro Bold 700 */
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('../fonts/be-vietnam-pro-v11-latin_vietnamese-700.woff2') format('woff2'); /* Đổi tên nếu cần */
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
