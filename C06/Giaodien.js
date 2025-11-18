@@ -1068,7 +1068,7 @@ function getStorageData(key, defaultValue = []) {
 }
 
 /**
- * TÍNH TOÁN TỒN KHO (ĐÃ SỬA: 3 SẢN PHẨM ĐẦU TIÊN HẾT HÀNG ĐỂ DEMO)
+ * TÍNH TOÁN TỒN KHO (ĐÃ SỬA: KHẮC PHỤC LỖI MẤT TỒN KHO KHI CÓ PHIẾU NHẬP ĐẦU TIÊN)
  */
 function calculateAllInventory(productsToCalc) {
     const allImports = getStorageData(IMPORTS_KEY, []).filter(i => i.status === 'Đã hoàn thành'); 
@@ -1081,17 +1081,18 @@ function calculateAllInventory(productsToCalc) {
         let tongNhap = 0;
         let tongXuat = 0;
 
-        // 1. Tính toán Nhập
+        // 1. Tính toán Nhập thực tế
         allImports.forEach(imp => {
             const item = imp.items.find(i => i.productId === id);
             if (item) {
                 tongNhap += item.qty;
             }
         });
-
-        // === LOGIC MỚI: DEMO 3 CÁI HẾT HÀNG ===
-        if (allImports.length === 0) {
-            // Nếu chưa có dữ liệu nhập hàng (lần đầu chạy)
+        
+        // --- LOGIC KHẮC PHỤC LỖI MẤT TỒN KHO ---
+        // Nếu sản phẩm CHƯA TỪNG được nhập (tongNhap thực tế = 0), 
+        // ta áp dụng logic tồn kho giả lập ban đầu để duy trì sản phẩm.
+        if (tongNhap === 0) {
             // Cho 3 sản phẩm đầu tiên (index 0, 1, 2) có số lượng là 0
             if (index < 3) {
                 tongNhap = 0; 
