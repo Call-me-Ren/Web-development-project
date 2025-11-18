@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - WatchTime</title>
-    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/admin.css"> 
 </head>
 <body>
     <div class="login-container">
@@ -28,6 +28,8 @@
         </form>
     </div>
 
+    <script src="../js/admin.js"></script> 
+
     <script>
         document.getElementById("form-admin-login").addEventListener("submit", function(e) {
             e.preventDefault();
@@ -44,49 +46,69 @@
                  return;
             }
             
-            // --- LOGIC: TÌM KIẾM TÀI KHOẢN ADMIN TRONG LOCALSTORAGE ---
-            
-            // 1. Xác định các key có thể là Admin
-            // (username, username_admin, hoặc quanly1_user)
-            const possibleKeys = [username, `${username}_admin`, 'quanly1_user']; 
-            
             let storedUserData = null;
+            let loginSuccess = false;
+            
+            // =========================================================
+            // --- BƯỚC 1: KIỂM TRA HARDCODE ADMIN GỐC (TUYỆT ĐỐI) ---
+            // =========================================================
+            const DEFAULT_ADMIN_USERNAME = 'quanly1';
+            const DEFAULT_ADMIN_PASSWORD = 'abcd1234';
 
-            // 2. Lặp qua các key và tìm tài khoản khớp
-            for (const key of possibleKeys) {
-                const data = localStorage.getItem(key);
-                if (data) {
-                    try {
-                        const user = JSON.parse(data);
-                        
-                        // 3. Kiểm tra Mật khẩu và cờ isAdmin
-                        if (user.password === pass && user.isAdmin === true) {
-                            storedUserData = user;
-                            break;
+            if (username === DEFAULT_ADMIN_USERNAME && pass === DEFAULT_ADMIN_PASSWORD) {
+                // Đăng nhập Admin gốc thành công, KHÔNG CẦN CHECK LOCAL STORAGE.
+                loginSuccess = true;
+                storedUserData = { isAdmin: true }; // Gán giá trị Admin cố định
+            } else {
+                
+                // =================================================================
+                // --- BƯỚC 2: KIỂM TRA ADMIN/USER KHÁC (CẦN LOCAL STORAGE) ---
+                // =================================================================
+                const possibleKeys = [username, `${username}_admin`]; 
+                
+                for (const key of possibleKeys) {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        try {
+                            const user = JSON.parse(data);
+                            
+                            // Kiểm tra Mật khẩu, cờ isAdmin, tên đăng nhập khớp
+                            if (user.password === pass && (user.isAdmin === true || user.key === username) && user.username === username) { 
+                                if (user.isLocked === true) {
+                                     errorMsg.textContent = `Tài khoản '${username}' đã bị khóa!`;
+                                     errorMsg.classList.remove("hidden");
+                                     return;
+                                }
+                                storedUserData = user;
+                                loginSuccess = true;
+                                break;
+                            }
+                        } catch (e) {
+                            console.error(`Lỗi parse dữ liệu cho key ${key}:`, e);
                         }
-                    } catch (e) {
-                        console.error(`Lỗi parse dữ liệu cho key ${key}:`, e);
                     }
                 }
             }
-
-            if (storedUserData) {
-                // BƯỚC SỬA: KIỂM TRA TÌNH TRẠNG KHÓA
-                if (storedUserData.isLocked === true) {
-                    errorMsg.textContent = "Tài khoản Admin này đã bị khóa!";
-                    errorMsg.classList.remove("hidden");
-                    return;
-                }
-                
+            
+            // --- KẾT QUẢ ĐĂNG NHẬP ---
+            if (loginSuccess) {
                 // Đăng nhập thành công
-                sessionStorage.setItem("isAdminLoggedIn", "true");
+                // Xác định là Admin hay User để lưu Session
+                const isAdmin = storedUserData && storedUserData.isAdmin;
+                sessionStorage.setItem("isAdminLoggedIn", isAdmin ? "true" : "false"); 
                 
-                alert("Đăng nhập Admin thành công!");
-                window.location.href = "dashboard.html"; 
+                if(isAdmin) {
+                    alert("Đăng nhập Admin thành công!");
+                    window.location.href = "dashboard.html"; 
+                } else {
+                     alert(`Đăng nhập thành công với tài khoản ${username}!`);
+                     // Giả định trang Client là index_client.html (Lùi 1 cấp từ admin/ ra ngoài)
+                     window.location.href = "../index_client.html"; 
+                }
                 
             } else {
                 // Đăng nhập thất bại
-                errorMsg.textContent = "Sai Tên đăng nhập hoặc Mật khẩu, hoặc Tài khoản không phải Admin!";
+                errorMsg.textContent = "Sai Tên đăng nhập hoặc Mật khẩu, hoặc Tài khoản không tồn tại!";
                 errorMsg.classList.remove("hidden");
             }
         });

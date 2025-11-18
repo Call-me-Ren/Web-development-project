@@ -180,7 +180,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // === TRƯỜNG HỢP 1: TRANG SẢN PHẨM (sanpham.html) ===
     if (shopGrid) {
+        // Render trước để tạo thẻ DOM
         renderProducts(currentProductData); 
+        // Lấy tất cả thẻ DOM (chưa lọc/phân trang)
         allProductCards = Array.from(document.querySelectorAll(".product-card"));
         
         // 1. Bắt buộc phải TẢI CÁC THỂ LOẠI vào dropdown trước
@@ -211,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         // 4. Khởi tạo các thành phần khác
-        initializePagination();
+        // initializePagination(); // Không gọi ở đây nữa, sẽ gọi trong applyFiltersAndSearch
         initializeFilters();
         initializeSearch();
         initializeAddToCart();
@@ -285,7 +287,7 @@ function attachClickEventToGrid(gridElement) {
         
         if (qtyInCart >= stock) { alert("Đã đạt giới hạn tồn kho!"); return; }
         
-        if(existing) existing.qty++; else cart.push({ ...product, qty: 1 });
+        if(existing) existing.qty++; else cart.push({ ...product, qty: 1, image: product.image });
         saveCart(cart);
         
         // Hiệu ứng giỏ hàng nhảy lên
@@ -332,6 +334,7 @@ function initializeSearch() {
 
             if (bodySearch) {
                 bodySearch.value = val;
+                // Gọi lọc sau khi nhập
                 if (typeof applyFiltersAndSearch === "function") {
                     applyFiltersAndSearch();
                 }
@@ -358,6 +361,7 @@ function initializeSearch() {
             if(headerSearch) {
                 headerSearch.value = e.target.value;
             }
+            // Gọi lọc sau khi nhập
             if (typeof applyFiltersAndSearch === "function") {
                 applyFiltersAndSearch();
             }
@@ -666,6 +670,8 @@ function applyFiltersAndSearch() {
 
     // SỬA: Lấy lại tham chiếu đến các thẻ nếu chúng chưa được tạo (khi refresh)
     if (allProductCards.length === 0) {
+        // TÁI TẠO CÁC THẺ HTML TRƯỚC KHI LỌC/PHÂN TRANG
+        renderProducts(currentProductData); 
         allProductCards = Array.from(document.querySelectorAll(".product-card"));
     }
     
@@ -703,7 +709,7 @@ function applyFiltersAndSearch() {
         return 0;
     });
     
-    // 4. Hiển thị kết quả
+    // 4. Hiển thị kết quả & Phân trang
     currentPage = 1;
     showPage(currentPage, currentList); 
     renderPagination(currentList);
@@ -713,8 +719,7 @@ function applyFiltersAndSearch() {
  * Khởi tạo Phân trang
  */
 function initializePagination() {
-    showPage(currentPage, allProductCards);
-    renderPagination(allProductCards);
+    // Không cần gọi ở đây nữa, đã được gọi trong applyFiltersAndSearch
 }
 
 /**
@@ -822,9 +827,9 @@ btn.className = `px-3 py-1 rounded-md ${i === currentPage ? 'bg-indigo-600 text-
  */
 function scrollToProductTop() {
     // 1. Tìm element mục tiêu
-    let targetElement = document.querySelector('[data-key="FeaturedProducts"]');
+    let targetElement = document.getElementById("product-grid");
     if (!targetElement) {
-        targetElement = document.getElementById("product-grid");
+        targetElement = document.querySelector('[data-key="FeaturedProducts"]');
     }
 
     if (targetElement) {

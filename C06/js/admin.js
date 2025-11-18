@@ -120,6 +120,19 @@ function checkAndEnforceAdminLogout() {
         // User 4 (Hoạt động)
         { key: 'khachhang4', username: 'khachhang4', password: '123456', firstname: 'Khách', lastname: 'Hàng 4', isLocked: false, isAdmin: false },
     ];
+    
+    // SỬA: Bắt buộc khởi tạo tài khoản Admin mặc định 'quanly1_user'
+    const adminKey = 'quanly1_user';
+    const adminUser = defaultUsers.find(u => u.key === adminKey);
+
+    if (adminUser) {
+        // LUÔN LUÔN đảm bảo tài khoản Admin gốc tồn tại 
+        if (!localStorage.getItem(adminKey)) {
+             localStorage.setItem(adminKey, JSON.stringify({...adminUser, email: adminUser.username, number: '0123456789', address: '123 Nguyễn Trãi, TP.HCM', gender: 'Nam'}));
+        }
+    }
+    
+    // Khởi tạo các user còn lại (chỉ khi chưa có)
     defaultUsers.forEach(user => {
         if (!localStorage.getItem(user.key)) {
             // SỬA: Đảm bảo có đủ trường cho việc hiển thị thông tin cá nhân và kiểm tra đăng nhập
@@ -445,3 +458,6 @@ window.updateOrderStatus = function(orderId, newStatus) {
     
     // Lưu ý: Cập nhật lại giao diện bảng sẽ được thực hiện ở file HTML gọi hàm này.
 };
+
+// Đảm bảo hàm menu di động được gọi
+attachMobileMenuEvents();
